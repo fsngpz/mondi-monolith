@@ -7,10 +7,11 @@ import org.springframework.security.core.userdetails.UserDetails
  * @author Ferdinand Sangap
  * @since 2024-04-10
  */
-class CustomUserDetails : UserDetails {
-  private lateinit var name: String
-  private lateinit var password: String
-  private lateinit var authorities: List<GrantedAuthority>
+class CustomUserDetails(
+  private val email: String,
+  private val password: String,
+  private var authorities: List<GrantedAuthority> = listOf()
+) : UserDetails {
   override fun getAuthorities(): List<GrantedAuthority> {
     return this.authorities
   }
@@ -20,7 +21,7 @@ class CustomUserDetails : UserDetails {
   }
 
   override fun getUsername(): String {
-    return this.name
+    return this.email
   }
 
   override fun isAccountNonExpired(): Boolean {

@@ -11,12 +11,10 @@ import org.springframework.stereotype.Component
  * @since 2024-04-10
  */
 @Component
-class CustomUserDetailService : UserDetailsService {
-  lateinit var userService: UserService
-
+class CustomUserDetailService(private val userService: UserService) : UserDetailsService {
   override fun loadUserByUsername(email: String): UserDetails {
     val userInfo = userService.getByEmail(email)
-    return userInfo.map { CustomUserDetails() }
+    return userInfo.map { CustomUserDetails(it.email, it.password) }
       .orElseThrow { UsernameNotFoundException("user not found $email") }
   }
 }
