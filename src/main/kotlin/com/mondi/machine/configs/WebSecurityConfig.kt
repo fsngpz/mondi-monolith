@@ -1,5 +1,6 @@
 package com.mondi.machine.configs
 
+import com.mondi.machine.auths.jwt.JwtAuthEntryPoint
 import com.mondi.machine.auths.jwt.JwtAuthFilter
 import com.mondi.machine.auths.users.UserService
 import org.springframework.context.annotation.Bean
@@ -10,8 +11,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer
-import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -30,7 +29,8 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector
 @EnableWebSecurity
 class WebSecurityConfig(
   private val userService: UserService,
-  private val jwtAuthFilter: JwtAuthFilter
+  private val jwtAuthFilter: JwtAuthFilter,
+  private val authEntryPoint: JwtAuthEntryPoint
 ) {
 
   @Bean
@@ -40,13 +40,19 @@ class WebSecurityConfig(
 
   @Bean
   fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
-    return http.csrf { obj: CsrfConfigurer<HttpSecurity> -> obj.disable() }
+
+    return http.csrf {
+      it.disable()
+    }
+      .exceptionHandling {
+        it.authenticationEntryPoint(authEntryPoint)
+      }
+      .sessionManagement {
+        it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+      }
       .authorizeHttpRequests {
         it.requestMatchers("/v1/auth/**").permitAll()
-        it.requestMatchers("/**").authenticated()
-      }
-      .sessionManagement { sess: SessionManagementConfigurer<HttpSecurity?> ->
-        sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        it.requestMatchers("/v1/**").authenticated()
       }
       .authenticationProvider(authenticationProvider())
       .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)

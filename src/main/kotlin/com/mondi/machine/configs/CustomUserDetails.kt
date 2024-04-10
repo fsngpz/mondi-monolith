@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails
 class CustomUserDetails(
   private val email: String,
   private val password: String,
-  private var authorities: List<GrantedAuthority> = listOf()
+  private var authorities: List<GrantedAuthority>
 ) : UserDetails {
   override fun getAuthorities(): List<GrantedAuthority> {
     return this.authorities
