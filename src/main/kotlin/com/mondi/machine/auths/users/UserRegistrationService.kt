@@ -1,5 +1,6 @@
 package com.mondi.machine.auths.users
 
+import com.mondi.machine.auths.roles.RoleService
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -13,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class UserRegistrationService(
+  private val roleService: RoleService,
+  private val userRoleService: UserRoleService,
   private val userRepository: UserRepository,
   private val passwordEncoder: PasswordEncoder
 ) : UserService(userRepository) {
@@ -33,14 +36,19 @@ class UserRegistrationService(
     // -- setup new instance of User --
     val newUser = User(
       email = email,
-      password = passwordEncoder.encode(password),
-      roles = ROLE_USER
+      password = passwordEncoder.encode(password)
     )
     // -- save the instance of user --
-    return userRepository.save(newUser)
+    userRepository.save(newUser)
+    // -- setup the instance of Role --
+    val role = roleService.getOrCreate(ROLE_USER)
+    // -- assign user to the role --
+    userRoleService.assign(newUser, role)
+    // -- return the instance of newUser --
+    return newUser
   }
 
   companion object {
-    const val ROLE_USER = "USER"
+    const val ROLE_USER = "ROLE_USER"
   }
 }

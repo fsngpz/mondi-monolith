@@ -1,5 +1,6 @@
-package com.mondi.machine.auths.users
+package com.mondi.machine.auths.roles
 
+import com.mondi.machine.auths.users.UserRole
 import com.mondi.machine.utils.AuditableBaseEntity
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
@@ -10,23 +11,22 @@ import org.hibernate.annotations.OnDeleteAction
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 
 /**
- * The entity model class for table Userd.
+ * The model class for table Role.
  *
  * @author Ferdinand Sangap
  * @since 2024-04-10
  */
 @Entity
 @EntityListeners(AuditingEntityListener::class)
-@Table(name = "users")
-class User(
-  val email: String,
-  val password: String,
+@Table(name = "roles")
+class Role(
+  val name: String
 ) : AuditableBaseEntity<String>() {
   // -- optional --
-  var username: String? = null
+  var description: String? = name
 
-  // -- many to one --
-  @OneToMany(mappedBy = "user")
+  // -- one to many --
+  @OneToMany(mappedBy = "role")
   @OnDelete(action = OnDeleteAction.CASCADE)
-  var roles: Set<UserRole> = setOf()
+  var users: Set<UserRole> = setOf()
 }
