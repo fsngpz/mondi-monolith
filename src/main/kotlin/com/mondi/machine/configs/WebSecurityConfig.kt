@@ -1,6 +1,7 @@
 package com.mondi.machine.configs
 
 import com.mondi.machine.auths.jwt.JwtAuthFilter
+import com.mondi.machine.auths.users.UserService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
@@ -27,11 +28,14 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector
  */
 @Configuration
 @EnableWebSecurity
-class WebSecurityConfig(private val jwtAuthFilter: JwtAuthFilter) {
+class WebSecurityConfig(
+  private val userService: UserService,
+  private val jwtAuthFilter: JwtAuthFilter
+) {
 
   @Bean
   fun userDetailsService(): UserDetailsService {
-    return CustomUserDetailService()
+    return CustomUserDetailService(userService)
   }
 
   @Bean
