@@ -1,17 +1,35 @@
 /*
+ * Users
+ */
+CREATE TABLE users
+(
+    id         BIGSERIAL
+        CONSTRAINT users_id_pk
+            PRIMARY KEY,
+    email      text                                               NOT NULL,
+    password   text                                               NOT NULL,
+    roles      text                                               NOT NULL,
+    created_at timestamp WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    creator_id bigint                                             NOT NULL,
+    updated_at timestamp WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater_id bigint                                             NOT NULL,
+    version    bigint                   DEFAULT 0                 NOT NULL
+);
+
+/*
  * Profile
  */
 CREATE TABLE profiles
 (
-    id                      BIGSERIAL
+    id                  BIGSERIAL
         CONSTRAINT profiles_id_pk
             PRIMARY KEY,
-    name                    text                                                            NOT NULL,
-    profile_picture_url     text,
-    address                 text,
-    created_at              timestamp WITH TIME ZONE        DEFAULT CURRENT_TIMESTAMP       NOT NULL,
-    creator_id              bigint                                                          NOT NULL,
-    updated_at              timestamp WITH TIME ZONE        DEFAULT CURRENT_TIMESTAMP       NOT NULL,
-    updater_id              bigint                                                          NOT NULL,
-    version                 bigint                          DEFAULT 0                       NOT NULL
+    name                text                                               NOT NULL,
+    profile_picture_url text,
+    address             text,
+    created_at          timestamp WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    creator_id          bigint                                             NOT NULL,
+    updated_at          timestamp WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater_id          bigint                                             NOT NULL,
+    version             bigint                   DEFAULT 0                 NOT NULL
 );
