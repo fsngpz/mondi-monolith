@@ -24,7 +24,10 @@ class ControllerExceptionHandler {
   @ExceptionHandler
   fun handleGeneralException(e: Exception): ResponseEntity<ErrorResponse> {
     // -- setup the instance of error response --
-    val errorResponse = ErrorResponse(e.message ?: e.stackTraceToString())
+    val errorResponse = ErrorResponse(
+      type = e.javaClass.simpleName,
+      message = e.message ?: e.stackTraceToString()
+    )
     // -- return as response entity --
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse)
   }
@@ -38,8 +41,10 @@ class ControllerExceptionHandler {
   @ExceptionHandler
   fun handlleAuthenticationException(e: AuthenticationException): ResponseEntity<ErrorResponse> {
     // -- setup the instance of error response --
-    val errorResponse = ErrorResponse(e.message ?: e.stackTraceToString())
-    // -- return as response entity --
+    val errorResponse = ErrorResponse(
+      type = e.javaClass.simpleName,
+      message = e.message ?: e.stackTraceToString()
+    )    // -- return as response entity --
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse)
   }
 }

@@ -6,4 +6,7 @@ package com.mondi.machine.exceptions
  * @author Ferdinand Sangap
  * @since 2024-04-10
  */
-data class ErrorResponse(val message: String)
+data class ErrorResponse(
+  val type: String,
+  val message: String
+)
