@@ -19,6 +19,6 @@ class User(
   val email: String,
   val password: String,
   val roles: String
-) : AuditableBaseEntity<Long>() {
-  var userName: String? = null
+) : AuditableBaseEntity<String>() {
+  var username: String? = null
 }

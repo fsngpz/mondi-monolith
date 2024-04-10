@@ -11,5 +11,11 @@ import org.springframework.data.jpa.repository.JpaRepository
  */
 interface UserRepository : JpaRepository<User, Long> {
 
+  /**
+   * a funtion to find the instance of [User] by email.
+   *
+   * @param email the email address.
+   * @return the Optional of [User].
+   */
   fun findByEmail(email: String): Optional<User>
 }

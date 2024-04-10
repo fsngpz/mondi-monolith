@@ -12,7 +12,7 @@ import org.springframework.web.context.request.ServletRequestAttributes
  * @author Ferdinand Sangap
  * @since 2024-04-08
  */
-class AuditorAwareUtil : AuditorAware<String>{
+class AuditorAwareUtil : AuditorAware<String> {
 
   override fun getCurrentAuditor(): Optional<String> {
     val httpServletRequest = getCurrentRequester()
@@ -21,12 +21,11 @@ class AuditorAwareUtil : AuditorAware<String>{
     val creator = if (httpServletRequest == null) {
       DEFAULT_CREATOR
     } else {
-      httpServletRequest.getHeader(ACCOUNT_UUID)
+      httpServletRequest.getHeader(ID)
     }
 
     return Optional.of(creator ?: DEFAULT_CREATOR)
   }
-
 
   /**
    * a private function to get the current requester from the [RequestContextHolder].
@@ -41,6 +40,6 @@ class AuditorAwareUtil : AuditorAware<String>{
 
   companion object {
     const val DEFAULT_CREATOR = "SYSTEM"
-    const val ACCOUNT_UUID = "Account-UUID"
+    const val ID = "ID"
   }
 }
