@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "com.mondi"
-version = "0.0.1-SNAPSHOT"
+version = "machine-0.0.1-SNAPSHOT"
 
 java {
   sourceCompatibility = JavaVersion.VERSION_17
