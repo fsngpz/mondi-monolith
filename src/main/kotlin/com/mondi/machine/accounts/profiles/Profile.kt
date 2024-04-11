@@ -17,7 +17,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 @Table(name = "profiles")
 class Profile(
   var name: String,
-) : AuditableBaseEntity<Long>() {
+) : AuditableBaseEntity<String>() {
   var profilePictureUrl: String? = null
 
   var address: String? = null

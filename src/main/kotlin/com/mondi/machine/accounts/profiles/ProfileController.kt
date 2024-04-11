@@ -4,10 +4,11 @@ import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.multipart.MultipartFile
 
 /**
  * The rest controller for [Profile].
@@ -43,18 +44,20 @@ class ProfileController(private val service: ProfileService) {
   @PostMapping("/profiles")
   @ResponseStatus(HttpStatus.CREATED)
   fun create(
-    @RequestBody request: ProfileRequest,
+    @RequestPart name: String?,
+    @RequestPart address: String?,
+    @RequestPart profilePicture: MultipartFile?,
     httpServletRequest: HttpServletRequest
   ): ProfileResponse {
     // -- get the ID from header--
     val id = httpServletRequest.getHeader("ID").toLong()
 
     // -- validate the field name --
-    requireNotNull(request.name) {
+    requireNotNull(name) {
       "field 'name' cannot be null"
     }
 
     // -- create the new data Profile --
-    return service.create(id, request.name, request.address, request.profilePicture).toResponse()
+    return service.create(id, name, address, profilePicture).toResponse()
   }
 }

@@ -47,6 +47,8 @@ dependencies {
   implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
   implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
 
+  // -- dropbox --
+  implementation("com.dropbox.core:dropbox-core-sdk:6.1.0")
 }
 
 tasks.withType<KotlinCompile> {

@@ -1,5 +1,6 @@
 package com.mondi.machine.accounts.profiles
 
+import com.mondi.machine.storage.dropbox.DropboxService
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -11,7 +12,10 @@ import org.springframework.web.multipart.MultipartFile
  * @since 2024-04-08
  */
 @Service
-class ProfileService(private val repository: ProfileRepository) {
+class ProfileService(
+  private val dropboxService: DropboxService,
+  private val repository: ProfileRepository
+) {
 
   /**
    * a function to handle request retrieving instance of [Profile].
@@ -36,9 +40,13 @@ class ProfileService(private val repository: ProfileRepository) {
    * @return the [Profile] instance.
    */
   fun create(id: Long, name: String, address: String?, profilePicture: MultipartFile?): Profile {
+    // -- upload profile picture --
+    val profilePictureUrl = profilePicture?.let { dropboxService.upload(id, it) }
+
     // -- find the profile to repository by id, if not found then create an instance --
     val profile = repository.findByIdOrNull(id) ?: Profile(name = name).apply {
       this.address = address
+      this.profilePictureUrl = profilePictureUrl
     }
     // -- save the instance to database and return --
     return repository.save(profile)
