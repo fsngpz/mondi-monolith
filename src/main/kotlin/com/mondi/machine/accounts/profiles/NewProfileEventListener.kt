@@ -7,6 +7,8 @@ import org.springframework.context.ApplicationListener
 import org.springframework.stereotype.Component
 
 /**
+ * The new profile event listener.
+ *
  * @author Ferdinand Sangap
  * @since 2024-04-12
  */
@@ -15,6 +17,12 @@ class NewProfileEventListener(
   private val profileService: ProfileService
 ) : ApplicationListener<UserApplicationEvent> {
   private val logger = LoggerFactory.getLogger(this::class.java)
+
+  /**
+   * an override function to handle the [ApplicationListener] of [UserApplicationEvent].
+   *
+   * @param event the [UserApplicationEvent] instance.
+   */
   override fun onApplicationEvent(event: UserApplicationEvent) {
     logger.info("Receiving the event with value: $event")
     // convert the source to instance of User --

@@ -4,6 +4,8 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
 /**
+ * The custom class for User Details.
+ *
  * @author Ferdinand Sangap
  * @since 2024-04-10
  */
