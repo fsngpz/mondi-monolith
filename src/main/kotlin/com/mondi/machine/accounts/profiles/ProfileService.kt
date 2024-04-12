@@ -1,5 +1,9 @@
 package com.mondi.machine.accounts.profiles
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.convertValue
+import com.mondi.machine.auths.users.UserService
 import com.mondi.machine.storage.dropbox.DropboxService
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -13,6 +17,8 @@ import org.springframework.web.multipart.MultipartFile
  */
 @Service
 class ProfileService(
+  private val objectMapper: ObjectMapper,
+  private val userService: UserService,
   private val dropboxService: DropboxService,
   private val repository: ProfileRepository
 ) {
@@ -31,24 +37,71 @@ class ProfileService(
   }
 
   /**
-   * a function to handle request create new profile.
+   * a function to update the instance of [Profile].
    *
-   * @param id the unique identifier of account.
-   * @param name the name of account.
-   * @param address the address of account.
-   * @param profilePicture the [MultipartFile] for profile picture.
+   * @param id the [Profile] unique identifier.
+   * @param request the [ProfileRequest] instance.
    * @return the [Profile] instance.
    */
-  fun create(id: Long, name: String, address: String?, profilePicture: MultipartFile?): Profile {
-    // -- upload profile picture --
-    val profilePictureUrl = profilePicture?.let { dropboxService.upload(id, it) }
-
-    // -- find the profile to repository by id, if not found then create an instance --
-    val profile = repository.findByIdOrNull(id) ?: Profile(name = name).apply {
-      this.address = address
-      this.profilePictureUrl = profilePictureUrl
+  fun update(id: Long, request: ProfileRequest): Profile {
+    // -- validate the field 'name' --
+    requireNotNull(request.name) {
+      "field 'name' cannot be null"
     }
-    // -- save the instance to database and return --
+    // -- get the profile instance --
+    val profile = get(id).apply {
+      this.name = request.name
+      this.address = request.address
+      this.profilePictureUrl = request.profilePictureUrl
+    }
+    // -- save the instance --
     return repository.save(profile)
+  }
+
+  /**
+   * a function to handle request patch / partial update of instance [Profile].
+   *
+   * @param id the unique identifier.
+   * @param request the [JsonNode] of payload.
+   * @param profilePicture the profile picture url.
+   * @return the [Profile] instance.
+   */
+  fun patch(id: Long, request: ProfileRequest, profilePicture: MultipartFile?): Profile {
+    // -- convert the request to json node --
+    val jsonNode = objectMapper.convertValue<JsonNode>(request)
+    // -- get the profile instance --
+    val profile = get(id)
+    // -- convert the instance of Profile to ProfileRequest --
+    val body = profile.toRequest()
+    // -- read for updating --
+    val reader = objectMapper.readerForUpdating(body)
+    // -- upload the profile picture --
+    val newRequest = jsonNode.uploadProfilePicture(id, profilePicture)
+    // -- merge the instance --
+    val mergedInstance = reader.readValue<ProfileRequest>(newRequest)
+    // -- update the instance --
+    return update(id, mergedInstance)
+  }
+
+  /**
+   * a private function to upload profile picture and store it to the new request then return as
+   * JSON Node.
+   *
+   * @param id the profile unique identifier.
+   * @param profilePicture the [MultipartFile] of Profile Picture.
+   * @return the new [JsonNode] with Profile Picture URL.
+   */
+  private fun JsonNode.uploadProfilePicture(
+    id: Long,
+    profilePicture: MultipartFile?
+  ): JsonNode {
+    // -- upload profile picture if the profilePicture is null then the value will be null --
+    val profilePictureUrl = profilePicture?.let { dropboxService.upload(id, it) }
+    // -- convert the value of JsonNode to ProfileRequest --
+    val nodeRequest = objectMapper.convertValue<ProfileRequest>(this)
+    // -- create new instance ProfileRequest and add the profile picture url to it --
+    val newRequest = ProfileRequest(nodeRequest.name, nodeRequest.address, profilePictureUrl)
+    // -- return as the JsonNode --
+    return objectMapper.convertValue<JsonNode>(newRequest)
   }
 }

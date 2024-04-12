@@ -64,7 +64,10 @@ CREATE TABLE profiles
 (
     id                  BIGSERIAL
         CONSTRAINT profiles_id_pk
-            PRIMARY KEY,
+            PRIMARY KEY
+        CONSTRAINT profiles_users_id_fk
+            REFERENCES users
+            ON UPDATE CASCADE ON DELETE CASCADE,
     name                text                                               NOT NULL,
     profile_picture_url text,
     address             text,

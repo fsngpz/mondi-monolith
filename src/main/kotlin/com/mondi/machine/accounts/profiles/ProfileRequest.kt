@@ -1,7 +1,5 @@
 package com.mondi.machine.accounts.profiles
 
-import org.springframework.web.multipart.MultipartFile
-
 /**
  * The model class of reqyest [Profile].
  *
@@ -11,5 +9,5 @@ import org.springframework.web.multipart.MultipartFile
 data class ProfileRequest(
   val name: String? = null,
   val address: String? = null,
-  val profilePicture: MultipartFile? = null
+  val profilePictureUrl: String? = null
 )

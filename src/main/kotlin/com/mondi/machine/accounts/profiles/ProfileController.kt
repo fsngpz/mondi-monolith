@@ -1,14 +1,11 @@
 package com.mondi.machine.accounts.profiles
 
 import jakarta.servlet.http.HttpServletRequest
-import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.ModelAttribute
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestPart
-import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.multipart.MultipartFile
 
 /**
  * The rest controller for [Profile].
@@ -35,29 +32,23 @@ class ProfileController(private val service: ProfileService) {
   }
 
   /**
-   * a REST controller to handle creating the new [Profile].
+   * a REST controller to handle update the [Profile] instance.
    *
-   * @param request the [ProfileRequest] payload.
+   * @param payload the [ProfileRequest] payload.
    * @param httpServletRequest the [HttpServletRequest].
-   * @return the [ProfileResponse]
+   * @return the [ProfileResponse].
    */
-  @PostMapping("/profiles")
-  @ResponseStatus(HttpStatus.CREATED)
-  fun create(
-    @RequestPart name: String?,
-    @RequestPart address: String?,
-    @RequestPart profilePicture: MultipartFile?,
+  @PatchMapping("/profiles")
+  fun patch(
+    @ModelAttribute payload: ProfileFileRequest,
     httpServletRequest: HttpServletRequest
   ): ProfileResponse {
     // -- get the ID from header--
     val id = httpServletRequest.getHeader("ID").toLong()
+    // -- create new instance ProfileRequest --
+    val request = ProfileRequest(name = payload.name, payload.address)
 
-    // -- validate the field name --
-    requireNotNull(name) {
-      "field 'name' cannot be null"
-    }
-
-    // -- create the new data Profile --
-    return service.create(id, name, address, profilePicture).toResponse()
+    // -- update the data Profile --
+    return service.patch(id, request, payload.profilePicture).toResponse()
   }
 }
