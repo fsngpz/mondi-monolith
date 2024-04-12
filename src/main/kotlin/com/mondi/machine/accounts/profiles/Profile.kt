@@ -20,7 +20,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 @EntityListeners(AuditingEntityListener::class)
 @Table(name = "profiles")
 class Profile(
-  var name: String,
 
   // -- one to one --
   @OneToOne
@@ -28,7 +27,8 @@ class Profile(
   @JoinColumn(name = "id")
   val user: User
 ) : AuditableBaseEntity<String>() {
+  // -- optional --
+  var name: String? = null
   var profilePictureUrl: String? = null
-
   var address: String? = null
 }

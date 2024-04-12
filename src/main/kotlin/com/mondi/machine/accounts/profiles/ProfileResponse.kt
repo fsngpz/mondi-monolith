@@ -9,7 +9,7 @@ package com.mondi.machine.accounts.profiles
  */
 data class ProfileResponse(
   val id: Long,
-  val name: String,
+  val name: String?,
   val address: String?,
   val profilePictureUrl: String?
 )

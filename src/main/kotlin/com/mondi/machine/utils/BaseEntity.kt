@@ -1,6 +1,5 @@
 package com.mondi.machine.utils
 
-import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -23,7 +22,7 @@ abstract class BaseEntity : Persistable<Long?> {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @get:JvmName(name = "id")
-  val id: Long? =null
+  var id: Long? = null
 
   @Version
   val version: Long = 0

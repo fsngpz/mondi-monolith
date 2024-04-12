@@ -62,13 +62,13 @@ CREATE TABLE users_roles
  */
 CREATE TABLE profiles
 (
-    id                  BIGSERIAL
+    id                  bigint
         CONSTRAINT profiles_id_pk
             PRIMARY KEY
         CONSTRAINT profiles_users_id_fk
             REFERENCES users
             ON UPDATE CASCADE ON DELETE CASCADE,
-    name                text                                               NOT NULL,
+    name                text,
     profile_picture_url text,
     address             text,
     created_at          timestamp WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,

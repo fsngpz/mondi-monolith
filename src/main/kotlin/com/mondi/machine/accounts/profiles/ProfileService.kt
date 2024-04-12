@@ -3,7 +3,7 @@ package com.mondi.machine.accounts.profiles
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.convertValue
-import com.mondi.machine.auths.users.UserService
+import com.mondi.machine.auths.users.User
 import com.mondi.machine.storage.dropbox.DropboxService
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -18,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile
 @Service
 class ProfileService(
   private val objectMapper: ObjectMapper,
-  private val userService: UserService,
   private val dropboxService: DropboxService,
   private val repository: ProfileRepository
 ) {
@@ -34,6 +33,19 @@ class ProfileService(
     return repository.findByIdOrNull(id) ?: throw NoSuchElementException(
       "no profile was found with id '$id'"
     )
+  }
+
+  /**
+   * a function to handle request create new [Profile] instance.
+   *
+   * @param user the [User] instance.
+   * @return the created [Profile] instance.
+   */
+  fun create(user: User): Profile {
+    // -- setup instance Profile --
+    val profile = Profile(user)
+    // -- save the instance to database --
+    return repository.save(profile)
   }
 
   /**
