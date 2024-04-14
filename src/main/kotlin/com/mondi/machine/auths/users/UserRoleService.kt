@@ -2,6 +2,8 @@ package com.mondi.machine.auths.users
 
 import com.mondi.machine.auths.roles.Role
 import com.sun.jdi.request.DuplicateRequestException
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 
 /**
@@ -12,6 +14,18 @@ import org.springframework.stereotype.Service
  */
 @Service
 class UserRoleService(private val userRoleRepository: UserRoleRepository) {
+  /**
+   * a function to find all data with specified filter.
+   *
+   * @param search the parameter for filter data by email or username.
+   * @param role the parameter to filter data by role.
+   * @param pageable the [Pageable].
+   * @return the [Page] of [UserRole].
+   */
+  fun findAll(search: String?, role: String?, pageable: Pageable): Page<UserRole> {
+    return userRoleRepository.findAllCustom(search, role, pageable)
+  }
+
   /**
    * a function to assign the [User] to single [Role].
    *
