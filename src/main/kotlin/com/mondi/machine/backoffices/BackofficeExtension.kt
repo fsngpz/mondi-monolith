@@ -2,6 +2,8 @@ package com.mondi.machine.backoffices
 
 import com.mondi.machine.auths.users.UserRole
 import com.mondi.machine.backoffices.accounts.BackofficeAccountResponse
+import com.mondi.machine.backoffices.transactions.BackofficeTransactionResponse
+import com.mondi.machine.transactions.Transaction
 
 /**
  * an extension function to map the [UserRole] instance to [BackofficeAccountResponse].
@@ -23,4 +25,19 @@ fun UserRole.toResponse(): BackofficeAccountResponse {
     this.user.username,
     userRoles
   )
+}
+
+/**
+ * an extension function to map the [Transaction] to [BackofficeAccountResponse].
+ *
+ * @return the [BackofficeTransactionResponse].
+ */
+fun Transaction.toResponse(): BackofficeTransactionResponse {
+  val id = this.id
+  // -- validate field id --
+  requireNotNull(id) {
+    "field id is null"
+  }
+  // -- return the mapped value --
+  return BackofficeTransactionResponse(id, this.productName, this.price, this.certificateUrl)
 }

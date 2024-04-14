@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController
  * @since 2024-04-14
  */
 @RestController
-@RequestMapping("/v1/backoffice")
+@RequestMapping("/v1/backoffice/accounts")
 class BackofficeAccountController(private val service: BackofficeAccountService) {
 
   /**
@@ -28,7 +28,7 @@ class BackofficeAccountController(private val service: BackofficeAccountService)
    * with direction [Sort.Direction.DESC].
    * @return [Page] of [BackofficeAccountResponse].
    */
-  @GetMapping("/accounts")
+  @GetMapping
   fun findAll(
     @RequestParam search: String? = null,
     @RequestParam role: String? = null,
