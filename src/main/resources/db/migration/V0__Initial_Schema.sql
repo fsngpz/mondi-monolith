@@ -77,3 +77,26 @@ CREATE TABLE profiles
     updater_id          text                                               NOT NULL,
     version             bigint                   DEFAULT 0                 NOT NULL
 );
+
+/*
+ * Transaction
+ */
+CREATE TABLE transactions
+(
+    id              BIGSERIAL
+        CONSTRAINT transactions_id_pk
+            PRIMARY KEY,
+    profile_id      bigint
+        CONSTRAINT transactions_profile_id_fk
+            REFERENCES profiles
+            ON UPDATE CASCADE ON DELETE CASCADE,
+    product_name    text                                               NOT NULL,
+    price           text                                               NOT NULL,
+    certificate_url text                                               NOT NULL,
+    purchased_at    timestamp WITH TIME ZONE                           NOT NULL,
+    created_at      timestamp WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    creator_id      text                                               NOT NULL,
+    updated_at      timestamp WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater_id      text                                               NOT NULL,
+    version         bigint                   DEFAULT 0                 NOT NULL
+);
