@@ -21,15 +21,33 @@ import org.springframework.transaction.annotation.Transactional
 class CustomUserDetailService(private val userService: UserService) : UserDetailsService {
   @Transactional
   override fun loadUserByUsername(email: String): UserDetails {
-    val userInfo = userService.getByEmail(email)
+    val userInfo = userService.findByEmail(email)
     return userInfo.map {
       CustomUserDetails(
+        requireNotNull(it.id),
         it.email,
         it.password,
         it.roles.toGrantedAuthorities()
       )
+    }.orElseThrow { UsernameNotFoundException("user not found $email") }
+  }
+
+  /**
+   * a function to get the [CustomUserDetails] instance.
+   *
+   * @param email the email address as the unique identifier.
+   * @return the [CustomUserDetails] instance.
+   */
+  fun getCustomUserDetails(email: String): CustomUserDetails {
+    // -- get the user instance by id --
+    val user = userService.getByEmail(email)
+    // -- get the id --
+    val id = user.id
+    // -- validate field id --
+    requireNotNull(id) {
+      "value id cannot be null "
     }
-      .orElseThrow { UsernameNotFoundException("user not found $email") }
+    return CustomUserDetails(id, user.email, user.password, user.roles.toGrantedAuthorities())
   }
 
   /**

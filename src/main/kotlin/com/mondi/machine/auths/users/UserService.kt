@@ -16,9 +16,21 @@ class UserService(private val userRepository: UserRepository) {
    * a function to get the [User] by email.
    *
    * @param email the email address of user.
+   * @return the [User] instance.
+   */
+  fun getByEmail(email: String): User {
+    return userRepository.findByEmail(email).orElseThrow {
+      NoSuchElementException("no user was found with email '$email'")
+    }
+  }
+
+  /**
+   * a function to find the [User] by email.
+   *
+   * @param email the email address of user.
    * @return the Optional of [User] instance.
    */
-  fun getByEmail(email: String): Optional<User> {
+  fun findByEmail(email: String): Optional<User> {
     return userRepository.findByEmail(email)
   }
 
@@ -29,6 +41,6 @@ class UserService(private val userRepository: UserRepository) {
    * @return the boolean of is email already exist.
    */
   fun isEmailAlreadyExist(email: String): Boolean {
-    return getByEmail(email).isPresent
+    return findByEmail(email).isPresent
   }
 }

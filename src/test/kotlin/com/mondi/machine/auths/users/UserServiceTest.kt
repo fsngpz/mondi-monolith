@@ -37,7 +37,7 @@ internal class UserServiceTest(@Autowired private val service: UserService) {
     whenever(mockRepository.findByEmail(any<String>())).thenReturn(Optional.empty())
 
     // -- execute --
-    val result = service.getByEmail("email")
+    val result = service.findByEmail("email")
     assertThat(result).isEmpty
 
     // -- verify --
@@ -51,7 +51,7 @@ internal class UserServiceTest(@Autowired private val service: UserService) {
     whenever(mockRepository.findByEmail(any<String>())).thenReturn(Optional.of(mockUser))
 
     // -- execute --
-    val result = service.getByEmail("email")
+    val result = service.findByEmail("email")
     assertThat(result).isPresent
 
     // -- verify --

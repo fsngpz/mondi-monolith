@@ -10,10 +10,15 @@ import org.springframework.security.core.userdetails.UserDetails
  * @since 2024-04-10
  */
 class CustomUserDetails(
+  private val id: Long,
   private val email: String,
   private val password: String,
   private var authorities: List<GrantedAuthority>
 ) : UserDetails {
+  fun getId(): Long {
+    return this.id
+  }
+
   override fun getAuthorities(): List<GrantedAuthority> {
     return this.authorities
   }

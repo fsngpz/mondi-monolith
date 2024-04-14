@@ -1,5 +1,6 @@
 package com.mondi.machine.auths.jwt
 
+import com.mondi.machine.configs.CustomHeaderHttpServletRequest
 import com.mondi.machine.configs.CustomUserDetailService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
@@ -28,23 +29,38 @@ class JwtAuthFilter(
     response: HttpServletResponse,
     filterChain: FilterChain
   ) {
+    val customHeader = HashMap<String, String>()
     val authHeader = request.getHeader(HttpHeaders.AUTHORIZATION)
     var token: String? = null
     var email: String? = null
+    var id: String? = null
     if (authHeader != null && authHeader.startsWith("Bearer ")) {
       token = authHeader.substring("Bearer ".length)
       email = jwtService.extractEmail(token)
+      id = jwtService.extractId(token)
     }
 
-    if (email != null && SecurityContextHolder.getContext().authentication == null) {
+    if (id != null && email != null && SecurityContextHolder.getContext().authentication == null) {
       val userDetails: UserDetails = customUserDetailService.loadUserByUsername(email)
       if (jwtService.validateToken(token, userDetails)) {
-        val authToken =
-          UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities)
+        // -- setup instance AuthenticationToken --
+        val authToken = UsernamePasswordAuthenticationToken(
+          userDetails,
+          null,
+          userDetails.authorities
+        )
         authToken.details = WebAuthenticationDetailsSource().buildDetails(request)
         SecurityContextHolder.getContext().authentication = authToken
+        // -- get the CustomUserDetails --
+        // val customUserDetails = customUserDetailService.getCustomUserDetails(email)
+      }
+      // -- set the custom header --
+      customHeader.apply {
+        this["ID"] = id
       }
     }
-    filterChain.doFilter(request, response)
+    // -- do customize the HttpServletRequest --
+    val newRequest = CustomHeaderHttpServletRequest(request, customHeader)
+    filterChain.doFilter(newRequest, response)
   }
 }

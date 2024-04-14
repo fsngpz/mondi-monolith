@@ -1,6 +1,7 @@
 package com.mondi.machine.auths
 
 import com.mondi.machine.auths.jwt.JwtService
+import com.mondi.machine.configs.CustomUserDetails
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.userdetails.UsernameNotFoundException
@@ -34,8 +35,10 @@ class AuthenticationService(
     require(authentication.isAuthenticated) {
       throw UsernameNotFoundException("invalid username and password!")
     }
+    // -- get the principal from Authentication and cast as CustomUserDetails --
+    val user = authentication.principal as CustomUserDetails
     // -- generate the token --
-    val bearerToken = jwtService.generateToken(email)
+    val bearerToken = jwtService.generateToken(user)
     // -- return the token --
     return AuthenticationResponse(bearerToken)
   }
