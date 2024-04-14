@@ -52,6 +52,7 @@ class WebSecurityConfig(
       }
       .authorizeHttpRequests {
         it.requestMatchers("/v1/auth/**").permitAll()
+        it.requestMatchers("/v1/backoffice/**").hasAnyRole(ROLE_ADMIN)
         it.requestMatchers("/v1/**").authenticated()
       }
       .authenticationProvider(authenticationProvider())
@@ -80,5 +81,9 @@ class WebSecurityConfig(
   @Bean(name = ["mvcHandlerMappingIntrospector"])
   fun mvcHandlerMappingIntrospector(): HandlerMappingIntrospector {
     return HandlerMappingIntrospector()
+  }
+
+  companion object {
+    const val ROLE_ADMIN = "ADMIN"
   }
 }

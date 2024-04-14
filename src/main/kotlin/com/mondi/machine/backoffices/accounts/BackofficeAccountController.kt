@@ -24,7 +24,8 @@ class BackofficeAccountController(private val service: BackofficeAccountService)
    *
    * @param search the parameter for filter data by email or username.
    * @param role the parameter to filter data by role.
-   * @param pageable the [Pageable].
+   * @param pageable the [Pageable] defaults sort [user.createdAt]
+   * with direction [Sort.Direction.DESC].
    * @return [Page] of [BackofficeAccountResponse].
    */
   @GetMapping("/accounts")
