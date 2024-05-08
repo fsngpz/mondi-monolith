@@ -1,6 +1,8 @@
 package com.mondi.machine.backoffices.transactions
 
 import com.mondi.machine.backoffices.toResponse
+import com.mondi.machine.transactions.Transaction
+import com.mondi.machine.transactions.TransactionRequest
 import com.mondi.machine.transactions.TransactionService
 import org.springframework.stereotype.Service
 
@@ -16,33 +18,10 @@ class BackofficeTransactionService(private val transactionService: TransactionSe
   /**
    * a function to handle request create new transaction.
    *
-   * @param request the [BackofficeTransactionRequest].
-   * @return the [BackofficeTransactionResponse].
+   * @param request the [BackofficeTransactionRequest] instance.
+   * @return the [BackofficeTransactionResponse] instance.
    */
   fun create(request: BackofficeTransactionRequest): BackofficeTransactionResponse {
-    // -- validate field userId --
-    requireNotNull(request.userId) {
-      "the field 'userId' cannot be null"
-    }
-    // -- validate field productName --
-    requireNotNull(request.productName) {
-      "the field 'productName' cannot be null"
-    }
-    // -- validate field price --
-    requireNotNull(request.price) {
-      "the field 'price' cannot be null"
-
-    }
-    // -- validate field certificateFile --
-    requireNotNull(request.certificateFile) {
-      "the field 'certificateFile' cannot be null"
-
-    }
-    // -- validate field purchasedAt --
-    requireNotNull(request.purchasedAt) {
-      "the field 'purchasedAt' cannot be null"
-
-    }
     // -- create new transaction --
     return transactionService.create(
       request.userId,
@@ -51,5 +30,24 @@ class BackofficeTransactionService(private val transactionService: TransactionSe
       request.certificateFile,
       request.purchasedAt
     ).toResponse()
+  }
+
+  /**
+   * a function to do an update of [Transaction].
+   *
+   * @param id the [Transaction] unique identifier.
+   * @param request the [BackofficeTransactionRequest] instance.
+   * @return the [BackofficeTransactionResponse] instance.
+   */
+  fun update(id: Long, request: BackofficeTransactionRequest): BackofficeTransactionResponse {
+    // -- setup the instance TransactionRequest --
+    val transactionRequest = TransactionRequest(
+      productName = request.productName,
+      price = request.price,
+      certificateFile = request.certificateFile,
+      purchasedAt = request.purchasedAt
+    )
+    // -- make an update to the specified transaction --
+    return transactionService.update(id, transactionRequest).toResponse()
   }
 }

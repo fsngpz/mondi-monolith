@@ -1,8 +1,13 @@
 package com.mondi.machine.backoffices.transactions
 
+import com.mondi.machine.backoffices.toNotNull
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ModelAttribute
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 /**
@@ -18,12 +23,29 @@ class BackofficeTransactionController(private val service: BackofficeTransaction
   /**
    * a POST request to handle create new transaction data.
    *
-   * @param request the [BackofficeTransactionRequest].
+   * @param request the [BackofficeTransactionNullableRequest].
    * @return the [BackofficeTransactionResponse].
    */
   @PostMapping
-  fun create(@ModelAttribute request: BackofficeTransactionRequest): BackofficeTransactionResponse {
+  @ResponseStatus(HttpStatus.CREATED)
+  fun create(@ModelAttribute request: BackofficeTransactionNullableRequest): BackofficeTransactionResponse {
     // -- create the data --
-    return service.create(request)
+    return service.create(request.toNotNull())
+  }
+
+  /**
+   * a PUT request to handle update the existing transaction data.
+   *
+   * @param transactionId the transaction unique identifier.
+   * @param request the [BackofficeTransactionNullableRequest] instance.
+   * @return the [BackofficeTransactionResponse] instance.
+   */
+  @PutMapping("/{transactionId}")
+  fun put(
+    @PathVariable transactionId: Long,
+    @ModelAttribute request: BackofficeTransactionNullableRequest
+  ): BackofficeTransactionResponse {
+    // -- update the data --
+    return service.update(transactionId, request.toNotNull())
   }
 }

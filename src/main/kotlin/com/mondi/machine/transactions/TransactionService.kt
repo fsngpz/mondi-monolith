@@ -6,6 +6,7 @@ import java.math.BigDecimal
 import java.time.OffsetDateTime
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 
@@ -21,6 +22,17 @@ class TransactionService(
   private val dropboxService: DropboxService,
   private val repository: TransactionRepository
 ) {
+
+  /**
+   * a function to get the [Transaction] instance.
+   *
+   * @param id the unique identifier of [Transaction].
+   * @return the [Transaction] instance.
+   */
+  fun get(id: Long): Transaction {
+    return repository.findByIdOrNull(id)
+      ?: throw NoSuchElementException("no transaction data was found with id '$id'")
+  }
 
   /**
    * a function to find all [Transaction] of specified user.
@@ -68,6 +80,31 @@ class TransactionService(
     // -- setup the instance of Transaction --
     val transaction = Transaction(productName, price, certificateUrl, purchasedAt, profile)
     // -- save the instance to database --
+    return repository.save(transaction)
+  }
+
+  /**
+   * a function to update the instance of [Transaction].
+   *
+   * @param id the [Transaction] unique identifier.
+   * @param request the [TransactionRequest] instance.
+   * @return the [Transaction] instance.
+   */
+  fun update(id: Long, request: TransactionRequest): Transaction {
+    // -- get the transaction instance --
+    val transaction = get(id)
+    // -- validate the id of user --
+    val userId = requireNotNull(transaction.profile.user.id) { "the id of user is null" }
+    // -- upload the certificate image --
+    val certificateUrl = dropboxService.upload(userId, request.certificateFile)
+    // -- update the instance --
+    transaction.apply {
+      this.productName = request.productName
+      this.price = request.price
+      this.certificateUrl = certificateUrl
+      this.purchasedAt = request.purchasedAt
+    }
+    // -- save the updated instance --
     return repository.save(transaction)
   }
 }

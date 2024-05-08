@@ -21,10 +21,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 @EntityListeners(AuditingEntityListener::class)
 @Table(name = "transactions")
 class Transaction(
-  val productName: String,
-  val price: BigDecimal,
-  val certificateUrl: String,
-  val purchasedAt: OffsetDateTime,
+  var productName: String,
+  var price: BigDecimal,
+  var certificateUrl: String,
+  var purchasedAt: OffsetDateTime,
 
   // -- Many to One --
   @ManyToOne
