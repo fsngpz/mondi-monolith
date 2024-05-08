@@ -59,7 +59,7 @@ class TransactionService(
   /**
    * a function to handle create new [Transaction].
    *
-   * @param id the user / profile unique identifier.
+   * @param userId the user / profile unique identifier.
    * @param productName the name of product.
    * @param price the price of transaction.
    * @param certificateFile the [MultipartFile] of product certificate.
@@ -67,16 +67,16 @@ class TransactionService(
    * @return the [Transaction] instance.
    */
   fun create(
-    id: Long,
+    userId: Long,
     productName: String,
     price: BigDecimal,
     certificateFile: MultipartFile,
     purchasedAt: OffsetDateTime
   ): Transaction {
     // -- get the profile --
-    val profile = profileService.get(id)
+    val profile = profileService.get(userId)
     // -- upload the certificate image --
-    val certificateUrl = dropboxService.upload(id, certificateFile)
+    val certificateUrl = dropboxService.upload(userId, certificateFile)
     // -- setup the instance of Transaction --
     val transaction = Transaction(productName, price, certificateUrl, purchasedAt, profile)
     // -- save the instance to database --
