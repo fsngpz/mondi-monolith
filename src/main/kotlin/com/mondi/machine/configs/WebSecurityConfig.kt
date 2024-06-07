@@ -51,6 +51,10 @@ class WebSecurityConfig(
         it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
       }
       .authorizeHttpRequests {
+        // -- swagger --
+        it.requestMatchers("/swagger-ui/**", "/swagger-ui**", "/v3/api-docs/**", "/v3/api-docs**", "/v3/**")
+          .permitAll()
+
         it.requestMatchers("/v1/auth/**").permitAll()
         it.requestMatchers("/v1/backoffice/**").hasAnyRole(ROLE_ADMIN)
         it.requestMatchers("/v1/**").authenticated()

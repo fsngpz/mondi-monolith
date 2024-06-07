@@ -19,6 +19,8 @@ repositories {
   mavenCentral()
 }
 
+val springDocVersion = "2.5.0"
+
 dependencies {
   // -- spring boot --
   implementation("org.springframework.boot:spring-boot-starter-web")
@@ -30,6 +32,9 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.flywaydb:flyway-core")
   runtimeOnly("org.postgresql:postgresql")
+
+  // -- spring doc --
+  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocVersion")
 
   // -- test --
   testImplementation("org.springframework.boot:spring-boot-starter-test")
