@@ -1,0 +1,10 @@
+name: On PR Opened
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Run Tests
+    uses: ./.github/workflows/run_tests.yml
