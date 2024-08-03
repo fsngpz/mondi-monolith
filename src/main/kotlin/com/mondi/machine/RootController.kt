@@ -1,6 +1,8 @@
 package com.mondi.machine
 
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -22,5 +24,10 @@ class RootController {
   @GetMapping("/")
   fun root(): String{
     return "OK"
+  }
+
+  @PostMapping("/")
+  fun post(@RequestBody data: Any): Any {
+   return data
   }
 }

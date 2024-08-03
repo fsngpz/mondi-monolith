@@ -58,6 +58,9 @@ class WebSecurityConfig(
         it.requestMatchers("/v1/auth/**").permitAll()
         it.requestMatchers("/v1/backoffice/**").hasAnyRole(ROLE_ADMIN)
         it.requestMatchers("/v1/**").authenticated()
+
+        // -- root --
+        it.requestMatchers("/").authenticated()
       }
       .authenticationProvider(authenticationProvider())
       .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
