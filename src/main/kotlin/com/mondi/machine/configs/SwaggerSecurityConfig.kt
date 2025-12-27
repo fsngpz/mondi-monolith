@@ -29,7 +29,7 @@ class SwaggerSecurityConfig {
             // -- add the components --
             this.components = Components().addSecuritySchemes("Bearer Authentication", createApiKeyScheme())
             // -- add the info --
-            this.info = Info().title("Dulang Backend API")
+            this.info = Info().title("Mondi Jewellery API")
         }
     }
 
