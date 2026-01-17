@@ -26,9 +26,9 @@ class SupabaseService(
     private val log = LoggerFactory.getLogger(SupabaseService::class.java)
 
     companion object {
-        private const val BUCKET_USERS = "users"
-        private const val BUCKET_PRODUCTS = "products"
-        private const val BUCKET_CERTIFICATES = "certificates"
+        const val BUCKET_USERS = "users"
+        const val BUCKET_PRODUCTS = "products"
+        const val BUCKET_CERTIFICATES = "certificates"
     }
 
     /**

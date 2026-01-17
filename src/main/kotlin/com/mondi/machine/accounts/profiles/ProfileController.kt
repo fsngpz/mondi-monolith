@@ -17,38 +17,38 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/v1/account")
 class ProfileController(private val service: ProfileService) {
 
-  /**
-   * a REST controller to handle request get the [ProfileResponse].
-   *
-   * @param httpServletRequest the [HttpServletRequest].
-   * @return the [ProfileResponse]
-   */
-  @GetMapping("/profiles")
-  fun get(httpServletRequest: HttpServletRequest): ProfileResponse {
-    // -- get the ID from header--
-    val id = httpServletRequest.getHeader("ID").toLong()
-    // -- get the profile using ID --
-    return service.get(id).toResponse()
-  }
+    /**
+     * a REST controller to handle request get the [ProfileResponse].
+     *
+     * @param httpServletRequest the [HttpServletRequest].
+     * @return the [ProfileResponse]
+     */
+    @GetMapping("/profiles")
+    fun get(httpServletRequest: HttpServletRequest): ProfileResponse {
+        // -- get the ID from header--
+        val id = httpServletRequest.getHeader("ID").toLong()
+        // -- get the profile using ID --
+        return service.get(id).toResponse()
+    }
 
-  /**
-   * a REST controller to handle update the [Profile] instance.
-   *
-   * @param payload the [ProfileRequest] payload.
-   * @param httpServletRequest the [HttpServletRequest].
-   * @return the [ProfileResponse].
-   */
-  @PatchMapping("/profiles")
-  fun patch(
-    @ModelAttribute payload: ProfileFileRequest,
-    httpServletRequest: HttpServletRequest
-  ): ProfileResponse {
-    // -- get the ID from header--
-    val id = httpServletRequest.getHeader("ID").toLong()
-    // -- create new instance ProfileRequest --
-    val request = ProfileRequest(name = payload.name, payload.address)
+    /**
+     * a REST controller to handle update the [Profile] instance.
+     *
+     * @param payload the [ProfileRequest] payload.
+     * @param httpServletRequest the [HttpServletRequest].
+     * @return the [ProfileResponse].
+     */
+    @PatchMapping("/profiles")
+    suspend fun patch(
+        @ModelAttribute payload: ProfileFileRequest,
+        httpServletRequest: HttpServletRequest
+    ): ProfileResponse {
+        // -- get the ID from header--
+        val id = httpServletRequest.getHeader("ID").toLong()
+        // -- create new instance ProfileRequest --
+        val request = ProfileRequest(name = payload.name, payload.address)
 
-    // -- update the data Profile --
-    return service.patch(id, request, payload.profilePicture).toResponse()
-  }
+        // -- update the data Profile --
+        return service.patch(id, request, payload.profilePicture).toResponse()
+    }
 }
