@@ -7,7 +7,6 @@ import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.mockito.Mock
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.never
@@ -17,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
 import org.springframework.mock.web.MockMultipartFile
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.web.multipart.MultipartFile
 import java.util.Optional
 
@@ -30,10 +30,10 @@ import java.util.Optional
 @Import(value = [ObjectMapper::class])
 internal class ProfileServiceTest(@Autowired private val service: ProfileService) {
     // -- region of mock --
-    @Mock
+    @MockitoBean
     lateinit var mockRepository: ProfileRepository
 
-    @Mock
+    @MockitoBean
     lateinit var mockSupabaseService: SupabaseService
     // -- end of region mock --
 

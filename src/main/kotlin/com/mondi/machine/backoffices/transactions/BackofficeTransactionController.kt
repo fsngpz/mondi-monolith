@@ -20,32 +20,32 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/v1/backoffice/transactions")
 class BackofficeTransactionController(private val service: BackofficeTransactionService) {
 
-  /**
-   * a POST request to handle create new transaction data.
-   *
-   * @param request the [BackofficeTransactionNullableRequest].
-   * @return the [BackofficeTransactionResponse].
-   */
-  @PostMapping
-  @ResponseStatus(HttpStatus.CREATED)
-  fun create(@ModelAttribute request: BackofficeTransactionNullableRequest): BackofficeTransactionResponse {
-    // -- create the data --
-    return service.create(request.toNotNull())
-  }
+    /**
+     * a POST request to handle create new transaction data.
+     *
+     * @param request the [BackofficeTransactionNullableRequest].
+     * @return the [BackofficeTransactionResponse].
+     */
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    suspend fun create(@ModelAttribute request: BackofficeTransactionNullableRequest): BackofficeTransactionResponse {
+        // -- create the data --
+        return service.create(request.toNotNull())
+    }
 
-  /**
-   * a PUT request to handle update the existing transaction data.
-   *
-   * @param transactionId the transaction unique identifier.
-   * @param request the [BackofficeTransactionNullableRequest] instance.
-   * @return the [BackofficeTransactionResponse] instance.
-   */
-  @PutMapping("/{transactionId}")
-  fun put(
-    @PathVariable transactionId: Long,
-    @ModelAttribute request: BackofficeTransactionNullableRequest
-  ): BackofficeTransactionResponse {
-    // -- update the data --
-    return service.update(transactionId, request.toNotNull())
-  }
+    /**
+     * a PUT request to handle update the existing transaction data.
+     *
+     * @param transactionId the transaction unique identifier.
+     * @param request the [BackofficeTransactionNullableRequest] instance.
+     * @return the [BackofficeTransactionResponse] instance.
+     */
+    @PutMapping("/{transactionId}")
+    suspend fun put(
+        @PathVariable transactionId: Long,
+        @ModelAttribute request: BackofficeTransactionNullableRequest
+    ): BackofficeTransactionResponse {
+        // -- update the data --
+        return service.update(transactionId, request.toNotNull())
+    }
 }

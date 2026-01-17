@@ -5,6 +5,7 @@ import com.mondi.machine.auths.users.User
 import com.mondi.machine.transactions.Transaction
 import com.mondi.machine.transactions.TransactionRequest
 import com.mondi.machine.transactions.TransactionService
+import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
@@ -12,9 +13,9 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.web.multipart.MultipartFile
 import java.math.BigDecimal
 import java.time.OffsetDateTime
@@ -30,7 +31,7 @@ import java.time.OffsetDateTime
 internal class BackofficeTransactionServiceTest(
     @Autowired private val backofficeTransactionService: BackofficeTransactionService
 ) {
-    @MockBean
+    @MockitoBean
     private lateinit var mockTransactionService: TransactionService
 
     @Test
@@ -40,7 +41,7 @@ internal class BackofficeTransactionServiceTest(
     }
 
     @Test
-    fun `create transaction success`() {
+    fun `create transaction success`() = runTest {
         val mockMultipartFile = MockMultipartFile("hello", ByteArray(1024))
         val mockRequest = BackofficeTransactionRequest(
             userId = 1L,
@@ -78,7 +79,7 @@ internal class BackofficeTransactionServiceTest(
     }
 
     @Test
-    fun `update transaction success`() {
+    fun `update transaction success`() = runTest {
         val mockMultipartFile = MockMultipartFile("hello", ByteArray(1024))
         val mockRequest = BackofficeTransactionRequest(
             userId = 1L,
