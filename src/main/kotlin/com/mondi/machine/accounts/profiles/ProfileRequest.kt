@@ -7,7 +7,7 @@ package com.mondi.machine.accounts.profiles
  * @since 2024-04-08
  */
 data class ProfileRequest(
-  val name: String? = null,
-  val address: String? = null,
-  val profilePictureUrl: String? = null
+    val name: String? = null,
+    val address: String? = null,
+    val profilePictureKey: String? = null
 )

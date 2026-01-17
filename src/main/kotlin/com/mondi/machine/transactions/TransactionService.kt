@@ -81,7 +81,7 @@ class TransactionService(
             BUCKET_CERTIFICATES,
             "$userId/${OffsetDateTime.now().toEpochSecond()}-${certificateFile.originalFilename}",
             certificateFile
-        )
+        ) ?: throw IllegalArgumentException("the file path on upload profile picture is null")
         // -- setup the instance of Transaction --
         val transaction = Transaction(productName, price, certificateUrl, purchasedAt, profile)
         // -- save the instance to database --
@@ -105,7 +105,7 @@ class TransactionService(
             BUCKET_CERTIFICATES,
             "$userId/${OffsetDateTime.now().toEpochSecond()}-${request.certificateFile.originalFilename}",
             request.certificateFile
-        )
+        ) ?: throw IllegalArgumentException("the file path on upload profile picture is null")
         // -- update the instance --
         transaction.apply {
             this.productName = request.productName

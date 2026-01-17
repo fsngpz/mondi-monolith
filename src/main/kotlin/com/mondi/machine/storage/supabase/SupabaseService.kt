@@ -1,5 +1,6 @@
 package com.mondi.machine.storage.supabase
 
+import com.mondi.machine.storage.FileSignedUrlResponse
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.storage.FileObject
@@ -9,6 +10,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
+import java.time.OffsetDateTime
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -65,21 +68,23 @@ class SupabaseService(
      * @param bucketName the bucket name.
      * @param fileName the file name.
      * @param file the [MultipartFile] instance.
+     * @param isOverwriteFile flag to indicate whether to overwrite the file if it already exists.
+     * @return the uploaded file path as [String].
      */
     suspend fun uploadFile(
         bucketName: String,
         fileName: String,
         file: MultipartFile,
-        isReplaceFileIfExist: Boolean = false
-    ): String {
+        isOverwriteFile: Boolean = false
+    ): String? {
         val supabase = getClient()
         val bucket = supabase.storage.from(bucketName)
         log.info("Uploading $fileName to $bucket")
         val result = bucket.upload(path = fileName, data = file.bytes) {
-            upsert = isReplaceFileIfExist
+            upsert = isOverwriteFile
         }
         log.info("Success upload $fileName to $bucket")
-        return result.path
+        return result.key
     }
 
     /**
@@ -93,5 +98,24 @@ class SupabaseService(
         val supabase = getClient()
         val bucket = supabase.storage.from(bucketName)
         return bucket.publicUrl(filePath)
+    }
+
+    /**
+     * a function to get the signed url of the file in the specified bucket.
+     *
+     * @param key the file key.
+     * @param expireDuration the expire duration.
+     * @return the [FileSignedUrlResponse].
+     */
+    suspend fun getSignedUrl(
+        key: String,
+        expireDuration: Duration
+    ): FileSignedUrlResponse {
+        val supabase = getClient()
+        val bucketName = key.substringBefore("/")
+        val fileKey = key.substringAfter("/")
+        val bucket = supabase.storage.from(bucketName)
+        val signedUrl = bucket.createSignedUrl(fileKey, expireDuration)
+        return FileSignedUrlResponse(signedUrl, OffsetDateTime.now().plusSeconds(expireDuration.inWholeSeconds))
     }
 }

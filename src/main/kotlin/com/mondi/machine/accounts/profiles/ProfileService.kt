@@ -65,7 +65,7 @@ class ProfileService(
         val profile = get(id).apply {
             this.name = request.name
             this.address = request.address
-            this.profilePictureUrl = request.profilePictureUrl
+            this.profilePictureUrl = request.profilePictureKey
         }
         // -- save the instance --
         return repository.save(profile)
@@ -110,18 +110,18 @@ class ProfileService(
     ): JsonNode {
         val extension = profilePicture?.originalFilename?.substringAfterLast('.', "")
         // -- upload profile picture if the profilePicture is null then the value will be null --
-        val profilePicturePath = profilePicture?.let {
+        val profilePictureKey = profilePicture?.let {
             supabaseService.uploadFile(
                 bucketName = BUCKET_USERS,
                 fileName = "/profile-picture/user-${id}.${extension}",
                 file = it,
-                isReplaceFileIfExist = true
+                isOverwriteFile = true
             )
         } ?: throw IllegalArgumentException("the file path on upload profile picture is null")
         // -- convert the value of JsonNode to ProfileRequest --
         val nodeRequest = objectMapper.convertValue<ProfileRequest>(this)
         // -- create new instance ProfileRequest and add the profile picture url to it --
-        val newRequest = ProfileRequest(nodeRequest.name, nodeRequest.address, profilePicturePath)
+        val newRequest = ProfileRequest(nodeRequest.name, nodeRequest.address, profilePictureKey)
         // -- return as the JsonNode --
         return objectMapper.convertValue<JsonNode>(newRequest)
     }
