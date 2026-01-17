@@ -1,9 +1,11 @@
 package com.mondi.machine.accounts.profiles
 
 import jakarta.servlet.http.HttpServletRequest
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.RequestAttribute
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -24,9 +26,9 @@ class ProfileController(private val service: ProfileService) {
      * @return the [ProfileResponse]
      */
     @GetMapping("/profiles")
-    fun get(httpServletRequest: HttpServletRequest): ProfileResponse {
-        // -- get the ID from header--
-        val id = httpServletRequest.getHeader("ID").toLong()
+    suspend fun get(
+        @RequestAttribute("ID") id: Long
+    ): ProfileResponse {
         // -- get the profile using ID --
         return service.get(id).toResponse()
     }
@@ -38,16 +40,13 @@ class ProfileController(private val service: ProfileService) {
      * @param httpServletRequest the [HttpServletRequest].
      * @return the [ProfileResponse].
      */
-    @PatchMapping("/profiles")
+    @PatchMapping("/profiles", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     suspend fun patch(
         @ModelAttribute payload: ProfileFileRequest,
-        httpServletRequest: HttpServletRequest
+        @RequestAttribute("ID") id: Long
     ): ProfileResponse {
-        // -- get the ID from header--
-        val id = httpServletRequest.getHeader("ID").toLong()
         // -- create new instance ProfileRequest --
         val request = ProfileRequest(name = payload.name, payload.address)
-
         // -- update the data Profile --
         return service.patch(id, request, payload.profilePicture).toResponse()
     }

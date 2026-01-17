@@ -66,11 +66,18 @@ class SupabaseService(
      * @param fileName the file name.
      * @param file the [MultipartFile] instance.
      */
-    suspend fun uploadFile(bucketName: String, fileName: String, file: MultipartFile): String {
+    suspend fun uploadFile(
+        bucketName: String,
+        fileName: String,
+        file: MultipartFile,
+        isReplaceFileIfExist: Boolean = false
+    ): String {
         val supabase = getClient()
         val bucket = supabase.storage.from(bucketName)
         log.info("Uploading $fileName to $bucket")
-        val result = bucket.upload(path = fileName, data = file.bytes)
+        val result = bucket.upload(path = fileName, data = file.bytes) {
+            upsert = isReplaceFileIfExist
+        }
         log.info("Success upload $fileName to $bucket")
         return result.path
     }

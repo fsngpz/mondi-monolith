@@ -1,6 +1,5 @@
 package com.mondi.machine.auths.jwt
 
-import com.mondi.machine.configs.CustomHeaderHttpServletRequest
 import com.mondi.machine.configs.CustomUserDetailService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
@@ -21,46 +20,40 @@ import org.springframework.web.filter.OncePerRequestFilter
  */
 @Component
 class JwtAuthFilter(
-  private val jwtService: JwtService,
-  private val customUserDetailService: CustomUserDetailService
+    private val jwtService: JwtService,
+    private val customUserDetailService: CustomUserDetailService
 ) : OncePerRequestFilter() {
-  override fun doFilterInternal(
-    request: HttpServletRequest,
-    response: HttpServletResponse,
-    filterChain: FilterChain
-  ) {
-    val customHeader = HashMap<String, String>()
-    val authHeader = request.getHeader(HttpHeaders.AUTHORIZATION)
-    var token: String? = null
-    var email: String? = null
-    var id: String? = null
-    if (authHeader != null && authHeader.startsWith("Bearer ")) {
-      token = authHeader.substring("Bearer ".length)
-      email = jwtService.extractEmail(token)
-      id = jwtService.extractId(token)
-    }
+    override fun doFilterInternal(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+        filterChain: FilterChain
+    ) {
+        val authHeader = request.getHeader(HttpHeaders.AUTHORIZATION)
+        var token: String? = null
+        var email: String? = null
+        var id: String? = null
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring("Bearer ".length)
+            email = jwtService.extractEmail(token)
+            id = jwtService.extractId(token)
+        }
 
-    if (id != null && email != null && SecurityContextHolder.getContext().authentication == null) {
-      val userDetails: UserDetails = customUserDetailService.loadUserByUsername(email)
-      if (jwtService.validateToken(token, userDetails)) {
-        // -- setup instance AuthenticationToken --
-        val authToken = UsernamePasswordAuthenticationToken(
-          userDetails,
-          null,
-          userDetails.authorities
-        )
-        authToken.details = WebAuthenticationDetailsSource().buildDetails(request)
-        SecurityContextHolder.getContext().authentication = authToken
-        // -- get the CustomUserDetails --
-        // val customUserDetails = customUserDetailService.getCustomUserDetails(email)
-      }
-      // -- set the custom header --
-      customHeader.apply {
-        this["ID"] = id
-      }
+        if (id != null && email != null && SecurityContextHolder.getContext().authentication == null) {
+            val userDetails: UserDetails = customUserDetailService.loadUserByUsername(email)
+            if (jwtService.validateToken(token, userDetails)) {
+                // -- setup instance AuthenticationToken --
+                val authToken = UsernamePasswordAuthenticationToken(
+                    userDetails,
+                    null,
+                    userDetails.authorities
+                )
+                authToken.details = WebAuthenticationDetailsSource().buildDetails(request)
+                SecurityContextHolder.getContext().authentication = authToken
+            }
+            // -- set the custom header --
+            request.setAttribute("ID", id)
+        }
+        // -- do customize the HttpServletRequest --
+        filterChain.doFilter(request, response)
     }
-    // -- do customize the HttpServletRequest --
-    val newRequest = CustomHeaderHttpServletRequest(request, customHeader)
-    filterChain.doFilter(newRequest, response)
-  }
 }

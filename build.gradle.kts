@@ -1,5 +1,13 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+val springDocVersion = "2.7.0"
+val ktorVersion = "3.3.3"
+val supabaseVersion = "3.3.0"
+val mockitoKotlin = "5.2.1"
+val jwtVersion = "0.11.5"
+val dropboxVersion = "6.1.0"
+val coroutinesVersion = "1.10.2"
+
 plugins {
     id("org.springframework.boot") version "3.5.9"
     id("io.spring.dependency-management") version "1.1.7"
@@ -19,13 +27,7 @@ repositories {
     mavenCentral()
 }
 
-val springDocVersion = "2.5.0"
-val ktorVersion = "3.3.3"
-val supabaseVersion = "3.3.0"
-val mockitoKotlin = "5.2.1"
-val jwtVersion = "0.11.5"
-val dropboxVersion = "6.1.0"
-val coroutinesVersion = "1.10.2"
+
 
 dependencies {
     // -- spring boot --
@@ -72,6 +74,8 @@ dependencies {
     implementation("io.ktor:ktor-client-java:${ktorVersion}")
 
     // -- coroutine --
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutinesVersion}")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:${coroutinesVersion}")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${coroutinesVersion}")
 }
 

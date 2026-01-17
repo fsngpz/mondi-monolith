@@ -7,7 +7,11 @@ import org.springframework.web.multipart.MultipartFile
  * @since 2024-04-12
  */
 data class ProfileFileRequest(
-  val name: String? = null,
-  val address: String? = null,
-  val profilePicture: MultipartFile? = null
+    val name: String? = null,
+    val address: String? = null,
+//    @Parameter(
+//        description = "The profile picture file to upload",
+//        schema = Schema(type = "string", format = "binary")
+//    )
+    val profilePicture: MultipartFile? = null
 )
