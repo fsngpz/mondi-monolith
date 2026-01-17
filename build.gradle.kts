@@ -1,68 +1,91 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  id("org.springframework.boot") version "3.2.4"
-  id("io.spring.dependency-management") version "1.1.4"
-  kotlin("jvm") version "1.9.23"
-  kotlin("plugin.spring") version "1.9.23"
-  kotlin("plugin.jpa") version "1.9.23"
+    id("org.springframework.boot") version "3.5.9"
+    id("io.spring.dependency-management") version "1.1.7"
+    kotlin("jvm") version "2.3.0"
+    kotlin("plugin.spring") version "2.3.0"
+    kotlin("plugin.jpa") version "2.3.0"
 }
 
 group = "com.mondi"
 version = "machine-0.0.1-SNAPSHOT"
 
 java {
-  sourceCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_17
 }
 
 repositories {
-  mavenCentral()
+    mavenCentral()
 }
 
 val springDocVersion = "2.5.0"
+val ktorVersion = "3.3.3"
+val supabaseVersion = "3.3.0"
+val mockitoKotlin = "5.2.1"
+val jwtVersion = "0.11.5"
+val dropboxVersion = "6.1.0"
+val coroutinesVersion = "1.10.2"
 
 dependencies {
-  // -- spring boot --
-  implementation("org.springframework.boot:spring-boot-starter-web")
+    // -- spring boot --
+    implementation("org.springframework.boot:spring-boot-starter-web")
 
-  // -- spring security --
-  implementation("org.springframework.boot:spring-boot-starter-security")
+    // -- spring security --
+    implementation("org.springframework.boot:spring-boot-starter-security")
 
-  // -- spring boot: data --
-  implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-  implementation("org.flywaydb:flyway-core")
-  runtimeOnly("org.postgresql:postgresql")
+    // -- spring boot: data --
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    runtimeOnly("org.postgresql:postgresql")
 
-  // -- spring doc --
-  implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocVersion")
+    // -- flyway --
+    implementation("org.flywaydb:flyway-core")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql")
+    runtimeOnly("org.postgresql:postgresql")
 
-  // -- test --
-  testImplementation("org.springframework.boot:spring-boot-starter-test")
-  testImplementation("org.springframework.boot:spring-boot-testcontainers")
-  testImplementation("org.testcontainers:junit-jupiter")
-  testImplementation("org.testcontainers:postgresql")
-  testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+    // -- spring doc --
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocVersion")
 
-  // -- kotlin --
-  implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-  implementation("org.jetbrains.kotlin:kotlin-reflect")
+    // -- test --
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:postgresql")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:${mockitoKotlin}")
 
-  // -- jwt --
-  implementation("io.jsonwebtoken:jjwt-api:0.11.5")
-  implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
-  implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
+    // -- kotlin --
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
 
-  // -- dropbox --
-  implementation("com.dropbox.core:dropbox-core-sdk:6.1.0")
+    // -- jwt --
+    implementation("io.jsonwebtoken:jjwt-api:${jwtVersion}")
+    implementation("io.jsonwebtoken:jjwt-impl:${jwtVersion}")
+    implementation("io.jsonwebtoken:jjwt-jackson:${jwtVersion}")
+
+    // -- dropbox --
+    implementation("com.dropbox.core:dropbox-core-sdk:${dropboxVersion}")
+
+    // -- supabase--
+    implementation("io.github.jan-tennert.supabase:storage-kt:${supabaseVersion}")
+
+    // -- ktor --
+    implementation("io.ktor:ktor-client-java:${ktorVersion}")
+
+    // -- coroutine --
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${coroutinesVersion}")
 }
 
-tasks.withType<KotlinCompile> {
-  kotlinOptions {
-    freeCompilerArgs += "-Xjsr305=strict"
-    jvmTarget = "17"
-  }
+tasks.withType<KotlinCompile>().configureEach {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        freeCompilerArgs.addAll(
+            "-Xjsr305=strict",
+            "-java-parameters",
+            "-Xannotation-default-target=param-property"
+        )
+    }
 }
 
 tasks.withType<Test> {
-  useJUnitPlatform()
+    useJUnitPlatform()
 }
