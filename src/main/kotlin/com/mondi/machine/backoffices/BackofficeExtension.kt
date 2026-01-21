@@ -2,9 +2,13 @@ package com.mondi.machine.backoffices
 
 import com.mondi.machine.auths.users.UserRole
 import com.mondi.machine.backoffices.accounts.BackofficeAccountResponse
+import com.mondi.machine.backoffices.products.BackofficeProductNullableRequest
+import com.mondi.machine.backoffices.products.BackofficeProductRequest
+import com.mondi.machine.backoffices.products.BackofficeProductResponse
 import com.mondi.machine.backoffices.transactions.BackofficeTransactionNullableRequest
 import com.mondi.machine.backoffices.transactions.BackofficeTransactionRequest
 import com.mondi.machine.backoffices.transactions.BackofficeTransactionResponse
+import com.mondi.machine.products.Product
 import com.mondi.machine.transactions.Transaction
 
 /**
@@ -81,5 +85,80 @@ fun BackofficeTransactionNullableRequest.toNotNull(): BackofficeTransactionReque
     this.price,
     this.certificateFile,
     this.purchasedAt
+  )
+}
+
+/**
+ * an extension function to map the [Product] to [BackofficeProductResponse].
+ *
+ * @return the [BackofficeProductResponse].
+ */
+fun Product.toResponse(): BackofficeProductResponse {
+  val id = this.id
+  // -- validate field id --
+  requireNotNull(id) {
+    "field id is null"
+  }
+  // -- return the mapped value --
+  return BackofficeProductResponse(
+    id,
+    this.name,
+    this.description,
+    this.price,
+    this.currency,
+    this.specificationInHtml,
+    this.discountPercentage,
+    this.media.map { it.mediaUrl },
+    this.category,
+    this.stock
+  )
+}
+
+/**
+ * an extension function to convert the [BackofficeProductNullableRequest]
+ * to [BackofficeProductRequest].
+ *
+ * @return the [BackofficeProductRequest] instance.
+ */
+fun BackofficeProductNullableRequest.toNotNull(): BackofficeProductRequest {
+  // -- validate field name --
+  requireNotNull(this.name) {
+    "the field 'name' cannot be null"
+  }
+  // -- validate field price --
+  requireNotNull(this.price) {
+    "the field 'price' cannot be null"
+  }
+  // -- validate field currency --
+  requireNotNull(this.currency) {
+    "the field 'currency' cannot be null"
+  }
+  // -- validate field discountPercentage --
+  requireNotNull(this.discountPercentage) {
+    "the field 'discountPercentage' cannot be null"
+  }
+  // -- validate field mediaFiles --
+  requireNotNull(this.mediaFiles) {
+    "the field 'mediaFiles' cannot be null"
+  }
+  // -- validate field category --
+  requireNotNull(this.category) {
+    "the field 'category' cannot be null"
+  }
+  // -- validate field stock --
+  requireNotNull(this.stock) {
+    "the field 'stock' cannot be null"
+  }
+  // -- return the instance of BackofficeProductRequest --
+  return BackofficeProductRequest(
+    this.name,
+    this.description,
+    this.price,
+    this.currency,
+    this.specificationInHtml,
+    this.discountPercentage,
+    this.mediaFiles,
+    this.category,
+    this.stock
   )
 }
