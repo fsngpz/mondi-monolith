@@ -35,11 +35,12 @@ class SupabaseService(
     }
 
     /**
-     * a private function to get Supabase client.
+     * an internal function to get Supabase client.
+     * Internal and open to allow mocking in tests.
      *
      * @return the [SupabaseClient] instance.
      */
-    private fun getClient(): SupabaseClient {
+    internal open fun getClient(): SupabaseClient {
         return createSupabaseClient(
             supabaseUrl = supabaseUrl,
             supabaseKey = supabaseKey

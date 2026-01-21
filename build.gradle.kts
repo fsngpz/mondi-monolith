@@ -7,6 +7,7 @@ val mockitoKotlin = "5.2.1"
 val jwtVersion = "0.11.5"
 val dropboxVersion = "6.1.0"
 val coroutinesVersion = "1.10.2"
+val mockkVersion = "1.13.14"
 
 plugins {
     id("org.springframework.boot") version "3.5.9"
@@ -68,6 +69,7 @@ dependencies {
     implementation("com.dropbox.core:dropbox-core-sdk:${dropboxVersion}")
 
     // -- supabase--
+    implementation("io.github.jan-tennert.supabase:supabase-kt:${supabaseVersion}")
     implementation("io.github.jan-tennert.supabase:storage-kt:${supabaseVersion}")
 
     // -- ktor --
@@ -77,6 +79,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutinesVersion}")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:${coroutinesVersion}")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${coroutinesVersion}")
+
+    // -- mockk --
+    testImplementation("io.mockk:mockk:${mockkVersion}")
 }
 
 tasks.withType<KotlinCompile>().configureEach {
