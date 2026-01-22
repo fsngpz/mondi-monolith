@@ -91,11 +91,12 @@ class SupabaseService(
     /**
      * a function to get the public url of the file in the specified bucket.
      *
-     * @param bucketName the bucket name.
-     * @param filePath the file path.
+     * @param fileKey the file key.
      * @return the public url as [String].
      */
-    fun getPublicUrl(bucketName: String, filePath: String): String {
+    fun getPublicUrl(fileKey: String): String {
+        val bucketName = fileKey.substringBefore("/")
+        val filePath = fileKey.substringAfter("/")
         val supabase = getClient()
         val bucket = supabase.storage.from(bucketName)
         return bucket.publicUrl(filePath)

@@ -160,8 +160,9 @@ class ProductService(
             val fileName = "${OffsetDateTime.now().toEpochSecond()}-${sanitizedFileName}.${extension}"
             val mediaKey = supabaseService.uploadFile(BUCKET_PRODUCTS, fileName, file)
                 ?: throw IllegalArgumentException("the file path on upload product media is null")
+            val mediaUrl = supabaseService.getPublicUrl(mediaKey)
             // -- create ProductMedia instance --
-            val productMedia = ProductMedia(mediaKey, index, product)
+            val productMedia = ProductMedia(mediaUrl, index, product)
             // -- save to database --
             mediaRepository.save(productMedia)
         }

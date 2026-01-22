@@ -17,7 +17,7 @@ data class BackofficeProductResponse(
     val currency: String,
     val specificationInHtml: String?,
     val discountPercentage: BigDecimal,
-    val mediaKeys: List<String>,
+    val mediaUrls: List<String>,
     val category: ProductCategory,
     val stock: Int
 )

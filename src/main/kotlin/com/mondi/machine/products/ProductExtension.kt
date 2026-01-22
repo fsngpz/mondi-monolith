@@ -20,7 +20,7 @@ fun Product.toResponse(): ProductResponse {
         this.currency,
         this.specificationInHtml,
         this.discountPercentage,
-        this.media.map { it.mediaKey },
+        this.media.map { it.mediaUrl },
         this.category,
         this.stock
     )

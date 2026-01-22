@@ -18,7 +18,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 @EntityListeners(AuditingEntityListener::class)
 @Table(name = "product_media")
 class ProductMedia(
-    var mediaKey: String,
+    var mediaUrl: String,
     var displayOrder: Int = 0,
 
     // -- Many to One --

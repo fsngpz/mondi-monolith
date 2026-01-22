@@ -48,6 +48,7 @@ class SupabaseServiceIntegrationTest(@Autowired private val service: SupabaseSer
     fun `uploadFileToBucket and getPublicUrl`() = runTest {
         val filePath = "test-upload-file.txt"
         val fileContent = "This is a test file for upload.".toByteArray()
+        val fileKey = "products/$filePath"
 
         val mockMultiPartFile = MockMultipartFile(
             "file",
@@ -56,7 +57,7 @@ class SupabaseServiceIntegrationTest(@Autowired private val service: SupabaseSer
         val uploadResult = service.uploadFile("products", filePath, mockMultiPartFile)
         assertThat(uploadResult).isNotNull
 
-        val publicUrl = service.getPublicUrl("products", filePath)
+        val publicUrl = service.getPublicUrl(fileKey)
         assertThat(publicUrl).isNotNull
     }
 }
