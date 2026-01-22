@@ -18,27 +18,27 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 @EntityListeners(AuditingEntityListener::class)
 @Table(name = "product_media")
 class ProductMedia(
-  var mediaUrl: String,
-  var displayOrder: Int = 0,
+    var mediaKey: String,
+    var displayOrder: Int = 0,
 
-  // -- Many to One --
-  @ManyToOne
-  @JoinColumn(name = "product_id")
-  val product: Product
+    // -- Many to One --
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    val product: Product
 ) : AuditableBaseEntity<String>() {
 
-  override fun equals(other: Any?): Boolean {
-    if (this === other) return true
-    if (javaClass != other?.javaClass) return false
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-    other as ProductMedia
+        other as ProductMedia
 
-    if (id != other.id) return false
+        if (id != other.id) return false
 
-    return true
-  }
+        return true
+    }
 
-  override fun hashCode(): Int {
-    return id?.hashCode() ?: 0
-  }
+    override fun hashCode(): Int {
+        return id?.hashCode() ?: 0
+    }
 }

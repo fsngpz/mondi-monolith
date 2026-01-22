@@ -8,6 +8,7 @@ val jwtVersion = "0.11.5"
 val dropboxVersion = "6.1.0"
 val coroutinesVersion = "1.10.2"
 val mockkVersion = "1.13.14"
+val apacheCommonsIoVersion = "2.21.0"
 
 plugins {
     id("org.springframework.boot") version "3.5.9"
@@ -45,6 +46,9 @@ dependencies {
     implementation("org.flywaydb:flyway-core")
     runtimeOnly("org.flywaydb:flyway-database-postgresql")
     runtimeOnly("org.postgresql:postgresql")
+
+    // -- apache commons io --
+    implementation("commons-io:commons-io:$apacheCommonsIoVersion")
 
     // -- spring doc --
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocVersion")

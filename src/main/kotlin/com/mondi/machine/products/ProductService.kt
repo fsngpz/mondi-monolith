@@ -3,6 +3,7 @@ package com.mondi.machine.products
 import com.mondi.machine.storage.supabase.SupabaseService
 import com.mondi.machine.storage.supabase.SupabaseService.Companion.BUCKET_PRODUCTS
 import jakarta.transaction.Transactional
+import org.apache.commons.io.FilenameUtils
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
@@ -154,13 +155,16 @@ class ProductService(
      */
     private suspend fun uploadAndSaveMediaFiles(product: Product, mediaFiles: List<MultipartFile>) {
         mediaFiles.forEachIndexed { index, file ->
-            val fileName = "${OffsetDateTime.now().toEpochSecond()}-${product.name}"
-            val mediaUrl = supabaseService.uploadFile(BUCKET_PRODUCTS, fileName, file)
+            val sanitizedFileName = product.name.sanitizeFileName()
+            val extension = FilenameUtils.getExtension(file.originalFilename)
+            val fileName = "${OffsetDateTime.now().toEpochSecond()}-${sanitizedFileName}.${extension}"
+            val mediaKey = supabaseService.uploadFile(BUCKET_PRODUCTS, fileName, file)
                 ?: throw IllegalArgumentException("the file path on upload product media is null")
             // -- create ProductMedia instance --
-            val productMedia = ProductMedia(mediaUrl, index, product)
+            val productMedia = ProductMedia(mediaKey, index, product)
             // -- save to database --
             mediaRepository.save(productMedia)
         }
     }
+
 }

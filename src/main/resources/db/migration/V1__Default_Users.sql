@@ -10,7 +10,7 @@ VALUES ('ROLE_ADMIN', 'Act as admin / super user', 'SYSTEM', 'SYSTEM');
  */
 INSERT INTO users(email, password, creator_id, updater_id)
 VALUES ('mondijewellery@gmail.com',
-        '$2a$10$DSHKXrR4Vma6dSaebtIgwOngIUHkOe6ycLIk5BfEpT5cLQ3YkC3IC',
+        '$2a$10$6aS/efMFc5eAZ7F9EKsDT.fwH7hL6welQ24ASQdsFerNvjjBCkp6W', /* Admin@2026 */
         'SYSTEM',
         'SYSTEM');
 

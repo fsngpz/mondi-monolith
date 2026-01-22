@@ -70,7 +70,7 @@ class SupabaseService(
      * @param fileName the file name.
      * @param file the [MultipartFile] instance.
      * @param isOverwriteFile flag to indicate whether to overwrite the file if it already exists.
-     * @return the uploaded file path as [String].
+     * @return the uploaded file key as [String].
      */
     suspend fun uploadFile(
         bucketName: String,

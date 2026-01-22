@@ -38,7 +38,7 @@ CREATE TABLE product_media
         CONSTRAINT product_media_product_id_fk
             REFERENCES products
             ON UPDATE CASCADE ON DELETE CASCADE,
-    media_url               text                                               NOT NULL,
+    media_key               text                                               NOT NULL,
     display_order           integer                  DEFAULT 0                 NOT NULL,
     created_at              timestamp WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     creator_id              text                                               NOT NULL,
