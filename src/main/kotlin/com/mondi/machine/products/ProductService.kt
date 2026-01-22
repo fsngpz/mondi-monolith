@@ -1,5 +1,6 @@
 package com.mondi.machine.products
 
+import com.mondi.machine.backoffices.products.BackofficeProductRequest
 import com.mondi.machine.storage.supabase.SupabaseService
 import com.mondi.machine.storage.supabase.SupabaseService.Companion.BUCKET_PRODUCTS
 import jakarta.transaction.Transactional
@@ -61,44 +62,26 @@ class ProductService(
     /**
      * a function to handle create new [Product].
      *
-     * @param name the name of product.
-     * @param description the description of product.
-     * @param price the price of product.
-     * @param currency the currency of product.
-     * @param specificationInHtml the specification in HTML format.
-     * @param discountPercentage the discount percentage.
-     * @param mediaFiles the list of [MultipartFile] for product media.
-     * @param category the category of product.
-     * @param stock the stock quantity.
+     * @param request the [BackofficeProductRequest] instance.
      * @return the [Product] instance.
      */
     @Transactional
-    suspend fun create(
-        name: String,
-        description: String?,
-        price: BigDecimal,
-        currency: String,
-        specificationInHtml: String?,
-        discountPercentage: BigDecimal,
-        mediaFiles: List<MultipartFile>,
-        category: ProductCategory,
-        stock: Int
-    ): Product {
+    suspend fun create(request: BackofficeProductRequest): Product {
         // -- setup the instance of Product --
         val product = Product(
-            name = name,
-            description = description,
-            price = price,
-            currency = currency,
-            specificationInHtml = specificationInHtml,
-            discountPercentage = discountPercentage,
-            category = category,
-            stock = stock
+            name = request.name,
+            description = request.description,
+            price = request.price,
+            currency = request.currency.name,
+            specificationInHtml = request.specificationInHtml,
+            discountPercentage = request.discountPercentage,
+            category = request.category,
+            stock = request.stock
         )
         // -- save the instance to database --
         val savedProduct = repository.save(product)
         // -- upload and save media files --
-        uploadAndSaveMediaFiles(savedProduct, mediaFiles)
+        uploadAndSaveMediaFiles(savedProduct, request.mediaFiles)
         // -- return the saved product --
         return savedProduct
     }
@@ -127,7 +110,9 @@ class ProductService(
         }
         // -- save the updated instance --
         val updatedProduct = repository.save(product)
-        // -- delete old media --
+        // -- clear old media from collection --
+        updatedProduct.media.clear()
+        // -- delete old media from database --
         mediaRepository.deleteByProductId(id)
         // -- upload and save new media files --
         uploadAndSaveMediaFiles(updatedProduct, request.mediaFiles)
@@ -164,7 +149,9 @@ class ProductService(
             // -- create ProductMedia instance --
             val productMedia = ProductMedia(mediaUrl, index, product)
             // -- save to database --
-            mediaRepository.save(productMedia)
+            val savedMedia = mediaRepository.save(productMedia)
+            // -- add to product's media collection --
+            product.media.add(savedMedia)
         }
     }
 
