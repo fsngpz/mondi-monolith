@@ -117,7 +117,7 @@ class ProfileService(
                 file = it,
                 isOverwriteFile = true
             )
-        } ?: throw IllegalArgumentException("the file path on upload profile picture is null")
+        }
         // -- convert the value of JsonNode to ProfileRequest --
         val nodeRequest = objectMapper.convertValue<ProfileRequest>(this)
         // -- create new instance ProfileRequest and add the profile picture url to it --

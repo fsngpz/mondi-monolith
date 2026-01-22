@@ -135,7 +135,14 @@ internal class TransactionServiceTest(@Autowired private val transactionService:
         val mockTransaction = createMockTransaction("ABC", BigDecimal.TEN, mockProfile)
         // -- mock --
         whenever(mockProfileService.get(any<Long>())).thenReturn(mockProfile)
-        whenever(mockSupabaseService.uploadFile(any<String>(), any<String>(), any<MultipartFile>())).thenReturn(
+        whenever(
+            mockSupabaseService.uploadFile(
+                any<String>(),
+                any<String>(),
+                any<MultipartFile>(),
+                any<Boolean>()
+            )
+        ).thenReturn(
             certificateUrl
         )
         whenever(mockTransactionRepository.save(any<Transaction>())).thenReturn(mockTransaction)
@@ -152,7 +159,7 @@ internal class TransactionServiceTest(@Autowired private val transactionService:
 
         // -- verify --
         verify(mockProfileService).get(any<Long>())
-        verify(mockSupabaseService).uploadFile(any<String>(), any<String>(), any<MultipartFile>())
+        verify(mockSupabaseService).uploadFile(any<String>(), any<String>(), any<MultipartFile>(), any<Boolean>())
         verify(mockTransactionRepository).save(any<Transaction>())
     }
 
@@ -172,7 +179,14 @@ internal class TransactionServiceTest(@Autowired private val transactionService:
         whenever(mockTransactionRepository.findById(any<Long>())).thenReturn(
             Optional.of(mockTransaction)
         )
-        whenever(mockSupabaseService.uploadFile(any<String>(), any<String>(), any<MultipartFile>())).thenReturn(
+        whenever(
+            mockSupabaseService.uploadFile(
+                any<String>(),
+                any<String>(),
+                any<MultipartFile>(),
+                any<Boolean>()
+            )
+        ).thenReturn(
             certificateUrl
         )
         whenever(mockTransactionRepository.save(any<Transaction>())).thenReturn(mockTransaction)
@@ -183,7 +197,7 @@ internal class TransactionServiceTest(@Autowired private val transactionService:
 
         // -- verify --
         verify(mockTransactionRepository).findById(any<Long>())
-        verify(mockSupabaseService).uploadFile(any<String>(), any<String>(), any<MultipartFile>())
+        verify(mockSupabaseService).uploadFile(any<String>(), any<String>(), any<MultipartFile>(), any<Boolean>())
         verify(mockTransactionRepository).save(any<Transaction>())
     }
 
@@ -207,7 +221,12 @@ internal class TransactionServiceTest(@Autowired private val transactionService:
 
         // -- verify --
         verify(mockTransactionRepository).findById(any<Long>())
-        verify(mockSupabaseService, never()).uploadFile(any<String>(), any<String>(), any<MultipartFile>())
+        verify(mockSupabaseService, never()).uploadFile(
+            any<String>(),
+            any<String>(),
+            any<MultipartFile>(),
+            any<Boolean>()
+        )
         verify(mockTransactionRepository, never()).save(any<Transaction>())
     }
 
@@ -229,7 +248,12 @@ internal class TransactionServiceTest(@Autowired private val transactionService:
 
         // -- verify --
         verify(mockTransactionRepository).findById(any<Long>())
-        verify(mockSupabaseService, never()).uploadFile(any<String>(), any<String>(), any<MultipartFile>())
+        verify(mockSupabaseService, never()).uploadFile(
+            any<String>(),
+            any<String>(),
+            any<MultipartFile>(),
+            any<Boolean>()
+        )
         verify(mockTransactionRepository, never()).save(any<Transaction>())
     }
 
