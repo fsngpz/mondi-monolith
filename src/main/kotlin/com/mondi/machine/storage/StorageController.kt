@@ -15,7 +15,7 @@ import kotlin.time.Duration.Companion.minutes
  */
 @RestController
 @RequestMapping("/v1/storage")
-class StorageController(private val service: SupabaseService) {
+class StorageController(private val service: SupabaseService) : StorageSwaggerController {
 
     /**
      * a GET request to handle get signed URL for file download.
@@ -24,9 +24,9 @@ class StorageController(private val service: SupabaseService) {
      * @return the [FileSignedUrlResponse].
      */
     @GetMapping("/file/signed-url")
-    suspend fun getSignedUrl(
+    override suspend fun getSignedUrl(
         @RequestParam fileKey: String,
-        @RequestParam expireDurationInMinutes: Int? = null
+        @RequestParam expireDurationInMinutes: Int?
     ): FileSignedUrlResponse {
         return service.getSignedUrl(fileKey, expireDurationInMinutes?.minutes ?: 15.minutes)
     }

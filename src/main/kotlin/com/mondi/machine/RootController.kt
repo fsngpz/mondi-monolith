@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 @RequestMapping
-class RootController {
+class RootController : RootSwaggerController {
 
   /**
    * a REST request to check health of service.
@@ -22,12 +22,12 @@ class RootController {
    * @return the String OK.
    */
   @GetMapping("/")
-  fun root(): String{
+  override fun root(): String{
     return "OK"
   }
 
   @PostMapping("/")
-  fun post(@RequestBody data: Any): Any {
+  override fun post(@RequestBody data: Any): Any {
    return data
   }
 }

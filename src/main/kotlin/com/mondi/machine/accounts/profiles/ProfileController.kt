@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 @RequestMapping("/v1/account")
-class ProfileController(private val service: ProfileService) {
+class ProfileController(private val service: ProfileService) : ProfileSwaggerController {
 
     /**
      * a REST controller to handle request get the [ProfileResponse].
@@ -26,7 +26,7 @@ class ProfileController(private val service: ProfileService) {
      * @return the [ProfileResponse]
      */
     @GetMapping("/profiles")
-    suspend fun get(
+    override suspend fun get(
         @RequestAttribute("ID") id: Long
     ): ProfileResponse {
         // -- get the profile using ID --
@@ -41,7 +41,7 @@ class ProfileController(private val service: ProfileService) {
      * @return the [ProfileResponse].
      */
     @PatchMapping("/profiles", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    suspend fun patch(
+    override suspend fun patch(
         @ModelAttribute payload: ProfileFileRequest,
         @RequestAttribute("ID") id: Long
     ): ProfileResponse {

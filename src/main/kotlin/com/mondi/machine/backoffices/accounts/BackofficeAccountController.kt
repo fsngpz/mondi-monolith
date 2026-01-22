@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 @RequestMapping("/v1/backoffice/accounts")
-class BackofficeAccountController(private val service: BackofficeAccountService) {
+class BackofficeAccountController(private val service: BackofficeAccountService) : BackofficeAccountSwaggerController {
 
   /**
    * a controller to handle request find accounts data.
@@ -29,9 +29,9 @@ class BackofficeAccountController(private val service: BackofficeAccountService)
    * @return [Page] of [BackofficeAccountResponse].
    */
   @GetMapping
-  fun findAll(
-    @RequestParam search: String? = null,
-    @RequestParam role: String? = null,
+  override fun findAll(
+    @RequestParam search: String?,
+    @RequestParam role: String?,
     @PageableDefault(sort = ["user.createdAt"], direction = Sort.Direction.DESC) pageable: Pageable
   ): Page<BackofficeAccountResponse> {
     // -- find the data --
