@@ -137,12 +137,13 @@ internal class SupabaseServiceTest {
     fun `attempting to get public url and success`() {
         val bucketName = SupabaseService.BUCKET_USERS
         val filePath = "profile/user123.jpg"
+        val fileKey = "$bucketName/$filePath"
         val expectedUrl = "https://supabase.example.com/storage/v1/object/public/$bucketName/$filePath"
         // -- mock --
         every { mockBucket.publicUrl(any<String>()) } returns expectedUrl
 
         // -- execute --
-        val result = supabaseService.getPublicUrl(bucketName, filePath)
+        val result = supabaseService.getPublicUrl(fileKey)
 
         // -- verify --
         assertThat(result).isEqualTo(expectedUrl)

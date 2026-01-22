@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 @RequestMapping("/v1/auth")
-class AuthenticationController(private val service: AuthenticationService) {
+class AuthenticationController(private val service: AuthenticationService) : AuthenticationSwaggerController {
 
   /**
    * a POST request to handle login.
@@ -22,7 +22,7 @@ class AuthenticationController(private val service: AuthenticationService) {
    * @return the [AuthenticationResponse] instance.
    */
   @PostMapping("/login")
-  fun login(@RequestBody request: AuthenticationRequest): AuthenticationResponse {
+  override fun login(@RequestBody request: AuthenticationRequest): AuthenticationResponse {
     // -- validate field email --
     requireNotNull(request.email) {
       "field 'email' cannot be null"

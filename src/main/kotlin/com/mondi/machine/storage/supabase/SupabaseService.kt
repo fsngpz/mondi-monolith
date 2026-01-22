@@ -70,7 +70,7 @@ class SupabaseService(
      * @param fileName the file name.
      * @param file the [MultipartFile] instance.
      * @param isOverwriteFile flag to indicate whether to overwrite the file if it already exists.
-     * @return the uploaded file path as [String].
+     * @return the uploaded file key as [String].
      */
     suspend fun uploadFile(
         bucketName: String,
@@ -91,11 +91,12 @@ class SupabaseService(
     /**
      * a function to get the public url of the file in the specified bucket.
      *
-     * @param bucketName the bucket name.
-     * @param filePath the file path.
+     * @param fileKey the file key.
      * @return the public url as [String].
      */
-    fun getPublicUrl(bucketName: String, filePath: String): String {
+    fun getPublicUrl(fileKey: String): String {
+        val bucketName = fileKey.substringBefore("/")
+        val filePath = fileKey.substringAfter("/")
         val supabase = getClient()
         val bucket = supabase.storage.from(bucketName)
         return bucket.publicUrl(filePath)

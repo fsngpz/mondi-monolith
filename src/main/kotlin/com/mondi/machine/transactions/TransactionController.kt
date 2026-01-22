@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 @RequestMapping("/v1/transactions")
-class TransactionController(private val service: TransactionService) {
+class TransactionController(private val service: TransactionService) : TransactionSwaggerController {
 
   /**
    * a GET request to find all [Transaction] that have been done by specific user.
@@ -33,7 +33,7 @@ class TransactionController(private val service: TransactionService) {
    * @return the [Page] of [TransactionResponse].
    */
   @GetMapping
-  fun findAll(
+  override fun findAll(
     search: String?,
     purchasedAtFrom: OffsetDateTime?,
     purchasedAtTo: OffsetDateTime?,

@@ -2,6 +2,7 @@ package com.mondi.machine.backoffices.transactions
 
 import com.mondi.machine.backoffices.toNotNull
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 @RequestMapping("/v1/backoffice/transactions")
-class BackofficeTransactionController(private val service: BackofficeTransactionService) {
+class BackofficeTransactionController(private val service: BackofficeTransactionService) : BackofficeTransactionSwaggerController {
 
     /**
      * a POST request to handle create new transaction data.
@@ -26,9 +27,9 @@ class BackofficeTransactionController(private val service: BackofficeTransaction
      * @param request the [BackofficeTransactionNullableRequest].
      * @return the [BackofficeTransactionResponse].
      */
-    @PostMapping
+    @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     @ResponseStatus(HttpStatus.CREATED)
-    suspend fun create(@ModelAttribute request: BackofficeTransactionNullableRequest): BackofficeTransactionResponse {
+    override suspend fun create(@ModelAttribute request: BackofficeTransactionNullableRequest): BackofficeTransactionResponse {
         // -- create the data --
         return service.create(request.toNotNull())
     }
@@ -40,8 +41,8 @@ class BackofficeTransactionController(private val service: BackofficeTransaction
      * @param request the [BackofficeTransactionNullableRequest] instance.
      * @return the [BackofficeTransactionResponse] instance.
      */
-    @PutMapping("/{transactionId}")
-    suspend fun put(
+    @PutMapping(value = ["/{transactionId}"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    override suspend fun put(
         @PathVariable transactionId: Long,
         @ModelAttribute request: BackofficeTransactionNullableRequest
     ): BackofficeTransactionResponse {

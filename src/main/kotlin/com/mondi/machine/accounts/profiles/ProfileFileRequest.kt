@@ -9,9 +9,5 @@ import org.springframework.web.multipart.MultipartFile
 data class ProfileFileRequest(
     val name: String? = null,
     val address: String? = null,
-//    @Parameter(
-//        description = "The profile picture file to upload",
-//        schema = Schema(type = "string", format = "binary")
-//    )
     val profilePicture: MultipartFile? = null
 )

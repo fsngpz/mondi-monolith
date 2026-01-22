@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 @RequestMapping("/v1/auth")
-class RegistrationController(private val registrationService: RegistrationService) {
+class RegistrationController(private val registrationService: RegistrationService) : RegistrationSwaggerController {
 
   /**
    * a function to do register the new User.
@@ -24,7 +24,7 @@ class RegistrationController(private val registrationService: RegistrationServic
    */
   @PostMapping("/register")
   @ResponseStatus(HttpStatus.CREATED)
-  fun register(@RequestBody request: RegistrationRequest) {
+  override fun register(@RequestBody request: RegistrationRequest) {
     // -- register the user --
     return registrationService.register(request)
   }

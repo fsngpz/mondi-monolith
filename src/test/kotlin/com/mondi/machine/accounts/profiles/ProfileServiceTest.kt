@@ -156,7 +156,14 @@ internal class ProfileServiceTest(@Autowired private val service: ProfileService
         val urlProfilePicture = "this.is.url"
         // -- mock --
         whenever(mockRepository.findById(any<Long>())).thenReturn(Optional.of(mockProfile))
-        whenever(mockSupabaseService.uploadFile(any<String>(), any<String>(), any<MultipartFile>())).thenReturn(
+        whenever(
+            mockSupabaseService.uploadFile(
+                any<String>(),
+                any<String>(),
+                any<MultipartFile>(),
+                any<Boolean>()
+            )
+        ).thenReturn(
             urlProfilePicture
         )
         whenever(mockRepository.save(any<Profile>())).thenReturn(mockProfile)
@@ -170,7 +177,7 @@ internal class ProfileServiceTest(@Autowired private val service: ProfileService
         assertThat(result).usingRecursiveComparison().isEqualTo(mockProfile)
 
         verify(mockRepository).save(any<Profile>())
-        verify(mockSupabaseService).uploadFile(any<String>(), any<String>(), any<MultipartFile>())
+        verify(mockSupabaseService).uploadFile(any<String>(), any<String>(), any<MultipartFile>(), any<Boolean>())
         // -- verify the captor --
         verify(mockRepository).save(profileCaptor.capture())
         val profileCaptured = profileCaptor.firstValue
@@ -197,7 +204,12 @@ internal class ProfileServiceTest(@Autowired private val service: ProfileService
         assertThat(result).usingRecursiveComparison().isEqualTo(mockProfile)
 
         verify(mockRepository).save(any<Profile>())
-        verify(mockSupabaseService, never()).uploadFile(any<String>(), any<String>(), any<MultipartFile>())
+        verify(mockSupabaseService, never()).uploadFile(
+            any<String>(),
+            any<String>(),
+            any<MultipartFile>(),
+            any<Boolean>()
+        )
         // -- verify the captor --
         verify(mockRepository).save(profileCaptor.capture())
         val profileCaptured = profileCaptor.firstValue
