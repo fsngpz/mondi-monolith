@@ -9,7 +9,6 @@ import java.time.OffsetDateTime
  */
 data class ProfileFileRequest(
     val name: String? = null,
-    val address: String? = null,
     val profilePicture: MultipartFile? = null,
     val mobile: String? = null,
     val membershipSince: OffsetDateTime? = null

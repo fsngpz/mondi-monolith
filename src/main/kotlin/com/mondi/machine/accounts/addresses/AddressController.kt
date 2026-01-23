@@ -1,5 +1,6 @@
 package com.mondi.machine.accounts.addresses
 
+import com.fasterxml.jackson.databind.JsonNode
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -7,7 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestAttribute
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -96,21 +96,21 @@ class AddressController(
     }
 
     /**
-     * Update an existing address.
+     * Patch / partial update an existing address.
      *
      * @param addressId the address ID.
      * @param request the [AddressRequest] instance.
      * @param userId the user ID from request attribute.
      * @return the updated [AddressResponse].
      */
-    @PutMapping("/{addressId}")
-    override fun update(
+    @PatchMapping("/{addressId}")
+    override fun patch(
         @PathVariable addressId: Long,
-        @RequestBody request: AddressRequest,
+        @RequestBody request: JsonNode,
         @RequestAttribute("ID") userId: Long
     ): ResponseEntity<AddressResponse> {
-        // -- update address --
-        val address = addressService.update(addressId, userId, request)
+        // -- patch address --
+        val address = addressService.patch(addressId, userId, request)
         // -- convert to response --
         return ResponseEntity.ok(address.toResponse())
     }
@@ -122,7 +122,7 @@ class AddressController(
      * @param userId the user ID from request attribute.
      * @return the updated [AddressResponse].
      */
-    @PatchMapping("/{addressId}/set-main")
+    @PatchMapping("/{addressId}/main")
     override fun setAsMain(
         @PathVariable addressId: Long,
         @RequestAttribute("ID") userId: Long

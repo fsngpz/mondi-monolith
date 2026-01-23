@@ -28,8 +28,8 @@ class Address(
     val user: User,
     var street: String,
     var city: String,
-    var state: String? = null,
-    var postalCode: String? = null,
+    var state: String,
+    var postalCode: String,
     var country: String,
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType::class)

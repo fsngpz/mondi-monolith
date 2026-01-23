@@ -32,6 +32,11 @@ object MobileNumberValidator {
             return false
         }
 
+        // -- check if contains invalid characters (letters) --
+        if (mobile.matches(Regex(".*[a-zA-Z].*"))) {
+            return false
+        }
+
         // -- remove all non-digit characters except plus sign --
         val digitsOnly = mobile.replace(Regex("[^+\\d]"), "")
 

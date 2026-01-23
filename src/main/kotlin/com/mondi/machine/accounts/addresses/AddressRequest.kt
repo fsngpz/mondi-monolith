@@ -9,11 +9,11 @@ package com.mondi.machine.accounts.addresses
 data class AddressRequest(
     val street: String,
     val city: String,
-    val state: String? = null,
-    val postalCode: String? = null,
+    val state: String,
+    val postalCode: String,
     val country: String,
-    val tag: AddressTag = AddressTag.HOME,
-    val isMain: Boolean = false,
-    val label: String? = null,
-    val notes: String? = null
+    val tag: AddressTag,
+    val isMain: Boolean,
+    val label: String?,
+    val notes: String?
 )

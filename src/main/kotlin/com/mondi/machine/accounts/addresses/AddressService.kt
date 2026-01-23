@@ -1,5 +1,7 @@
 package com.mondi.machine.accounts.addresses
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.mondi.machine.auths.users.User
 import com.mondi.machine.auths.users.UserRepository
 import org.slf4j.Logger
@@ -17,7 +19,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class AddressService(
     private val addressRepository: AddressRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val objectMapper: ObjectMapper
 ) {
 
     private val logger: Logger = LoggerFactory.getLogger(AddressService::class.java)
@@ -77,12 +80,18 @@ class AddressService(
      */
     @Transactional
     fun create(userId: Long, request: AddressRequest): Address {
+        // -- validate required fields --
+        requireNotNull(request.street) { "field 'street' cannot be null" }
+        requireNotNull(request.city) { "field 'city' cannot be null" }
+        requireNotNull(request.country) { "field 'country' cannot be null" }
+
         // -- find user --
         val user = userRepository.findByIdOrNull(userId)
             ?: throw NoSuchElementException("User not found with id: $userId")
 
         // -- if this address is marked as main, unset other main addresses --
-        if (request.isMain) {
+        val isMain = request.isMain ?: false
+        if (isMain) {
             unsetMainAddress(user)
         }
 
@@ -94,8 +103,8 @@ class AddressService(
             state = request.state,
             postalCode = request.postalCode,
             country = request.country,
-            tag = request.tag,
-            isMain = request.isMain
+            tag = request.tag ?: AddressTag.HOME,
+            isMain = isMain
         ).apply {
             this.label = request.label
             this.notes = request.notes
@@ -121,7 +130,8 @@ class AddressService(
         val address = getById(addressId, userId)
 
         // -- if changing to main, unset other main addresses --
-        if (request.isMain && !address.isMain) {
+        val newIsMain = request.isMain
+        if (newIsMain && !address.isMain) {
             unsetMainAddress(address.user)
         }
 
@@ -133,7 +143,7 @@ class AddressService(
             this.postalCode = request.postalCode
             this.country = request.country
             this.tag = request.tag
-            this.isMain = request.isMain
+            this.isMain = newIsMain
             this.label = request.label
             this.notes = request.notes
         }
@@ -142,6 +152,28 @@ class AddressService(
         val updatedAddress = addressRepository.save(address)
         logger.info("Updated address $addressId for user $userId")
         return updatedAddress
+    }
+
+    /**
+     * Patch / partial update an existing address.
+     *
+     * @param addressId the address ID.
+     * @param userId the user ID.
+     * @param request the [AddressRequest] instance with partial updates.
+     * @return the updated [Address] instance.
+     */
+    @Transactional
+    fun patch(addressId: Long, userId: Long, request: JsonNode): Address {
+        // -- get the existing address --
+        val address = getById(addressId, userId)
+        // -- convert the instance of Address to AddressRequest --
+        val body = address.toNullableRequest()
+        // -- read for updating --
+        val reader = objectMapper.readerForUpdating(body)
+        // -- merge the instance --
+        val mergedInstance = reader.readValue<AddressNullableRequest>(request)
+        // -- update the instance --
+        return update(addressId, userId, mergedInstance.toNonNull())
     }
 
     /**

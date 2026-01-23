@@ -1,5 +1,6 @@
 package com.mondi.machine.accounts.addresses
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.mondi.machine.exceptions.ErrorResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.ArraySchema
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestAttribute
 import org.springframework.web.bind.annotation.RequestBody
 
@@ -129,12 +129,12 @@ interface AddressSwaggerController {
         @RequestAttribute("ID") userId: Long
     ): ResponseEntity<AddressResponse>
 
-    @Operation(summary = "Update address", description = "Update an existing address")
+    @Operation(summary = "Patch address", description = "Patch / partial update an existing address")
     @ApiResponses(
         value = [
             ApiResponse(
                 responseCode = "200",
-                description = "Successfully updated address",
+                description = "Successfully patched address",
                 content = [
                     Content(
                         mediaType = "application/json",
@@ -154,10 +154,14 @@ interface AddressSwaggerController {
             )
         ]
     )
-    @PutMapping("/{addressId}")
-    fun update(
+    @PatchMapping("/{addressId}")
+    fun patch(
         @PathVariable addressId: Long,
-        @RequestBody request: AddressRequest,
+        @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            content = [
+                Content(schema = Schema(implementation = AddressNullableRequest::class))
+            ]
+        ) request: JsonNode,
         @RequestAttribute("ID") userId: Long
     ): ResponseEntity<AddressResponse>
 
@@ -186,7 +190,7 @@ interface AddressSwaggerController {
             )
         ]
     )
-    @PatchMapping("/{addressId}/set-main")
+    @PatchMapping("/{addressId}/main")
     fun setAsMain(
         @PathVariable addressId: Long,
         @RequestAttribute("ID") userId: Long

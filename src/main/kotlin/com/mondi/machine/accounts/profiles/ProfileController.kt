@@ -48,7 +48,6 @@ class ProfileController(private val service: ProfileService) : ProfileSwaggerCon
         // -- create new instance ProfileRequest --
         val request = ProfileRequest(
             name = payload.name,
-            address = payload.address,
             mobile = payload.mobile,
             membershipSince = payload.membershipSince
         )

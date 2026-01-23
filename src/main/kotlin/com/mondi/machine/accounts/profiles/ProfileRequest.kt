@@ -10,7 +10,6 @@ import java.time.OffsetDateTime
  */
 data class ProfileRequest(
     val name: String? = null,
-    val address: String? = null,
     val profilePictureKey: String? = null,
     val mobile: String? = null,
     val membershipSince: OffsetDateTime? = null

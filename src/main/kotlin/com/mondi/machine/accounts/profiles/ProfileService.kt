@@ -132,7 +132,6 @@ class ProfileService(
         // -- create new instance ProfileRequest and add the profile picture url to it --
         val newRequest = ProfileRequest(
             name = nodeRequest.name,
-            address = nodeRequest.address,
             profilePictureKey = profilePictureKey,
             mobile = nodeRequest.mobile,
             membershipSince = nodeRequest.membershipSince
