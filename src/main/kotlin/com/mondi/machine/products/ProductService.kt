@@ -41,7 +41,7 @@ class ProductService(
     /**
      * a function to find all [Product].
      *
-     * @param search the parameter to filter data by name or description.
+     * @param search the parameter to filter data by name, description, or specificationInHtml.
      * @param category the parameter to filter data by category.
      * @param minPrice the minimum price to filter data.
      * @param maxPrice the maximum price to filter data.

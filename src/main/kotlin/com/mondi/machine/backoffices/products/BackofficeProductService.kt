@@ -2,8 +2,12 @@ package com.mondi.machine.backoffices.products
 
 import com.mondi.machine.backoffices.toResponse
 import com.mondi.machine.products.Product
+import com.mondi.machine.products.ProductCategory
 import com.mondi.machine.products.ProductService
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import java.math.BigDecimal
 
 /**
  * The service class for backoffice related to product.
@@ -57,5 +61,42 @@ class BackofficeProductService(private val productService: ProductService) {
     fun delete(id: Long) {
         // -- delete the product --
         productService.delete(id)
+    }
+
+    /**
+     * a function to find all [Product] with filters.
+     *
+     * @param search the parameter to filter data by name, description, or specificationInHtml.
+     * @param category the parameter to filter data by category.
+     * @param minPrice the minimum price to filter data.
+     * @param maxPrice the maximum price to filter data.
+     * @param pageable the [Pageable].
+     * @return the [Page] of [BackofficeProductResponse].
+     */
+    fun findAll(
+        search: String?,
+        category: ProductCategory?,
+        minPrice: BigDecimal,
+        maxPrice: BigDecimal,
+        pageable: Pageable
+    ): Page<BackofficeProductResponse> {
+        // -- find all products --
+        return productService.findAll(search, category, minPrice, maxPrice, pageable)
+            .map { productResponse ->
+                BackofficeProductResponse(
+                    id = productResponse.id,
+                    name = productResponse.name,
+                    description = productResponse.description,
+                    price = productResponse.price,
+                    currency = productResponse.currency,
+                    specificationInHtml = productResponse.specificationInHtml,
+                    discountPercentage = productResponse.discountPercentage,
+                    mediaUrls = productResponse.mediaUrls,
+                    category = productResponse.category,
+                    stock = productResponse.stock,
+                    sku = productResponse.sku,
+                    status = productResponse.status
+                )
+            }
     }
 }

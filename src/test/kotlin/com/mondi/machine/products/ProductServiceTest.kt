@@ -117,6 +117,220 @@ internal class ProductServiceTest(@Autowired private val productService: Product
     }
 
     @Test
+    fun `find all with search filter by name`() {
+        val products = listOf(createMockProduct("Diamond Ring"))
+        // -- mock --
+        whenever(
+            mockProductRepository.findAllCustom(
+                "Diamond",
+                null,
+                BigDecimal.ZERO,
+                BigDecimal("999999999"),
+                Pageable.unpaged()
+            )
+        ).thenReturn(PageImpl(products))
+
+        // -- execute --
+        val result = productService.findAll(
+            "Diamond",
+            null,
+            BigDecimal.ZERO,
+            BigDecimal("999999999"),
+            Pageable.unpaged()
+        )
+
+        assertThat(result).hasSize(1)
+        assertThat(result.content[0].name).contains("Diamond")
+
+        // -- verify --
+        verify(mockProductRepository).findAllCustom(
+            "Diamond",
+            null,
+            BigDecimal.ZERO,
+            BigDecimal("999999999"),
+            Pageable.unpaged()
+        )
+    }
+
+    @Test
+    fun `find all with search filter by description`() {
+        val products = listOf(createMockProduct("Gold Ring"))
+        // -- mock --
+        whenever(
+            mockProductRepository.findAllCustom(
+                "Test description",
+                null,
+                BigDecimal.ZERO,
+                BigDecimal("999999999"),
+                Pageable.unpaged()
+            )
+        ).thenReturn(PageImpl(products))
+
+        // -- execute --
+        val result = productService.findAll(
+            "Test description",
+            null,
+            BigDecimal.ZERO,
+            BigDecimal("999999999"),
+            Pageable.unpaged()
+        )
+
+        assertThat(result).hasSize(1)
+
+        // -- verify --
+        verify(mockProductRepository).findAllCustom(
+            "Test description",
+            null,
+            BigDecimal.ZERO,
+            BigDecimal("999999999"),
+            Pageable.unpaged()
+        )
+    }
+
+    @Test
+    fun `find all with search filter by specificationInHtml`() {
+        val products = listOf(createMockProduct("Gold Ring"))
+        // -- mock --
+        whenever(
+            mockProductRepository.findAllCustom(
+                "Test specification",
+                null,
+                BigDecimal.ZERO,
+                BigDecimal("999999999"),
+                Pageable.unpaged()
+            )
+        ).thenReturn(PageImpl(products))
+
+        // -- execute --
+        val result = productService.findAll(
+            "Test specification",
+            null,
+            BigDecimal.ZERO,
+            BigDecimal("999999999"),
+            Pageable.unpaged()
+        )
+
+        assertThat(result).hasSize(1)
+
+        // -- verify --
+        verify(mockProductRepository).findAllCustom(
+            "Test specification",
+            null,
+            BigDecimal.ZERO,
+            BigDecimal("999999999"),
+            Pageable.unpaged()
+        )
+    }
+
+    @Test
+    fun `find all with category filter`() {
+        val products = listOf(createMockProduct("Diamond Ring"), createMockProduct("Gold Ring"))
+        // -- mock --
+        whenever(
+            mockProductRepository.findAllCustom(
+                null,
+                ProductCategory.RING,
+                BigDecimal.ZERO,
+                BigDecimal("999999999"),
+                Pageable.unpaged()
+            )
+        ).thenReturn(PageImpl(products))
+
+        // -- execute --
+        val result = productService.findAll(
+            null,
+            ProductCategory.RING,
+            BigDecimal.ZERO,
+            BigDecimal("999999999"),
+            Pageable.unpaged()
+        )
+
+        assertThat(result).hasSize(2)
+        assertThat(result.content).allMatch { it.category == ProductCategory.RING }
+
+        // -- verify --
+        verify(mockProductRepository).findAllCustom(
+            null,
+            ProductCategory.RING,
+            BigDecimal.ZERO,
+            BigDecimal("999999999"),
+            Pageable.unpaged()
+        )
+    }
+
+    @Test
+    fun `find all with price range filter`() {
+        val products = listOf(createMockProduct("Mid-priced Ring"))
+        // -- mock --
+        whenever(
+            mockProductRepository.findAllCustom(
+                null,
+                null,
+                BigDecimal("1000"),
+                BigDecimal("2000"),
+                Pageable.unpaged()
+            )
+        ).thenReturn(PageImpl(products))
+
+        // -- execute --
+        val result = productService.findAll(
+            null,
+            null,
+            BigDecimal("1000"),
+            BigDecimal("2000"),
+            Pageable.unpaged()
+        )
+
+        assertThat(result).hasSize(1)
+
+        // -- verify --
+        verify(mockProductRepository).findAllCustom(
+            null,
+            null,
+            BigDecimal("1000"),
+            BigDecimal("2000"),
+            Pageable.unpaged()
+        )
+    }
+
+    @Test
+    fun `find all with multiple filters`() {
+        val products = listOf(createMockProduct("Diamond Ring"))
+        // -- mock --
+        whenever(
+            mockProductRepository.findAllCustom(
+                "Diamond",
+                ProductCategory.RING,
+                BigDecimal("1000"),
+                BigDecimal("2000"),
+                Pageable.unpaged()
+            )
+        ).thenReturn(PageImpl(products))
+
+        // -- execute --
+        val result = productService.findAll(
+            "Diamond",
+            ProductCategory.RING,
+            BigDecimal("1000"),
+            BigDecimal("2000"),
+            Pageable.unpaged()
+        )
+
+        assertThat(result).hasSize(1)
+        assertThat(result.content[0].name).contains("Diamond")
+        assertThat(result.content[0].category).isEqualTo(ProductCategory.RING)
+
+        // -- verify --
+        verify(mockProductRepository).findAllCustom(
+            "Diamond",
+            ProductCategory.RING,
+            BigDecimal("1000"),
+            BigDecimal("2000"),
+            Pageable.unpaged()
+        )
+    }
+
+    @Test
     fun `attempting to create and success`() = runTest {
         val mockMultipartFile = MockMultipartFile("image.jpg", ByteArray(1024))
         val mockProduct = createMockProduct("Diamond Ring")

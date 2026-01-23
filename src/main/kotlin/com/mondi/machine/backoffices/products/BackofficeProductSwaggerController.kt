@@ -1,12 +1,17 @@
 package com.mondi.machine.backoffices.products
 
+import com.mondi.machine.products.ProductCategory
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springdoc.core.annotations.ParameterObject
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.http.MediaType
+import java.math.BigDecimal
 
 /**
  * The interface for Backoffice Product Swagger Controller.
@@ -44,4 +49,13 @@ interface BackofficeProductSwaggerController {
 
     @Operation(summary = "Delete product")
     fun delete(@Parameter(description = "Product ID") productId: Long)
+
+    @Operation(summary = "Get all products with filters")
+    fun findAll(
+        search: String?,
+        category: ProductCategory?,
+        minPrice: BigDecimal,
+        maxPrice: BigDecimal,
+        @ParameterObject pageable: Pageable
+    ): Page<BackofficeProductResponse>
 }
