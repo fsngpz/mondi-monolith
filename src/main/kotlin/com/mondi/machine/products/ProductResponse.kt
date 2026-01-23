@@ -18,5 +18,7 @@ data class ProductResponse(
     val discountPercentage: BigDecimal,
     val mediaUrls: List<String>,
     val category: ProductCategory,
-    val stock: Int
+    val stock: Int,
+    val sku: String,
+    val status: ProductStatus
 )

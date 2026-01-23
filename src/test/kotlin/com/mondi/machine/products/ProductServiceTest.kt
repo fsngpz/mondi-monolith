@@ -38,6 +38,9 @@ internal class ProductServiceTest(@Autowired private val productService: Product
 
     @MockitoBean
     lateinit var mockProductMediaRepository: ProductMediaRepository
+
+    @MockitoBean
+    lateinit var mockSkuGenerationService: SkuGenerationService
     // -- end of region mock --
 
     // -- region of smoke testing --
@@ -47,6 +50,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
         assertThat(mockSupabaseService).isNotNull
         assertThat(mockProductRepository).isNotNull
         assertThat(mockProductMediaRepository).isNotNull
+        assertThat(mockSkuGenerationService).isNotNull
     }
     // -- end of region smoke testing --
 
@@ -119,7 +123,9 @@ internal class ProductServiceTest(@Autowired private val productService: Product
         val mockProductMedia = ProductMedia("https://example.com/image.jpg", 0, mockProduct)
         val mediaKey = "products/image.jpg"
         val publicUrl = "https://example.com/image.jpg"
+        val generatedSku = "RING_26_001"
         // -- mock --
+        whenever(mockSkuGenerationService.generateSku(any<ProductCategory>())).thenReturn(generatedSku)
         whenever(mockProductRepository.save(any<Product>())).thenReturn(mockProduct)
         whenever(
             mockSupabaseService.uploadFile(
@@ -149,10 +155,96 @@ internal class ProductServiceTest(@Autowired private val productService: Product
         assertThat(result).usingRecursiveComparison().ignoringFields("media").isEqualTo(mockProduct)
 
         // -- verify --
+        verify(mockSkuGenerationService).generateSku(any<ProductCategory>())
         verify(mockProductRepository).save(any<Product>())
         verify(mockSupabaseService).uploadFile(any<String>(), any<String>(), any<MultipartFile>(), any<Boolean>())
         verify(mockSupabaseService).getPublicUrl(any<String>())
         verify(mockProductMediaRepository).save(any<ProductMedia>())
+    }
+
+    @Test
+    fun `creating product generates unique SKU`() = runTest {
+        val mockMultipartFile = MockMultipartFile("image.jpg", ByteArray(1024))
+        val mockProduct = createMockProduct("Test Ring")
+        val mockProductMedia = ProductMedia("https://example.com/image.jpg", 0, mockProduct)
+        val mediaKey = "products/image.jpg"
+        val publicUrl = "https://example.com/image.jpg"
+        val generatedSku = "RING_26_042"
+        // -- mock --
+        whenever(mockSkuGenerationService.generateSku(ProductCategory.RING)).thenReturn(generatedSku)
+        whenever(mockProductRepository.save(any<Product>())).thenReturn(mockProduct)
+        whenever(
+            mockSupabaseService.uploadFile(
+                any<String>(),
+                any<String>(),
+                any<MultipartFile>(),
+                any<Boolean>()
+            )
+        ).thenReturn(mediaKey)
+        whenever(mockSupabaseService.getPublicUrl(any<String>())).thenReturn(publicUrl)
+        whenever(mockProductMediaRepository.save(any<ProductMedia>())).thenReturn(mockProductMedia)
+
+        // -- execute --
+        productService.create(
+            com.mondi.machine.backoffices.products.BackofficeProductRequest(
+                name = "Test Ring",
+                description = "Test description",
+                price = BigDecimal("1500.00"),
+                currency = com.mondi.machine.utils.Currency.USD,
+                specificationInHtml = "<p>14k gold</p>",
+                discountPercentage = BigDecimal("10.00"),
+                mediaFiles = listOf(mockMultipartFile),
+                category = ProductCategory.RING,
+                stock = 50
+            )
+        )
+
+        // -- verify SKU generation was called with correct category --
+        verify(mockSkuGenerationService).generateSku(ProductCategory.RING)
+    }
+
+    @Test
+    fun `created product has ACTIVE status by default`() = runTest {
+        val mockMultipartFile = MockMultipartFile("image.jpg", ByteArray(1024))
+        val mockProduct = createMockProduct("Diamond Ring")
+        val mockProductMedia = ProductMedia("https://example.com/image.jpg", 0, mockProduct)
+        val mediaKey = "products/image.jpg"
+        val publicUrl = "https://example.com/image.jpg"
+        val generatedSku = "RING_26_001"
+        // -- mock --
+        whenever(mockSkuGenerationService.generateSku(any<ProductCategory>())).thenReturn(generatedSku)
+        whenever(mockProductRepository.save(any<Product>())).thenAnswer { invocation ->
+            val product = invocation.arguments[0] as Product
+            assertThat(product.status).isEqualTo(ProductStatus.ACTIVE)
+            mockProduct
+        }
+        whenever(
+            mockSupabaseService.uploadFile(
+                any<String>(),
+                any<String>(),
+                any<MultipartFile>(),
+                any<Boolean>()
+            )
+        ).thenReturn(mediaKey)
+        whenever(mockSupabaseService.getPublicUrl(any<String>())).thenReturn(publicUrl)
+        whenever(mockProductMediaRepository.save(any<ProductMedia>())).thenReturn(mockProductMedia)
+
+        // -- execute --
+        val result = productService.create(
+            com.mondi.machine.backoffices.products.BackofficeProductRequest(
+                name = "Diamond Ring",
+                description = "Beautiful diamond ring",
+                price = BigDecimal("1500.00"),
+                currency = com.mondi.machine.utils.Currency.USD,
+                specificationInHtml = "<p>14k gold</p>",
+                discountPercentage = BigDecimal("10.00"),
+                mediaFiles = listOf(mockMultipartFile),
+                category = ProductCategory.RING,
+                stock = 50
+            )
+        )
+
+        assertThat(result.status).isEqualTo(ProductStatus.ACTIVE)
     }
 
     @Test
@@ -248,7 +340,9 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             specificationInHtml = "<p>Test specification</p>",
             discountPercentage = BigDecimal("10.00"),
             category = ProductCategory.RING,
-            stock = 50
+            stock = 50,
+            sku = "RING_26_001",
+            status = ProductStatus.ACTIVE
         ).apply {
             this.id = 1L
         }

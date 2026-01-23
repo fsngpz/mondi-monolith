@@ -23,7 +23,8 @@ import java.time.OffsetDateTime
 class ProductService(
     private val supabaseService: SupabaseService,
     private val repository: ProductRepository,
-    private val mediaRepository: ProductMediaRepository
+    private val mediaRepository: ProductMediaRepository,
+    private val skuGenerationService: SkuGenerationService
 ) {
 
     /**
@@ -67,6 +68,8 @@ class ProductService(
      */
     @Transactional
     suspend fun create(request: BackofficeProductRequest): Product {
+        // -- generate SKU --
+        val sku = skuGenerationService.generateSku(request.category)
         // -- setup the instance of Product --
         val product = Product(
             name = request.name,
@@ -76,7 +79,9 @@ class ProductService(
             specificationInHtml = request.specificationInHtml,
             discountPercentage = request.discountPercentage,
             category = request.category,
-            stock = request.stock
+            stock = request.stock,
+            sku = sku,
+            status = ProductStatus.ACTIVE
         )
         // -- save the instance to database --
         val savedProduct = repository.save(product)

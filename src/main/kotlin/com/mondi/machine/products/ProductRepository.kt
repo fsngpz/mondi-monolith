@@ -40,4 +40,13 @@ interface ProductRepository : JpaRepository<Product, Long> {
         maxPrice: BigDecimal,
         pageable: Pageable
     ): Page<Product>
+
+    /**
+     * a function to count products by SKU prefix.
+     *
+     * @param skuPrefix the SKU prefix (e.g., "RING_26_")
+     * @return the count of products with the given SKU prefix.
+     */
+    @Query("SELECT COUNT(p) FROM Product p WHERE p.sku LIKE CONCAT(:skuPrefix, '%')")
+    fun countBySkuPrefix(skuPrefix: String): Long
 }

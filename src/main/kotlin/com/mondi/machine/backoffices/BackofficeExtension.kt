@@ -110,7 +110,9 @@ fun Product.toResponse(): BackofficeProductResponse {
         this.discountPercentage,
         this.media.map { it.mediaUrl },
         this.category,
-        this.stock
+        this.stock,
+        this.sku,
+        this.status
     )
 }
 

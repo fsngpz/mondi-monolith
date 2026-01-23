@@ -3,6 +3,7 @@ package com.mondi.machine.backoffices.products
 import com.mondi.machine.products.Product
 import com.mondi.machine.products.ProductCategory
 import com.mondi.machine.products.ProductService
+import com.mondi.machine.products.ProductStatus
 import com.mondi.machine.utils.Currency
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
@@ -63,6 +64,8 @@ internal class BackofficeProductServiceTest(
         assertThat(result.price).isEqualTo(mockProduct.price)
         assertThat(result.category).isEqualTo(mockProduct.category)
         assertThat(result.stock).isEqualTo(mockProduct.stock)
+        assertThat(result.sku).isNotBlank()
+        assertThat(result.status).isEqualTo(ProductStatus.ACTIVE)
 
         // -- verify --
         verify(mockProductService).create(any<BackofficeProductRequest>())
@@ -117,7 +120,9 @@ internal class BackofficeProductServiceTest(
             specificationInHtml = "<p>Test specification</p>",
             discountPercentage = BigDecimal("10.00"),
             category = ProductCategory.RING,
-            stock = 50
+            stock = 50,
+            sku = "RING_26_001",
+            status = ProductStatus.ACTIVE
         ).apply {
             this.id = 1L
         }

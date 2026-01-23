@@ -120,7 +120,7 @@ class WebSecurityConfig(
                         "https://mondi-website.vercel.app",
                         "https://mondijewellery.studio",
                         "http://localhost:3000",
-                        "http://localhost:4173"
+                        "http://localhost:5173"
                     )
                     .allowedMethods(CorsConfiguration.ALL)
                     .allowedHeaders(CorsConfiguration.ALL)
