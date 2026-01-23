@@ -1,6 +1,7 @@
 # Google OAuth Authentication Documentation
 
-This document provides comprehensive instructions on how to set up and use Google OAuth authentication in the Mondi jewelry store application.
+This document provides comprehensive instructions on how to set up and use Google OAuth authentication in the Mondi
+jewelry store application.
 
 ## Table of Contents
 
@@ -17,7 +18,8 @@ This document provides comprehensive instructions on how to set up and use Googl
 
 ## Overview
 
-The application now supports Google OAuth 2.0 authentication, allowing users to sign in using their Gmail accounts. This provides a seamless authentication experience without requiring users to create and remember separate passwords.
+The application now supports Google OAuth 2.0 authentication, allowing users to sign in using their Gmail accounts. This
+provides a seamless authentication experience without requiring users to create and remember separate passwords.
 
 ### Key Features
 
@@ -79,14 +81,14 @@ Before implementing Google OAuth, you need:
 1. Go to "APIs & Services" → "OAuth consent screen"
 2. Select "External" user type
 3. Fill in the required information:
-   - App name: Mondi Jewelry Store
-   - User support email: your-email@example.com
-   - Developer contact information: your-email@example.com
+    - App name: Mondi Jewelry Store
+    - User support email: your-email@example.com
+    - Developer contact information: your-email@example.com
 4. Click "Save and Continue"
 5. Add scopes (required):
-   - `.../auth/userinfo.email`
-   - `.../auth/userinfo.profile`
-   - `openid`
+    - `.../auth/userinfo.email`
+    - `.../auth/userinfo.profile`
+    - `openid`
 6. Click "Save and Continue"
 7. Add test users (for development)
 8. Click "Save and Continue"
@@ -96,17 +98,17 @@ Before implementing Google OAuth, you need:
 1. Go to "APIs & Services" → "Credentials"
 2. Click "Create Credentials" → "OAuth client ID"
 3. Select application type:
-   - **Web application** (for web apps)
-   - **Android** (for Android apps)
-   - **iOS** (for iOS apps)
+    - **Web application** (for web apps)
+    - **Android** (for Android apps)
+    - **iOS** (for iOS apps)
 4. Configure settings:
-   - Name: Mondi Web Client
-   - Authorized JavaScript origins:
-     - http://localhost:3000 (development)
-     - https://yourdomain.com (production)
-   - Authorized redirect URIs:
-     - http://localhost:3000 (development)
-     - https://yourdomain.com (production)
+    - Name: Mondi Web Client
+    - Authorized JavaScript origins:
+        - http://localhost:3000 (development)
+        - https://yourdomain.com (production)
+    - Authorized redirect URIs:
+        - http://localhost:3000 (development)
+        - https://yourdomain.com (production)
 5. Click "Create"
 6. Copy the **Client ID** (you'll need this for configuration)
 
@@ -158,44 +160,15 @@ Use environment variables in production:
 export GOOGLE_OAUTH_CLIENT_ID=your-production-client-id
 ```
 
-## Database Schema
-
-The OAuth implementation adds the following fields to the `users` table:
-
-### Migration: V3__Add_OAuth_Support.sql
-
-```sql
--- OAuth provider enum
-CREATE TYPE oauth_provider as enum ('LOCAL', 'GOOGLE');
-
--- Make password nullable for OAuth users
-ALTER TABLE users ALTER COLUMN password DROP NOT NULL;
-
--- Add OAuth fields
-ALTER TABLE users ADD COLUMN provider oauth_provider DEFAULT 'LOCAL' NOT NULL;
-ALTER TABLE users ADD COLUMN provider_id text;
-
--- Unique constraint for OAuth users
-CREATE UNIQUE INDEX users_provider_provider_id_uindex
-    ON users (provider, provider_id) WHERE provider_id IS NOT NULL;
-
--- Constraint to ensure data integrity
-ALTER TABLE users ADD CONSTRAINT check_password_for_local_provider
-    CHECK (
-        (provider = 'LOCAL' AND password IS NOT NULL) OR
-        (provider != 'LOCAL' AND provider_id IS NOT NULL)
-    );
-```
-
 ### Fields Description
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `provider` | `oauth_provider` | Authentication provider ('LOCAL' or 'GOOGLE') |
-| `provider_id` | `text` | Unique identifier from OAuth provider (Google user ID) |
-| `password` | `text` | Password (nullable for OAuth users) |
-| `email` | `text` | User email address |
-| `username` | `text` | User display name |
+| Field         | Type             | Description                                            |
+|---------------|------------------|--------------------------------------------------------|
+| `provider`    | `oauth_provider` | Authentication provider ('LOCAL' or 'GOOGLE')          |
+| `provider_id` | `text`           | Unique identifier from OAuth provider (Google user ID) |
+| `password`    | `text`           | Password (nullable for OAuth users)                    |
+| `email`       | `text`           | User email address                                     |
+| `username`    | `text`           | User display name                                      |
 
 ## API Endpoints
 
@@ -218,9 +191,9 @@ Content-Type: application/json
 
 #### Request Body
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `idToken` | `string` | Yes | Google ID token from Google Sign-In |
+| Field     | Type     | Required | Description                         |
+|-----------|----------|----------|-------------------------------------|
+| `idToken` | `string` | Yes      | Google ID token from Google Sign-In |
 
 #### Response (Success - 200 OK)
 
@@ -232,8 +205,8 @@ Content-Type: application/json
 
 #### Response Fields
 
-| Field | Type | Description |
-|-------|------|-------------|
+| Field         | Type     | Description                         |
+|---------------|----------|-------------------------------------|
 | `bearerToken` | `string` | JWT token for authenticated session |
 
 #### Error Responses
@@ -286,6 +259,7 @@ npm install @react-oauth/google
 **Using script tag:**
 
 ```html
+
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 ```
 
@@ -294,42 +268,42 @@ npm install @react-oauth/google
 **React Example:**
 
 ```jsx
-import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+import {GoogleOAuthProvider, GoogleLogin} from '@react-oauth/google';
 
 function App() {
-  const handleSuccess = async (credentialResponse) => {
-    try {
-      // Send ID token to backend
-      const response = await fetch('http://localhost:8080/v1/auth/oauth/google', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          idToken: credentialResponse.credential
-        })
-      });
+    const handleSuccess = async (credentialResponse) => {
+        try {
+            // Send ID token to backend
+            const response = await fetch('http://localhost:8080/v1/auth/oauth/google', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    idToken: credentialResponse.credential
+                })
+            });
 
-      const data = await response.json();
+            const data = await response.json();
 
-      // Store JWT token
-      localStorage.setItem('token', data.bearerToken);
+            // Store JWT token
+            localStorage.setItem('token', data.bearerToken);
 
-      // Redirect to home page
-      window.location.href = '/';
-    } catch (error) {
-      console.error('Authentication failed:', error);
-    }
-  };
+            // Redirect to home page
+            window.location.href = '/';
+        } catch (error) {
+            console.error('Authentication failed:', error);
+        }
+    };
 
-  return (
-    <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
-      <GoogleLogin
-        onSuccess={handleSuccess}
-        onError={() => console.log('Login Failed')}
-      />
-    </GoogleOAuthProvider>
-  );
+    return (
+        <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
+            <GoogleLogin
+                onSuccess={handleSuccess}
+                onError={() => console.log('Login Failed')}
+            />
+        </GoogleOAuthProvider>
+    );
 }
 ```
 
@@ -339,34 +313,34 @@ function App() {
 <!DOCTYPE html>
 <html>
 <head>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
-  <div id="g_id_onload"
-       data-client_id="YOUR_GOOGLE_CLIENT_ID"
-       data-callback="handleCredentialResponse">
-  </div>
-  <div class="g_id_signin" data-type="standard"></div>
+<div id="g_id_onload"
+     data-client_id="YOUR_GOOGLE_CLIENT_ID"
+     data-callback="handleCredentialResponse">
+</div>
+<div class="g_id_signin" data-type="standard"></div>
 
-  <script>
+<script>
     function handleCredentialResponse(response) {
-      fetch('http://localhost:8080/v1/auth/oauth/google', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          idToken: response.credential
+        fetch('http://localhost:8080/v1/auth/oauth/google', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                idToken: response.credential
+            })
         })
-      })
-      .then(res => res.json())
-      .then(data => {
-        localStorage.setItem('token', data.bearerToken);
-        window.location.href = '/';
-      })
-      .catch(error => console.error('Error:', error));
+                .then(res => res.json())
+                .then(data => {
+                    localStorage.setItem('token', data.bearerToken);
+                    window.location.href = '/';
+                })
+                .catch(error => console.error('Error:', error));
     }
-  </script>
+</script>
 </body>
 </html>
 ```
@@ -529,11 +503,11 @@ The implementation includes comprehensive unit tests for `GoogleOAuthService`:
 #### Test Setup
 
 1. Obtain a valid Google ID token:
-   - Go to [Google OAuth Playground](https://developers.google.com/oauthplayground/)
-   - Select "Google OAuth2 API v2" → "userinfo.email" and "userinfo.profile"
-   - Click "Authorize APIs"
-   - Exchange authorization code for tokens
-   - Copy the `id_token`
+    - Go to [Google OAuth Playground](https://developers.google.com/oauthplayground/)
+    - Select "Google OAuth2 API v2" → "userinfo.email" and "userinfo.profile"
+    - Click "Authorize APIs"
+    - Exchange authorization code for tokens
+    - Copy the `id_token`
 
 2. Test the endpoint:
 
@@ -562,26 +536,26 @@ Test the complete flow:
 ### Best Practices
 
 1. **HTTPS Only in Production**
-   - Always use HTTPS for production environments
-   - Google OAuth requires HTTPS for authorized domains
+    - Always use HTTPS for production environments
+    - Google OAuth requires HTTPS for authorized domains
 
 2. **Client ID Protection**
-   - Store Client ID in environment variables
-   - Never commit sensitive credentials to version control
-   - Use different Client IDs for development and production
+    - Store Client ID in environment variables
+    - Never commit sensitive credentials to version control
+    - Use different Client IDs for development and production
 
 3. **Token Verification**
-   - Backend always verifies ID token with Google
-   - Never trust client-side token validation alone
+    - Backend always verifies ID token with Google
+    - Never trust client-side token validation alone
 
 4. **JWT Token Security**
-   - JWT tokens expire after 30 minutes
-   - Store tokens securely (HttpOnly cookies or secure storage)
-   - Implement token refresh mechanism for better UX
+    - JWT tokens expire after 30 minutes
+    - Store tokens securely (HttpOnly cookies or secure storage)
+    - Implement token refresh mechanism for better UX
 
 5. **CORS Configuration**
-   - Configure CORS properly for your frontend domains
-   - Don't use wildcard (*) in production
+    - Configure CORS properly for your frontend domains
+    - Don't use wildcard (*) in production
 
 ### Environment Variables
 
@@ -622,11 +596,13 @@ spring:
 #### Issue 1: "Invalid Google ID token"
 
 **Causes:**
+
 - Token has expired
 - Token was issued for different Client ID
 - Network issues during verification
 
 **Solution:**
+
 - Ensure frontend uses correct Client ID
 - Request new token from Google
 - Check network connectivity
@@ -634,18 +610,22 @@ spring:
 #### Issue 2: "Email already exists with local account"
 
 **Cause:**
+
 - User previously registered with email/password
 
 **Solution:**
+
 - Inform user to login with password
 - Or implement account linking feature
 
 #### Issue 3: "redirect_uri_mismatch"
 
 **Cause:**
+
 - Frontend redirect URI not registered in Google Cloud Console
 
 **Solution:**
+
 - Add the redirect URI to authorized redirect URIs in Google Cloud Console
 - Ensure URI matches exactly (including protocol and port)
 
