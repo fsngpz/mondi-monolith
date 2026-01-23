@@ -8,13 +8,19 @@ package com.mondi.machine.accounts.profiles
  * @since 2024-04-08
  */
 fun Profile.toResponse(): ProfileResponse {
-  val id = this.id
-  // -- validate the field id --
-  requireNotNull(id) {
-    "value for 'id' is null"
-  }
-  // -- return the instance of ProfileResponse --
-  return ProfileResponse(id, this.name, this.address, this.profilePictureUrl)
+    val id = this.id
+    // -- validate the field id --
+    requireNotNull(id) {
+        "value for 'id' is null"
+    }
+    // -- return the instance of ProfileResponse --
+    return ProfileResponse(
+        id = id,
+        name = this.name,
+        profilePictureUrl = this.profilePictureUrl,
+        mobile = this.user.mobile,
+        membershipSince = this.user.membershipSince
+    )
 }
 
 /**
@@ -23,5 +29,10 @@ fun Profile.toResponse(): ProfileResponse {
  * @return the [ProfileRequest] instance.
  */
 fun Profile.toRequest(): ProfileRequest {
-  return ProfileRequest(this.name, this.address, this.profilePictureUrl)
+    return ProfileRequest(
+        name = this.name,
+        profilePictureKey = this.profilePictureUrl,
+        mobile = this.user.mobile,
+        membershipSince = this.user.membershipSince
+    )
 }

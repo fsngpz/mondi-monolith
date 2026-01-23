@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
  * @author Ferdinand Sangap.
  * @since 2026-01-22
  */
-@Tag(name = "Google OAuth API")
+@Tag(name = "Authentication API")
 interface GoogleOAuthSwaggerController {
 
     @Operation(summary = "Authenticate with Google OAuth")

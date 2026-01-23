@@ -1,3 +1,5 @@
+CREATE TYPE oauth_provider as enum ('LOCAL', 'GOOGLE');
+
 /*
  * Users
  */
@@ -7,8 +9,13 @@ CREATE TABLE users
         CONSTRAINT users_id_pk
             PRIMARY KEY,
     email               text                                               NOT NULL,
-    password            text                                               NOT NULL,
+    password            text,
     username            text,
+    provider            oauth_provider           DEFAULT 'LOCAL'           NOT NULL,
+    provider_id         text,
+    mobile              text,
+    membership_since    timestamp WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    email_verified_at   timestamp WITH TIME ZONE,
     created_at          timestamp WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     creator_id          text                                               NOT NULL,
     updated_at          timestamp WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -17,6 +24,14 @@ CREATE TABLE users
 );
 
 CREATE UNIQUE INDEX users_email_uindex ON users (LOWER(email));
+CREATE UNIQUE INDEX users_provider_provider_id_uindex ON users (provider, provider_id) WHERE provider_id IS NOT NULL;
+
+-- Add constraint to ensure password is not null when provider is LOCAL
+ALTER TABLE users ADD CONSTRAINT check_password_for_local_provider
+    CHECK (
+        (provider = 'LOCAL' AND password IS NOT NULL) OR
+        (provider != 'LOCAL' AND provider_id IS NOT NULL)
+        );
 
 /*
  * Roles
@@ -70,7 +85,6 @@ CREATE TABLE profiles
             ON UPDATE CASCADE ON DELETE CASCADE,
     name                text,
     profile_picture_url text,
-    address             text,
     created_at          timestamp WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     creator_id          text                                               NOT NULL,
     updated_at          timestamp WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,

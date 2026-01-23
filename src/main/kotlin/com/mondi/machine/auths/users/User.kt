@@ -16,6 +16,7 @@ import org.hibernate.annotations.OnDelete
 import org.hibernate.annotations.OnDeleteAction
 import org.hibernate.dialect.PostgreSQLEnumJdbcType
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
+import java.time.OffsetDateTime
 
 /**
  * The entity model class for table Userd.
@@ -27,23 +28,30 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 @EntityListeners(AuditingEntityListener::class)
 @Table(name = "users")
 class User(
-  val email: String,
-  val password: String?,
-  @Enumerated(EnumType.STRING)
-  @JdbcType(PostgreSQLEnumJdbcType::class)
-  val provider: OAuthProvider = OAuthProvider.LOCAL,
-  val providerId: String? = null
+    val email: String,
+    val password: String?,
+    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType::class)
+    val provider: OAuthProvider = OAuthProvider.LOCAL,
+    val providerId: String? = null
 ) : AuditableBaseEntity<String>() {
-  // -- optional --
-  var username: String? = null
+    // -- optional --
+    var username: String? = null
+    var mobile: String? = null
 
-  // -- one to one --
-  @OneToOne(mappedBy = "user", cascade = [CascadeType.ALL])
-  @PrimaryKeyJoinColumn
-  var profile: Profile? = null
+    var membershipSince: OffsetDateTime? = null
+    var emailVerifiedAt: OffsetDateTime? = null
 
-  // -- many to one --
-  @OneToMany(mappedBy = "user")
-  @OnDelete(action = OnDeleteAction.CASCADE)
-  var roles: Set<UserRole> = setOf()
+    // -- one to one --
+    @OneToOne(mappedBy = "user", cascade = [CascadeType.ALL])
+    @PrimaryKeyJoinColumn
+    var profile: Profile? = null
+
+    // -- many to one --
+    @OneToMany(mappedBy = "user")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    var roles: Set<UserRole> = setOf()
+
+    val isEmailVerified: Boolean
+        get() = emailVerifiedAt != null
 }

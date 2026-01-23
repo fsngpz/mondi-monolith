@@ -1,5 +1,7 @@
 package com.mondi.machine.accounts.profiles
 
+import java.time.OffsetDateTime
+
 /**
  * The model class for response [Profile].
  *
@@ -8,8 +10,9 @@ package com.mondi.machine.accounts.profiles
  *
  */
 data class ProfileResponse(
-  val id: Long,
-  val name: String?,
-  val address: String?,
-  val profilePictureUrl: String?
+    val id: Long,
+    val name: String?,
+    val profilePictureUrl: String?,
+    val mobile: String?,
+    val membershipSince: OffsetDateTime?
 )

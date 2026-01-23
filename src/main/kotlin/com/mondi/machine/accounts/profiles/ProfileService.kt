@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.convertValue
 import com.mondi.machine.auths.users.User
+import com.mondi.machine.auths.users.UserRepository
 import com.mondi.machine.storage.supabase.SupabaseService
 import com.mondi.machine.storage.supabase.SupabaseService.Companion.BUCKET_USERS
+import com.mondi.machine.utils.MobileNumberValidator
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -20,7 +22,8 @@ import org.springframework.web.multipart.MultipartFile
 class ProfileService(
     private val objectMapper: ObjectMapper,
     private val supabaseService: SupabaseService,
-    private val repository: ProfileRepository
+    private val repository: ProfileRepository,
+    private val userRepository: UserRepository
 ) {
 
     /**
@@ -61,13 +64,19 @@ class ProfileService(
         requireNotNull(request.name) {
             "field 'name' cannot be null"
         }
+        // -- validate and normalize mobile number if provided --
+        val normalizedMobile = MobileNumberValidator.validateAndNormalize(request.mobile)
         // -- get the profile instance --
         val profile = get(id).apply {
             this.name = request.name
-            this.address = request.address
             this.profilePictureUrl = request.profilePictureKey
+            // -- update user fields --
+            this.user.mobile = normalizedMobile
+            this.user.membershipSince = request.membershipSince
         }
-        // -- save the instance --
+        // -- save the user instance --
+        userRepository.save(profile.user)
+        // -- save the profile instance --
         return repository.save(profile)
     }
 
@@ -121,7 +130,12 @@ class ProfileService(
         // -- convert the value of JsonNode to ProfileRequest --
         val nodeRequest = objectMapper.convertValue<ProfileRequest>(this)
         // -- create new instance ProfileRequest and add the profile picture url to it --
-        val newRequest = ProfileRequest(nodeRequest.name, nodeRequest.address, profilePictureKey)
+        val newRequest = ProfileRequest(
+            name = nodeRequest.name,
+            profilePictureKey = profilePictureKey,
+            mobile = nodeRequest.mobile,
+            membershipSince = nodeRequest.membershipSince
+        )
         // -- return as the JsonNode --
         return objectMapper.convertValue<JsonNode>(newRequest)
     }

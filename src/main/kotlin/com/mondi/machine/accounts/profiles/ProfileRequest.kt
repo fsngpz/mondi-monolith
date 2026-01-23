@@ -1,5 +1,7 @@
 package com.mondi.machine.accounts.profiles
 
+import java.time.OffsetDateTime
+
 /**
  * The model class of reqyest [Profile].
  *
@@ -8,6 +10,7 @@ package com.mondi.machine.accounts.profiles
  */
 data class ProfileRequest(
     val name: String? = null,
-    val address: String? = null,
-    val profilePictureKey: String? = null
+    val profilePictureKey: String? = null,
+    val mobile: String? = null,
+    val membershipSince: OffsetDateTime? = null
 )

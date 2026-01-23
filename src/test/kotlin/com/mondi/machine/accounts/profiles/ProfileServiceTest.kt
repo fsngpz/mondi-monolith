@@ -35,6 +35,9 @@ internal class ProfileServiceTest(@Autowired private val service: ProfileService
 
     @MockitoBean
     lateinit var mockSupabaseService: SupabaseService
+
+    @MockitoBean
+    lateinit var mockUserRepository: com.mondi.machine.auths.users.UserRepository
     // -- end of region mock --
 
     // -- region of smoke testing --
@@ -43,6 +46,7 @@ internal class ProfileServiceTest(@Autowired private val service: ProfileService
         assertThat(service).isNotNull
         assertThat(mockRepository).isNotNull
         assertThat(mockSupabaseService).isNotNull
+        assertThat(mockUserRepository).isNotNull
     }
     // -- end of region smoke testing --
 
@@ -93,7 +97,7 @@ internal class ProfileServiceTest(@Autowired private val service: ProfileService
 
     @Test
     fun `update but name is null`() {
-        val mockRequest = ProfileRequest(address = "address in here")
+        val mockRequest = ProfileRequest()
         // -- execute --
         assertThrows<IllegalArgumentException> { service.update(0L, mockRequest) }
 
@@ -104,7 +108,7 @@ internal class ProfileServiceTest(@Autowired private val service: ProfileService
 
     @Test
     fun `update but no profile was found`() {
-        val mockRequest = ProfileRequest(name = "Lorem", address = "address in here")
+        val mockRequest = ProfileRequest(name = "Lorem")
         // -- mock --
         whenever(mockRepository.findById(any<Long>())).thenReturn(Optional.empty())
 
@@ -119,21 +123,23 @@ internal class ProfileServiceTest(@Autowired private val service: ProfileService
     fun `update and success`() {
         val mockUser = User("mail", "pw")
         val mockProfile = Profile(user = mockUser)
-        val mockRequest = ProfileRequest(name = "Lorem", address = "address in here")
+        val mockRequest = ProfileRequest(name = "Lorem")
         // -- mock --
         whenever(mockRepository.findById(any<Long>())).thenReturn(Optional.of(mockProfile))
         whenever(mockRepository.save(any<Profile>())).thenReturn(mockProfile)
+        whenever(mockUserRepository.save(any<User>())).thenReturn(mockUser)
         // -- execute --
         val result = service.update(1L, mockRequest)
 
         // -- verify --
         assertThat(result).usingRecursiveComparison().isEqualTo(mockProfile)
         verify(mockRepository).save(any<Profile>())
+        verify(mockUserRepository).save(any<User>())
     }
 
     @Test
     fun `patch but no profile was found`() = runTest {
-        val mockRequest = ProfileRequest(name = "Lorem", address = "address in here")
+        val mockRequest = ProfileRequest(name = "Lorem")
         val mockProfilePicture = MockMultipartFile("hello", ByteArray(0))
 
         // -- mock --
@@ -151,7 +157,7 @@ internal class ProfileServiceTest(@Autowired private val service: ProfileService
         val mockUser = User("mail", "pw")
         val mockProfile = Profile(user = mockUser)
 
-        val mockRequest = ProfileRequest(name = "Lorem", address = "address in here")
+        val mockRequest = ProfileRequest(name = "Lorem")
         val mockProfilePicture = MockMultipartFile("hello", ByteArray(0))
         val urlProfilePicture = "this.is.url"
         // -- mock --
@@ -189,7 +195,7 @@ internal class ProfileServiceTest(@Autowired private val service: ProfileService
         val mockUser = User("mail", "pw")
         val mockProfile = Profile(user = mockUser)
 
-        val mockRequest = ProfileRequest(name = "Lorem", address = "address in here")
+        val mockRequest = ProfileRequest(name = "Lorem")
         val mockProfilePicture = null
         // -- mock --
         whenever(mockRepository.findById(any<Long>())).thenReturn(Optional.of(mockProfile))
