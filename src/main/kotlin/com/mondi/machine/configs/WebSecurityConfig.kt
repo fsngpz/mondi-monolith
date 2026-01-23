@@ -115,7 +115,9 @@ class WebSecurityConfig(
                 registry.addMapping("/**")
                     .allowedOriginPatterns(
                         "*.mondijewellery.studio",
+                        "*.mondi-website.vercel.app",
                         "mondijewellery.studio",
+                        "https://mondi-website.vercel.app",
                         "https://mondijewellery.studio",
                         "http://localhost:3000",
                         "http://localhost:4173"
