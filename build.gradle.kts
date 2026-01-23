@@ -9,6 +9,7 @@ val dropboxVersion = "6.1.0"
 val coroutinesVersion = "1.10.2"
 val mockkVersion = "1.13.14"
 val apacheCommonsIoVersion = "2.21.0"
+val googleApiClientVersion = "2.7.2"
 
 plugins {
     id("org.springframework.boot") version "3.5.9"
@@ -68,6 +69,9 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:${jwtVersion}")
     implementation("io.jsonwebtoken:jjwt-impl:${jwtVersion}")
     implementation("io.jsonwebtoken:jjwt-jackson:${jwtVersion}")
+
+    // -- google oauth2 --
+    implementation("com.google.api-client:google-api-client:${googleApiClientVersion}")
 
     // -- dropbox --
     implementation("com.dropbox.core:dropbox-core-sdk:${dropboxVersion}")

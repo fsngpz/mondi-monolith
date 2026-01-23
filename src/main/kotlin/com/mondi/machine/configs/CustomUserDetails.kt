@@ -1,6 +1,8 @@
 package com.mondi.machine.configs
 
+import com.mondi.machine.auths.users.User
 import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
 /**
@@ -12,9 +14,21 @@ import org.springframework.security.core.userdetails.UserDetails
 class CustomUserDetails(
   private val id: Long,
   private val email: String,
-  private val password: String,
+  private val password: String?,
   private var authorities: List<GrantedAuthority>
 ) : UserDetails {
+
+  /**
+   * Constructor that accepts a User entity.
+   *
+   * @param user the [User] entity.
+   */
+  constructor(user: User) : this(
+    requireNotNull(user.id) { "User ID cannot be null" },
+    user.email,
+    user.password,
+    user.roles.map { SimpleGrantedAuthority(it.role.name) }
+  )
   fun getId(): Long {
     return this.id
   }
@@ -23,7 +37,7 @@ class CustomUserDetails(
     return this.authorities
   }
 
-  override fun getPassword(): String {
+  override fun getPassword(): String? {
     return this.password
   }
 

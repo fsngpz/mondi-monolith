@@ -22,14 +22,8 @@ class CustomUserDetailService(private val userService: UserService) : UserDetail
   @Transactional
   override fun loadUserByUsername(email: String): UserDetails {
     val userInfo = userService.findByEmail(email)
-    return userInfo.map {
-      CustomUserDetails(
-        requireNotNull(it.id),
-        it.email,
-        it.password,
-        it.roles.toGrantedAuthorities()
-      )
-    }.orElseThrow { UsernameNotFoundException("user not found $email") }
+    return userInfo.map { CustomUserDetails(it) }
+      .orElseThrow { UsernameNotFoundException("user not found $email") }
   }
 
   /**
@@ -41,13 +35,8 @@ class CustomUserDetailService(private val userService: UserService) : UserDetail
   fun getCustomUserDetails(email: String): CustomUserDetails {
     // -- get the user instance by id --
     val user = userService.getByEmail(email)
-    // -- get the id --
-    val id = user.id
-    // -- validate field id --
-    requireNotNull(id) {
-      "value id cannot be null "
-    }
-    return CustomUserDetails(id, user.email, user.password, user.roles.toGrantedAuthorities())
+    // -- return CustomUserDetails using User constructor --
+    return CustomUserDetails(user)
   }
 
   /**
