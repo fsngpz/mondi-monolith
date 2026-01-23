@@ -2,6 +2,7 @@ package com.mondi.machine.auths.oauth
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken
 import com.mondi.machine.auths.jwt.JwtService
+import com.mondi.machine.auths.refresh.RefreshTokenService
 import com.mondi.machine.auths.roles.Role
 import com.mondi.machine.auths.roles.RoleService
 import com.mondi.machine.auths.users.OAuthProvider
@@ -38,6 +39,9 @@ internal class GoogleOAuthServiceTest(
     private lateinit var mockJwtService: JwtService
 
     @MockitoBean
+    private lateinit var mockRefreshTokenService: RefreshTokenService
+
+    @MockitoBean
     private lateinit var mockUserRepository: UserRepository
 
     @MockitoBean
@@ -54,6 +58,7 @@ internal class GoogleOAuthServiceTest(
         assertThat(googleOAuthService).isNotNull
         assertThat(mockGoogleOAuthProperties).isNotNull
         assertThat(mockJwtService).isNotNull
+        assertThat(mockRefreshTokenService).isNotNull
         assertThat(mockUserRepository).isNotNull
         assertThat(mockRoleService).isNotNull
         assertThat(mockUserRoleService).isNotNull
@@ -91,6 +96,7 @@ internal class GoogleOAuthServiceTest(
         }
         whenever(mockRoleService.getOrCreate(GoogleOAuthService.ROLE_USER)).thenReturn(mockRole)
         whenever(mockJwtService.generateToken(any())).thenReturn("jwt-token")
+        whenever(mockRefreshTokenService.generateRefreshToken(any())).thenReturn("refresh-token")
 
         // -- execute --
         val result = spyService.authenticate(idToken)
@@ -98,6 +104,7 @@ internal class GoogleOAuthServiceTest(
         // -- assertions --
         assertThat(result).isNotNull
         assertThat(result.bearerToken).isEqualTo("jwt-token")
+        assertThat(result.refreshToken).isEqualTo("refresh-token")
 
         // -- verify interactions --
         verify(mockUserRepository).save(any<User>())
@@ -130,6 +137,7 @@ internal class GoogleOAuthServiceTest(
         // -- mock repository --
         whenever(mockUserRepository.findByProviderAndProviderId(OAuthProvider.GOOGLE, providerId)).thenReturn(mockUser)
         whenever(mockJwtService.generateToken(any())).thenReturn("jwt-token")
+        whenever(mockRefreshTokenService.generateRefreshToken(any())).thenReturn("refresh-token")
 
         // -- execute --
         val result = spyService.authenticate(idToken)
@@ -137,6 +145,7 @@ internal class GoogleOAuthServiceTest(
         // -- assertions --
         assertThat(result).isNotNull
         assertThat(result.bearerToken).isEqualTo("jwt-token")
+        assertThat(result.refreshToken).isEqualTo("refresh-token")
 
         // -- verify no new user is created --
         verify(mockUserRepository, org.mockito.kotlin.never()).save(any<User>())

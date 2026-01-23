@@ -6,6 +6,7 @@ import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
 import com.mondi.machine.auths.AuthenticationResponse
 import com.mondi.machine.auths.jwt.JwtService
+import com.mondi.machine.auths.refresh.RefreshTokenService
 import com.mondi.machine.auths.roles.RoleService
 import com.mondi.machine.auths.users.OAuthProvider
 import com.mondi.machine.auths.users.User
@@ -31,6 +32,7 @@ import java.util.Collections
 class GoogleOAuthService(
     private val googleOAuthProperties: GoogleOAuthProperties,
     private val jwtService: JwtService,
+    private val refreshTokenService: RefreshTokenService,
     private val userRepository: UserRepository,
     private val roleService: RoleService,
     private val userRoleService: UserRoleService,
@@ -43,7 +45,7 @@ class GoogleOAuthService(
      * a function to authenticate user with Google OAuth.
      *
      * @param idToken the Google ID token from client.
-     * @return the [AuthenticationResponse] containing JWT token.
+     * @return the [AuthenticationResponse] containing JWT token and refresh token.
      * @throws IllegalArgumentException if token is invalid.
      */
     @Transactional
@@ -60,12 +62,15 @@ class GoogleOAuthService(
         // -- find or create user --
         val user = findOrCreateOAuthUser(email, providerId, name)
 
-        // -- generate JWT token --
+        // -- generate JWT access token --
         val customUserDetails = CustomUserDetails(user)
         val bearerToken = jwtService.generateToken(customUserDetails)
 
+        // -- generate refresh token --
+        val refreshToken = refreshTokenService.generateRefreshToken(user)
+
         // -- return authentication response --
-        return AuthenticationResponse(bearerToken)
+        return AuthenticationResponse(bearerToken, refreshToken)
     }
 
     /**

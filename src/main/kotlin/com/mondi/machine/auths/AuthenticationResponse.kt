@@ -7,5 +7,6 @@ package com.mondi.machine.auths
  * @since 2024-04-10
  */
 data class AuthenticationResponse(
-  val bearerToken: String
+  val bearerToken: String,
+  val refreshToken: String
 )

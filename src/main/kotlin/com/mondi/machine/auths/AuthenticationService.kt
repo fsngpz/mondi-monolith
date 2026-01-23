@@ -1,6 +1,8 @@
 package com.mondi.machine.auths
 
 import com.mondi.machine.auths.jwt.JwtService
+import com.mondi.machine.auths.refresh.RefreshTokenService
+import com.mondi.machine.auths.users.UserRepository
 import com.mondi.machine.configs.CustomUserDetails
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -16,7 +18,9 @@ import org.springframework.stereotype.Service
 @Service
 class AuthenticationService(
   private val jwtService: JwtService,
-  private val authenticationManager: AuthenticationManager
+  private val authenticationManager: AuthenticationManager,
+  private val refreshTokenService: RefreshTokenService,
+  private val userRepository: UserRepository
 ) {
 
   /**
@@ -24,7 +28,7 @@ class AuthenticationService(
    *
    * @param email the email of user.
    * @param password the password of user.
-   * @return the JWT token in [AuthenticationResponse].
+   * @return the JWT token and refresh token in [AuthenticationResponse].
    */
   fun login(email: String, password: String): AuthenticationResponse {
     // -- setup the instance for email and password --
@@ -36,10 +40,15 @@ class AuthenticationService(
       throw UsernameNotFoundException("invalid username and password!")
     }
     // -- get the principal from Authentication and cast as CustomUserDetails --
-    val user = authentication.principal as CustomUserDetails
-    // -- generate the token --
-    val bearerToken = jwtService.generateToken(user)
-    // -- return the token --
-    return AuthenticationResponse(bearerToken)
+    val customUserDetails = authentication.principal as CustomUserDetails
+    // -- generate the access token --
+    val bearerToken = jwtService.generateToken(customUserDetails)
+    // -- get the user entity from database --
+    val user = userRepository.findById(customUserDetails.getId())
+      .orElseThrow { UsernameNotFoundException("User not found") }
+    // -- generate the refresh token --
+    val refreshToken = refreshTokenService.generateRefreshToken(user)
+    // -- return the tokens --
+    return AuthenticationResponse(bearerToken, refreshToken)
   }
 }

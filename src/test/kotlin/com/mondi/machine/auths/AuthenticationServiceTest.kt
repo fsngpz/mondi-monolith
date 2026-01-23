@@ -1,6 +1,8 @@
 package com.mondi.machine.auths
 
 import com.mondi.machine.auths.jwt.JwtService
+import com.mondi.machine.auths.refresh.RefreshTokenService
+import com.mondi.machine.auths.users.UserRepository
 import com.mondi.machine.configs.CustomUserDetails
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -34,6 +36,12 @@ internal class AuthenticationServiceTest(@Autowired private val service: Authent
   @MockBean
   lateinit var mockAuthenticationManager: AuthenticationManager
 
+  @MockBean
+  lateinit var mockRefreshTokenService: RefreshTokenService
+
+  @MockBean
+  lateinit var mockUserRepository: UserRepository
+
   // -- end of region mock --
 
   // -- region of smoke testing --
@@ -42,6 +50,8 @@ internal class AuthenticationServiceTest(@Autowired private val service: Authent
     assertThat(service).isNotNull
     assertThat(mockJwtService).isNotNull
     assertThat(mockAuthenticationManager).isNotNull
+    assertThat(mockRefreshTokenService).isNotNull
+    assertThat(mockUserRepository).isNotNull
   }
   // -- end of region smoke testing --
 
