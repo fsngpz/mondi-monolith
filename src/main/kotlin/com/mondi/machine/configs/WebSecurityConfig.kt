@@ -18,6 +18,9 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.context.RequestAttributeSecurityContextRepository
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector
 
 /**
@@ -48,9 +51,6 @@ class WebSecurityConfig(
             }
             // 1. Explicitly disable CSRF for stateless APIs
             .csrf { it.disable() }
-
-            // 2. Handle CORS (Very important for Swagger and Frontend)
-            .cors { it.configure(http) }
 
             .exceptionHandling {
                 it.authenticationEntryPoint(authEntryPoint)
@@ -106,6 +106,24 @@ class WebSecurityConfig(
     @Bean(name = ["mvcHandlerMappingIntrospector"])
     fun mvcHandlerMappingIntrospector(): HandlerMappingIntrospector {
         return HandlerMappingIntrospector()
+    }
+
+    @Bean
+    fun corsConfigurer(): WebMvcConfigurer {
+        return object : WebMvcConfigurer {
+            override fun addCorsMappings(registry: CorsRegistry) {
+                registry.addMapping("/**")
+                    .allowedOriginPatterns(
+                        "*.mondijewellery.studio",
+                        "mondijewellery.studio",
+                        "https://mondijewellery.studio",
+                        "http://localhost:3000",
+                        "http://localhost:4173"
+                    )
+                    .allowedMethods(CorsConfiguration.ALL)
+                    .allowedHeaders(CorsConfiguration.ALL)
+            }
+        }
     }
 
     companion object {
