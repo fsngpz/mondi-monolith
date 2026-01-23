@@ -14,7 +14,14 @@ fun Profile.toResponse(): ProfileResponse {
     "value for 'id' is null"
   }
   // -- return the instance of ProfileResponse --
-  return ProfileResponse(id, this.name, this.address, this.profilePictureUrl)
+  return ProfileResponse(
+    id = id,
+    name = this.name,
+    address = this.address,
+    profilePictureUrl = this.profilePictureUrl,
+    mobile = this.user.mobile,
+    membershipSince = this.user.membershipSince
+  )
 }
 
 /**
@@ -23,5 +30,11 @@ fun Profile.toResponse(): ProfileResponse {
  * @return the [ProfileRequest] instance.
  */
 fun Profile.toRequest(): ProfileRequest {
-  return ProfileRequest(this.name, this.address, this.profilePictureUrl)
+  return ProfileRequest(
+    name = this.name,
+    address = this.address,
+    profilePictureKey = this.profilePictureUrl,
+    mobile = this.user.mobile,
+    membershipSince = this.user.membershipSince
+  )
 }

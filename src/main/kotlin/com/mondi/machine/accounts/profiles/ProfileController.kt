@@ -46,7 +46,12 @@ class ProfileController(private val service: ProfileService) : ProfileSwaggerCon
         @RequestAttribute("ID") id: Long
     ): ProfileResponse {
         // -- create new instance ProfileRequest --
-        val request = ProfileRequest(name = payload.name, payload.address)
+        val request = ProfileRequest(
+            name = payload.name,
+            address = payload.address,
+            mobile = payload.mobile,
+            membershipSince = payload.membershipSince
+        )
         // -- update the data Profile --
         return service.patch(id, request, payload.profilePicture).toResponse()
     }

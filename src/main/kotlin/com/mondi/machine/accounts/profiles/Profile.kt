@@ -25,19 +25,18 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 @Table(name = "profiles")
 class Profile(
 
-  // -- one to one --
-  @OneToOne
-  @MapsId
-  @JoinColumn(name = "id")
-  val user: User
+    // -- one to one --
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "id")
+    val user: User
 ) : AuditableBaseEntity<String>() {
-  // -- optional --
-  var name: String? = null
-  var profilePictureUrl: String? = null
-  var address: String? = null
+    // -- optional --
+    var name: String? = null
+    var profilePictureUrl: String? = null
 
-  // -- One to Many --
-  @OneToMany(mappedBy = "profile")
-  @OnDelete(action = OnDeleteAction.CASCADE)
-  var transactions: Set<Transaction> = setOf()
+    // -- One to Many --
+    @OneToMany(mappedBy = "profile")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    var transactions: Set<Transaction> = setOf()
 }

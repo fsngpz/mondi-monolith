@@ -87,7 +87,6 @@ class GoogleOAuthService(
                 .build()
             // -- verify token --
             val googleIdToken = verifier.verify(idToken)
-            logger.info("✅ Token verification SUCCESS!")
             googleIdToken.payload
         } catch (e: Exception) {
             logger.error("Exception during token verification: ${e.message}")
