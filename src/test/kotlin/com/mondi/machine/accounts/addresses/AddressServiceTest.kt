@@ -26,7 +26,10 @@ import java.util.Optional
  */
 @SpringBootTest(classes = [AddressService::class])
 @Import(value = [ObjectMapper::class])
-internal class AddressServiceTest(@Autowired private val service: AddressService) {
+internal class AddressServiceTest(
+    @Autowired private val service: AddressService,
+    @Autowired private val objectMapper: ObjectMapper
+) {
     // -- region of mock --
     @MockitoBean
     lateinit var mockAddressRepository: AddressRepository
@@ -173,45 +176,6 @@ internal class AddressServiceTest(@Autowired private val service: AddressService
     }
 
     @Test
-    fun `create address but street is null`() {
-        val request = createAddressRequest(street = null)
-
-        // -- execute --
-        val exception = assertThrows<IllegalArgumentException> { service.create(1L, request) }
-
-        // -- verify --
-        assertThat(exception.message).isEqualTo("field 'street' cannot be null")
-        verify(mockUserRepository, never()).findById(any<Long>())
-        verify(mockAddressRepository, never()).save(any())
-    }
-
-    @Test
-    fun `create address but city is null`() {
-        val request = createAddressRequest(city = null)
-
-        // -- execute --
-        val exception = assertThrows<IllegalArgumentException> { service.create(1L, request) }
-
-        // -- verify --
-        assertThat(exception.message).isEqualTo("field 'city' cannot be null")
-        verify(mockUserRepository, never()).findById(any<Long>())
-        verify(mockAddressRepository, never()).save(any())
-    }
-
-    @Test
-    fun `create address but country is null`() {
-        val request = createAddressRequest(country = null)
-
-        // -- execute --
-        val exception = assertThrows<IllegalArgumentException> { service.create(1L, request) }
-
-        // -- verify --
-        assertThat(exception.message).isEqualTo("field 'country' cannot be null")
-        verify(mockUserRepository, never()).findById(any<Long>())
-        verify(mockAddressRepository, never()).save(any())
-    }
-
-    @Test
     fun `create address but user not found`() {
         val request = createAddressRequest()
 
@@ -272,42 +236,6 @@ internal class AddressServiceTest(@Autowired private val service: AddressService
 
         // -- verify old main was unset --
         assertThat(oldMainAddress.isMain).isFalse
-    }
-
-    @Test
-    fun `update address but street is null`() {
-        val request = createAddressRequest(street = null)
-
-        // -- execute --
-        val exception = assertThrows<IllegalArgumentException> { service.update(1L, 1L, request) }
-
-        // -- verify --
-        assertThat(exception.message).isEqualTo("field 'street' cannot be null")
-        verify(mockAddressRepository, never()).findById(any<Long>())
-    }
-
-    @Test
-    fun `update address but city is null`() {
-        val request = createAddressRequest(city = null)
-
-        // -- execute --
-        val exception = assertThrows<IllegalArgumentException> { service.update(1L, 1L, request) }
-
-        // -- verify --
-        assertThat(exception.message).isEqualTo("field 'city' cannot be null")
-        verify(mockAddressRepository, never()).findById(any<Long>())
-    }
-
-    @Test
-    fun `update address but country is null`() {
-        val request = createAddressRequest(country = null)
-
-        // -- execute --
-        val exception = assertThrows<IllegalArgumentException> { service.update(1L, 1L, request) }
-
-        // -- verify --
-        assertThat(exception.message).isEqualTo("field 'country' cannot be null")
-        verify(mockAddressRepository, never()).findById(any<Long>())
     }
 
     @Test
@@ -382,24 +310,25 @@ internal class AddressServiceTest(@Autowired private val service: AddressService
         mockAddress.country = "Old Country"
         mockAddress.label = "Old Label"
 
-        // -- partial request with only street updated --
+        // -- partial request with only street and label updated --
         // -- note: ObjectMapper will merge this with existing values --
-        val partialRequest = AddressRequest(
-            street = "New Street"
-        )
+        val partialRequestJson = objectMapper.createObjectNode().apply {
+            put("street", "New Street")
+            put("label", "New Label")
+        }
 
         // -- mock --
         whenever(mockAddressRepository.findById(any<Long>())).thenReturn(Optional.of(mockAddress))
         whenever(mockAddressRepository.save(any<Address>())).thenReturn(mockAddress)
 
         // -- execute --
-        val result = service.patch(1L, 1L, partialRequest)
+        val result = service.patch(1L, 1L, partialRequestJson)
 
-        // -- verify that only street was updated, other fields remain unchanged --
+        // -- verify that only street and label were updated, other fields remain unchanged --
         assertThat(result.street).isEqualTo("New Street")
         assertThat(result.city).isEqualTo("Old City")
         assertThat(result.country).isEqualTo("Old Country")
-        assertThat(result.label).isEqualTo("Old Label")
+        assertThat(result.label).isEqualTo("New Label")
         verify(mockAddressRepository, org.mockito.kotlin.times(2)).findById(any<Long>())
         verify(mockAddressRepository).save(mockAddress)
     }
@@ -533,21 +462,26 @@ internal class AddressServiceTest(@Autowired private val service: AddressService
     }
 
     private fun createAddressRequest(
-        street: String? = "123 Test St",
-        city: String? = "Test City",
-        country: String? = "Test Country",
-        isMain: Boolean? = false
+        street: String = "123 Test St",
+        city: String = "Test City",
+        state: String = "Test State",
+        postalCode: String = "12345",
+        country: String = "Test Country",
+        tag: AddressTag = AddressTag.HOME,
+        isMain: Boolean = false,
+        label: String? = "Test Label",
+        notes: String? = "Test Notes"
     ): AddressRequest {
         return AddressRequest(
             street = street,
             city = city,
-            state = "Test State",
-            postalCode = "12345",
+            state = state,
+            postalCode = postalCode,
             country = country,
-            tag = AddressTag.HOME,
+            tag = tag,
             isMain = isMain,
-            label = "Test Label",
-            notes = "Test Notes"
+            label = label,
+            notes = notes
         )
     }
     // -- end of region helper functions --
