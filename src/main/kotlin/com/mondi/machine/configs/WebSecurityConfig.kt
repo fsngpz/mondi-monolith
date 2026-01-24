@@ -119,9 +119,11 @@ class WebSecurityConfig(
             "*.mondijewellery.studio",
             "*.mondi-website.vercel.app",
             "*.mondi-backoffice.vercel.app",
+            "*.backoffice.mondijewellery.studio",
             "https://mondijewellery.studio",
             "https://mondi-website.vercel.app",
             "https://mondi-backoffice.vercel.app",
+            "https://backoffice.mondijewellery.studio",
             "http://localhost:3000",
             "http://localhost:5173"
         )
