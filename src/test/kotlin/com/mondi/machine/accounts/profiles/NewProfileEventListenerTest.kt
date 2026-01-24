@@ -9,7 +9,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 
 /**
  * The test class of [NewProfileEventListener].
@@ -19,32 +19,32 @@ import org.springframework.boot.test.mock.mockito.MockBean
  */
 @SpringBootTest(classes = [NewProfileEventListener::class])
 internal class NewProfileEventListenerTest(
-  @Autowired private val listener: NewProfileEventListener
+    @Autowired private val listener: NewProfileEventListener
 ) {
-  // -- region of mock --
-  @MockBean
-  lateinit var mockProfileService: ProfileService
-  // -- end of region mock --
+    // -- region of mock --
+    @MockitoBean
+    lateinit var mockProfileService: ProfileService
+    // -- end of region mock --
 
-  // -- region of smoke test --
-  @Test
-  fun `dependencies are not null`() {
-    assertThat(listener).isNotNull
-    assertThat(mockProfileService).isNotNull
-  }
-  // -- end of region smoke test --
+    // -- region of smoke test --
+    @Test
+    fun `dependencies are not null`() {
+        assertThat(listener).isNotNull
+        assertThat(mockProfileService).isNotNull
+    }
+    // -- end of region smoke test --
 
-  @Test
-  fun `onApplicationEvent success`() {
-    // -- mock --
-    val mockUser = User("email", "pass").apply { this.id = 1L }
-    val mockRequest = UserEventRequest(mockUser)
-    val mockEvent = UserApplicationEvent(mockRequest)
+    @Test
+    fun `onApplicationEvent success`() {
+        // -- mock --
+        val mockUser = User("email", "pass").apply { this.id = 1L }
+        val mockRequest = UserEventRequest(mockUser, "http://profile.picture.url/image.png")
+        val mockEvent = UserApplicationEvent(mockRequest)
 
-    // -- execute --
-    listener.onApplicationEvent(mockEvent)
+        // -- execute --
+        listener.onApplicationEvent(mockEvent)
 
-    // -- verify --
-    verify(mockProfileService).create(any<User>())
-  }
+        // -- verify --
+        verify(mockProfileService).create(any<User>(), any<String>())
+    }
 }

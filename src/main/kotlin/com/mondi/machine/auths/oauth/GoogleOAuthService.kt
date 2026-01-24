@@ -58,9 +58,10 @@ class GoogleOAuthService(
         val email = payload.email
         val providerId = payload.subject
         val name = payload["name"] as? String
+        val profilePictureUrl = payload["picture"] as? String
 
         // -- find or create user --
-        val user = findOrCreateOAuthUser(email, providerId, name)
+        val user = findOrCreateOAuthUser(email, providerId, name, profilePictureUrl)
 
         // -- generate JWT access token --
         val customUserDetails = CustomUserDetails(user)
@@ -101,9 +102,15 @@ class GoogleOAuthService(
      * @param email the user email.
      * @param providerId the provider ID (Google user ID).
      * @param name the user name from Google profile.
+     * @param profilePictureUrl the profile picture URL.
      * @return the [User] instance.
      */
-    private fun findOrCreateOAuthUser(email: String, providerId: String, name: String?): User {
+    private fun findOrCreateOAuthUser(
+        email: String,
+        providerId: String,
+        name: String?,
+        profilePictureUrl: String?
+    ): User {
         // -- try to find user by provider and provider ID --
         val existingUser = userRepository.findByProviderAndProviderId(OAuthProvider.GOOGLE, providerId)
 
@@ -135,7 +142,7 @@ class GoogleOAuthService(
         userRoleService.assign(newUser, role)
 
         // -- publish event for profile creation --
-        sendEvent(newUser)
+        sendEvent(newUser, profilePictureUrl)
 
         // -- return the new user --
         return newUser
@@ -145,10 +152,11 @@ class GoogleOAuthService(
      * a private function to publish event.
      *
      * @param user the [User] instance.
+     * @param profilePictureUrl the profile picture URL.
      */
-    private fun sendEvent(user: User) {
+    private fun sendEvent(user: User, profilePictureUrl: String?) {
         // -- setup the instance of UserEventRequest --
-        val eventRequest = UserEventRequest(user)
+        val eventRequest = UserEventRequest(user, profilePictureUrl)
         // -- publish the event --
         userEventPublisher.publish(eventRequest)
     }

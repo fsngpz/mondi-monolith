@@ -86,7 +86,7 @@ internal class ProfileServiceTest(@Autowired private val service: ProfileService
         whenever(mockRepository.save(any<Profile>())).thenReturn(mockProfile)
 
         // -- execute --
-        val result = service.create(mockUser)
+        val result = service.create(mockUser, "http://profile.picture.url/image.png")
 
         // -- verify --
         assertThat(result).usingRecursiveComparison().isEqualTo(mockProfile)

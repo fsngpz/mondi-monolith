@@ -14,23 +14,24 @@ import org.springframework.stereotype.Component
  */
 @Component
 class NewProfileEventListener(
-  private val profileService: ProfileService
+    private val profileService: ProfileService
 ) : ApplicationListener<UserApplicationEvent> {
-  private val logger = LoggerFactory.getLogger(this::class.java)
+    private val logger = LoggerFactory.getLogger(this::class.java)
 
-  /**
-   * an override function to handle the [ApplicationListener] of [UserApplicationEvent].
-   *
-   * @param event the [UserApplicationEvent] instance.
-   */
-  override fun onApplicationEvent(event: UserApplicationEvent) {
-    logger.info("Receiving the event with value: $event")
-    // convert the source to instance of User --
-    val eventResponse = event.source as UserEventRequest
-    // -- get the user instance --
-    val user = eventResponse.user
-    // -- create the new profile --
-    profileService.create(user)
-    logger.info("Finished handle event with value: $event")
-  }
+    /**
+     * an override function to handle the [ApplicationListener] of [UserApplicationEvent].
+     *
+     * @param event the [UserApplicationEvent] instance.
+     */
+    override fun onApplicationEvent(event: UserApplicationEvent) {
+        logger.info("Receiving the event with value: $event")
+        // convert the source to instance of User --
+        val eventResponse = event.source as UserEventRequest
+        // -- get the user instance --
+        val user = eventResponse.user
+        val profilePictureUrl = eventResponse.profilePictureUrl
+        // -- create the new profile --
+        profileService.create(user, profilePictureUrl)
+        logger.info("Finished handle event with value: $event")
+    }
 }

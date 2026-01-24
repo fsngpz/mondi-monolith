@@ -43,11 +43,14 @@ class ProfileService(
      * a function to handle request create new [Profile] instance.
      *
      * @param user the [User] instance.
+     * @param profilePictureUrl the profile picture url.
      * @return the created [Profile] instance.
      */
-    fun create(user: User): Profile {
+    fun create(user: User, profilePictureUrl: String?): Profile {
         // -- setup instance Profile --
-        val profile = Profile(user)
+        val profile = Profile(user).apply {
+            this.profilePictureUrl = profilePictureUrl
+        }
         // -- save the instance to database --
         return repository.save(profile)
     }
