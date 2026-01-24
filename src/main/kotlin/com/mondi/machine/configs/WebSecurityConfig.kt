@@ -71,8 +71,13 @@ class WebSecurityConfig(
                     "/v3/api-docs"
                 ).permitAll()
 
-                // -- Public: Auth & Root --
-                it.requestMatchers("/v1/auth/**", "/").permitAll()
+                // -- Public APIs --
+                it.requestMatchers(
+                    "/v1/auth/**",
+                    "/",
+                    "/v1/products**"
+
+                ).permitAll()
 
                 // -- Protected: Backoffice --
                 it.requestMatchers("/v1/backoffice/**").hasRole(ROLE_ADMIN)
