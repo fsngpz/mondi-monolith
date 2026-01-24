@@ -47,6 +47,22 @@ interface BackofficeProductSwaggerController {
         request: BackofficeProductNullableRequest
     ): BackofficeProductResponse
 
+    @Operation(
+        summary = "Update existing product with media management (recommended)",
+        description = "Update product while keeping existing media by URLs and uploading new media files. " +
+                "Frontend should send existingMediaUrls to keep and newMediaFiles to upload.",
+        requestBody = RequestBody(
+            content = [Content(
+                mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                schema = Schema(implementation = BackofficeProductUpdateNullableRequest::class)
+            )]
+        )
+    )
+    suspend fun patchWithMediaManagement(
+        @Parameter(description = "Product ID") productId: Long,
+        request: BackofficeProductUpdateNullableRequest
+    ): BackofficeProductResponse
+
     @Operation(summary = "Delete product")
     fun delete(@Parameter(description = "Product ID") productId: Long)
 

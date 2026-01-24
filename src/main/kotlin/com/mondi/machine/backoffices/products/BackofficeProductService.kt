@@ -30,27 +30,32 @@ class BackofficeProductService(private val productService: ProductService) {
     }
 
     /**
-     * a function to do an update of [Product].
+     * a function to do an update of [Product] with media management.
+     * Keeps existing media by URLs and uploads new media files.
      *
      * @param id the [Product] unique identifier.
-     * @param request the [BackofficeProductRequest] instance.
+     * @param request the [BackofficeProductUpdateRequest] instance.
      * @return the [BackofficeProductResponse] instance.
      */
-    suspend fun update(id: Long, request: BackofficeProductRequest): BackofficeProductResponse {
-        // -- setup the instance ProductRequest --
-        val productRequest = com.mondi.machine.products.ProductRequest(
+    suspend fun updateWithMediaManagement(
+        id: Long,
+        request: BackofficeProductUpdateRequest
+    ): BackofficeProductResponse {
+        // -- make an update to the specified product --
+        return productService.updateWithMediaManagement(
+            id = id,
             name = request.name,
             description = request.description,
             price = request.price,
             currency = request.currency.name,
             specificationInHtml = request.specificationInHtml,
             discountPercentage = request.discountPercentage,
-            mediaFiles = request.mediaFiles,
             category = request.category,
-            stock = request.stock
-        )
-        // -- make an update to the specified product --
-        return productService.update(id, productRequest).toResponse()
+            stock = request.stock,
+            existingMediaUrls = request.existingMediaUrls ?: emptyList(),
+            newMediaFiles = request.newMediaFiles ?: emptyList(),
+            status = request.status
+        ).toResponse()
     }
 
     /**

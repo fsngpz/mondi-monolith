@@ -73,37 +73,6 @@ internal class BackofficeProductServiceTest(
     }
 
     @Test
-    fun `update product success`() = runTest {
-        val mockMultipartFile = MockMultipartFile("image", ByteArray(1024))
-        val mockRequest = BackofficeProductRequest(
-            name = "Updated Ring",
-            description = "Updated description",
-            price = BigDecimal("2000.00"),
-            currency = Currency.USD,
-            specificationInHtml = "<p>18k gold</p>",
-            discountPercentage = BigDecimal("15.00"),
-            mediaFiles = listOf(mockMultipartFile),
-            category = ProductCategory.RING,
-            stock = 30
-        )
-        val mockProduct = createMockProduct("Updated Ring")
-        // -- mock --
-        whenever(
-            mockProductService.update(any<Long>(), any())
-        ).thenReturn(mockProduct)
-
-        // -- execute --
-        val result = backofficeProductService.update(1L, mockRequest)
-        assertThat(result.name).isEqualTo(mockProduct.name)
-        assertThat(result.price).isEqualTo(mockProduct.price)
-        assertThat(result.category).isEqualTo(mockProduct.category)
-        assertThat(result.stock).isEqualTo(mockProduct.stock)
-
-        // -- verify --
-        verify(mockProductService).update(any<Long>(), any())
-    }
-
-    @Test
     fun `delete product success`() {
         // -- execute --
         backofficeProductService.delete(1L)

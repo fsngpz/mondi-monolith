@@ -9,6 +9,7 @@ import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.ModelAttribute
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -55,6 +56,23 @@ class BackofficeProductController(private val service: BackofficeProductService)
     ): BackofficeProductResponse {
         // -- update the data --
         return service.update(productId, request.toNotNull())
+    }
+
+    /**
+     * a PATCH request to handle update the existing product data with media management.
+     * Allows keeping existing media by URLs and uploading new media files.
+     *
+     * @param productId the product unique identifier.
+     * @param request the [BackofficeProductUpdateNullableRequest] instance.
+     * @return the [BackofficeProductResponse] instance.
+     */
+    @PatchMapping(value = ["/{productId}"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    override suspend fun patchWithMediaManagement(
+        @PathVariable productId: Long,
+        @ModelAttribute request: BackofficeProductUpdateNullableRequest
+    ): BackofficeProductResponse {
+        // -- update the data with media management --
+        return service.updateWithMediaManagement(productId, request.toNotNull())
     }
 
     /**
