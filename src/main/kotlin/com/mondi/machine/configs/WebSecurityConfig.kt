@@ -118,8 +118,10 @@ class WebSecurityConfig(
         configuration.allowedOriginPatterns = listOf(
             "*.mondijewellery.studio",
             "*.mondi-website.vercel.app",
+            "*.mondi-backoffice.vercel.app",
             "https://mondijewellery.studio",
             "https://mondi-website.vercel.app",
+            "https://mondi-backoffice.vercel.app",
             "http://localhost:3000",
             "http://localhost:5173"
         )
