@@ -1,12 +1,17 @@
 package com.mondi.machine.backoffices.products
 
+import com.mondi.machine.products.ProductCategory
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.parameters.RequestBody
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springdoc.core.annotations.ParameterObject
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.http.MediaType
+import java.math.BigDecimal
 
 /**
  * The interface for Backoffice Product Swagger Controller.
@@ -29,19 +34,30 @@ interface BackofficeProductSwaggerController {
     suspend fun create(request: BackofficeProductNullableRequest): BackofficeProductResponse
 
     @Operation(
-        summary = "Update existing product",
+        summary = "Update existing product with media management (recommended)",
+        description = "Update product while keeping existing media by URLs and uploading new media files. " +
+                "Frontend should send existingMediaUrls to keep and newMediaFiles to upload.",
         requestBody = RequestBody(
             content = [Content(
                 mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
-                schema = Schema(implementation = BackofficeProductNullableRequest::class)
+                schema = Schema(implementation = BackofficeProductUpdateNullableRequest::class)
             )]
         )
     )
-    suspend fun put(
+    suspend fun patchWithMediaManagement(
         @Parameter(description = "Product ID") productId: Long,
-        request: BackofficeProductNullableRequest
+        request: BackofficeProductUpdateNullableRequest
     ): BackofficeProductResponse
 
     @Operation(summary = "Delete product")
     fun delete(@Parameter(description = "Product ID") productId: Long)
+
+    @Operation(summary = "Get all products with filters")
+    fun findAll(
+        search: String?,
+        category: ProductCategory?,
+        minPrice: BigDecimal,
+        maxPrice: BigDecimal,
+        @ParameterObject pageable: Pageable
+    ): Page<BackofficeProductResponse>
 }

@@ -1,4 +1,5 @@
 CREATE TYPE product_category as enum ('RING', 'EARRING', 'NECKLACE', 'BRACELET', 'PENDANT', 'OTHER');
+CREATE TYPE product_status as enum ('ACTIVE', 'INACTIVE');
 
 /*
  * Products
@@ -16,6 +17,8 @@ CREATE TABLE products
     discount_percentage     numeric(5, 2)            DEFAULT 0.00              NOT NULL,
     category                product_category         DEFAULT 'OTHER'           NOT NULL,
     stock                   integer                  DEFAULT 0                 NOT NULL,
+    sku                     text                                               NOT NULL UNIQUE,
+    status                  product_status           DEFAULT 'ACTIVE'          NOT NULL,
     created_at              timestamp WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     creator_id              text                                               NOT NULL,
     updated_at              timestamp WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -25,6 +28,8 @@ CREATE TABLE products
 
 CREATE INDEX products_category_index ON products (category);
 CREATE INDEX products_price_index ON products (price);
+CREATE INDEX products_sku_index ON products (sku);
+CREATE INDEX products_status_index ON products (status);
 
 /*
  * Product Media

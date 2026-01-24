@@ -17,7 +17,7 @@ interface ProductRepository : JpaRepository<Product, Long> {
     /**
      * a function to find all [Product] with custom logic.
      *
-     * @param search the parameter to filter data by name or description.
+     * @param search the parameter to filter data by name, description, or specificationInHtml.
      * @param category the parameter to filter data by category.
      * @param minPrice the minimum price to filter data.
      * @param maxPrice the maximum price to filter data.
@@ -27,7 +27,7 @@ interface ProductRepository : JpaRepository<Product, Long> {
     @Query(
         """
     FROM Product p
-    WHERE ((:search IS NULL ) OR (p.name ILIKE %:#{#search}% OR p.description ILIKE %:#{#search}%))
+    WHERE ((:search IS NULL ) OR (p.name ILIKE %:#{#search}% OR p.description ILIKE %:#{#search}% OR p.specificationInHtml ILIKE %:#{#search}%))
     AND (p.category = COALESCE(:category, p.category))
     AND (cast(p.price as bigdecimal) >= :minPrice)
     AND (cast(p.price as bigdecimal) <= :maxPrice)
@@ -40,4 +40,13 @@ interface ProductRepository : JpaRepository<Product, Long> {
         maxPrice: BigDecimal,
         pageable: Pageable
     ): Page<Product>
+
+    /**
+     * a function to count products by SKU prefix.
+     *
+     * @param skuPrefix the SKU prefix (e.g., "RING_26_")
+     * @return the count of products with the given SKU prefix.
+     */
+    @Query("SELECT COUNT(p) FROM Product p WHERE p.sku LIKE CONCAT(:skuPrefix, '%')")
+    fun countBySkuPrefix(skuPrefix: String): Long
 }

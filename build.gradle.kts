@@ -10,6 +10,7 @@ val coroutinesVersion = "1.10.2"
 val mockkVersion = "1.13.14"
 val apacheCommonsIoVersion = "2.21.0"
 val googleApiClientVersion = "2.7.2"
+val owaspSanitizerVersion = "20260102.1"
 
 plugins {
     id("org.springframework.boot") version "3.5.9"
@@ -50,6 +51,9 @@ dependencies {
 
     // -- apache commons io --
     implementation("commons-io:commons-io:$apacheCommonsIoVersion")
+
+    // -- OWASP Java HTML Sanitizer for XSS prevention --
+    implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:$owaspSanitizerVersion")
 
     // -- spring doc --
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocVersion")

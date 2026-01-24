@@ -5,6 +5,8 @@ import com.mondi.machine.backoffices.accounts.BackofficeAccountResponse
 import com.mondi.machine.backoffices.products.BackofficeProductNullableRequest
 import com.mondi.machine.backoffices.products.BackofficeProductRequest
 import com.mondi.machine.backoffices.products.BackofficeProductResponse
+import com.mondi.machine.backoffices.products.BackofficeProductUpdateNullableRequest
+import com.mondi.machine.backoffices.products.BackofficeProductUpdateRequest
 import com.mondi.machine.backoffices.transactions.BackofficeTransactionNullableRequest
 import com.mondi.machine.backoffices.transactions.BackofficeTransactionRequest
 import com.mondi.machine.backoffices.transactions.BackofficeTransactionResponse
@@ -110,7 +112,9 @@ fun Product.toResponse(): BackofficeProductResponse {
         this.discountPercentage,
         this.media.map { it.mediaUrl },
         this.category,
-        this.stock
+        this.stock,
+        this.sku,
+        this.status
     )
 }
 
@@ -160,5 +164,56 @@ fun BackofficeProductNullableRequest.toNotNull(): BackofficeProductRequest {
         this.mediaFiles,
         this.category,
         this.stock
+    )
+}
+
+/**
+ * an extension function to convert the [BackofficeProductUpdateNullableRequest]
+ * to [BackofficeProductUpdateRequest].
+ *
+ * @return the [BackofficeProductUpdateRequest] instance.
+ */
+fun BackofficeProductUpdateNullableRequest.toNotNull(): BackofficeProductUpdateRequest {
+    // -- validate field name --
+    requireNotNull(this.name) {
+        "the field 'name' cannot be null"
+    }
+    // -- validate field price --
+    requireNotNull(this.price) {
+        "the field 'price' cannot be null"
+    }
+    // -- validate field currency --
+    requireNotNull(this.currency) {
+        "the field 'currency' cannot be null"
+    }
+    // -- validate field discountPercentage --
+    requireNotNull(this.discountPercentage) {
+        "the field 'discountPercentage' cannot be null"
+    }
+    // -- validate field category --
+    requireNotNull(this.category) {
+        "the field 'category' cannot be null"
+    }
+    // -- validate field stock --
+    requireNotNull(this.stock) {
+        "the field 'stock' cannot be null"
+    }
+    // -- validate field status --
+    requireNotNull(this.status) {
+        "the field 'status' cannot be null"
+    }
+    // -- return the instance of BackofficeProductUpdateRequest --
+    return BackofficeProductUpdateRequest(
+        this.name,
+        this.description,
+        this.price,
+        this.currency,
+        this.specificationInHtml,
+        this.discountPercentage,
+        this.existingMediaUrls ?: emptyList(),
+        this.newMediaFiles ?: emptyList(),
+        this.category,
+        this.stock,
+        this.status
     )
 }

@@ -19,6 +19,8 @@ import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.context.RequestAttributeSecurityContextRepository
 import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector
@@ -51,6 +53,8 @@ class WebSecurityConfig(
             }
             // 1. Explicitly disable CSRF for stateless APIs
             .csrf { it.disable() }
+            // 2. Enable CORS with custom configuration
+            .cors { it.configurationSource(corsConfigurationSource()) }
 
             .exceptionHandling {
                 it.authenticationEntryPoint(authEntryPoint)
@@ -109,6 +113,27 @@ class WebSecurityConfig(
     }
 
     @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val configuration = CorsConfiguration()
+        configuration.allowedOriginPatterns = listOf(
+            "*.mondijewellery.studio",
+            "*.mondi-website.vercel.app",
+            "https://mondijewellery.studio",
+            "https://mondi-website.vercel.app",
+            "http://localhost:3000",
+            "http://localhost:5173"
+        )
+        configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
+        configuration.allowedHeaders = listOf("*")
+        configuration.allowCredentials = true
+        configuration.maxAge = 3600L
+
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", configuration)
+        return source
+    }
+
+    @Bean
     fun corsConfigurer(): WebMvcConfigurer {
         return object : WebMvcConfigurer {
             override fun addCorsMappings(registry: CorsRegistry) {
@@ -120,7 +145,7 @@ class WebSecurityConfig(
                         "https://mondi-website.vercel.app",
                         "https://mondijewellery.studio",
                         "http://localhost:3000",
-                        "http://localhost:4173"
+                        "http://localhost:5173"
                     )
                     .allowedMethods(CorsConfiguration.ALL)
                     .allowedHeaders(CorsConfiguration.ALL)

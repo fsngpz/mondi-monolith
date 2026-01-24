@@ -1,6 +1,7 @@
 package com.mondi.machine.backoffices.products
 
 import com.mondi.machine.products.ProductCategory
+import com.mondi.machine.products.ProductStatus
 import java.math.BigDecimal
 
 /**
@@ -19,5 +20,7 @@ data class BackofficeProductResponse(
     val discountPercentage: BigDecimal,
     val mediaUrls: List<String>,
     val category: ProductCategory,
-    val stock: Int
+    val stock: Int,
+    val sku: String,
+    val status: ProductStatus
 )

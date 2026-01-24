@@ -34,7 +34,7 @@ class ProductController(private val service: ProductService) : ProductSwaggerCon
     /**
      * a GET request to find all products with filters.
      *
-     * @param search the parameter to filter data by name or description.
+     * @param search the parameter to filter data by name, description, or specificationInHtml.
      * @param category the parameter to filter data by category.
      * @param minPrice the minimum price to filter data (default: 0).
      * @param maxPrice the maximum price to filter data (default: 999999999).

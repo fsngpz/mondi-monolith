@@ -35,7 +35,13 @@ class Product(
     @JdbcType(PostgreSQLEnumJdbcType::class)
     var category: ProductCategory,
 
-    var stock: Int = 0
+    var stock: Int = 0,
+
+    var sku: String,
+
+    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType::class)
+    var status: ProductStatus = ProductStatus.ACTIVE
 ) : AuditableBaseEntity<String>() {
 
     @OneToMany(mappedBy = "product", cascade = [CascadeType.ALL], orphanRemoval = true)
