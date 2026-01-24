@@ -24,6 +24,10 @@ interface BackofficeProductSwaggerController {
 
     @Operation(
         summary = "Create new product",
+        description = """
+            When discountPrice and discountPercentage are provided, the system will use the discountPrice then 
+            save it to discountPercentage.
+        """,
         requestBody = RequestBody(
             content = [Content(
                 mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,

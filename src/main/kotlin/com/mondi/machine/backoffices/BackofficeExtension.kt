@@ -141,10 +141,6 @@ fun BackofficeProductNullableRequest.toNotNull(): BackofficeProductRequest {
     requireNotNull(this.discountPercentage) {
         "the field 'discountPercentage' cannot be null"
     }
-    // -- validate field mediaFiles --
-    requireNotNull(this.mediaFiles) {
-        "the field 'mediaFiles' cannot be null"
-    }
     // -- validate field category --
     requireNotNull(this.category) {
         "the field 'category' cannot be null"
@@ -161,6 +157,7 @@ fun BackofficeProductNullableRequest.toNotNull(): BackofficeProductRequest {
         this.currency,
         this.specificationInHtml,
         this.discountPercentage,
+        this.discountPrice,
         this.mediaFiles,
         this.category,
         this.stock
@@ -210,6 +207,7 @@ fun BackofficeProductUpdateNullableRequest.toNotNull(): BackofficeProductUpdateR
         this.currency,
         this.specificationInHtml,
         this.discountPercentage,
+        this.discountPrice,
         this.existingMediaUrls ?: emptyList(),
         this.newMediaFiles ?: emptyList(),
         this.category,

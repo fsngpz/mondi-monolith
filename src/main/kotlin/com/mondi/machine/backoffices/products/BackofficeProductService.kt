@@ -4,6 +4,7 @@ import com.mondi.machine.backoffices.toResponse
 import com.mondi.machine.products.Product
 import com.mondi.machine.products.ProductCategory
 import com.mondi.machine.products.ProductService
+import com.mondi.machine.products.getFinalDiscountPercentage
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -41,6 +42,11 @@ class BackofficeProductService(private val productService: ProductService) {
         id: Long,
         request: BackofficeProductUpdateRequest
     ): BackofficeProductResponse {
+        val price = request.price
+        val inputPrice = request.discountPrice ?: BigDecimal.ZERO
+        val inputPercent = request.discountPercentage
+        val discountPercentage = getFinalDiscountPercentage(price, inputPrice, inputPercent)
+
         // -- make an update to the specified product --
         return productService.updateWithMediaManagement(
             id = id,
@@ -49,7 +55,7 @@ class BackofficeProductService(private val productService: ProductService) {
             price = request.price,
             currency = request.currency.name,
             specificationInHtml = request.specificationInHtml,
-            discountPercentage = request.discountPercentage,
+            discountPercentage = discountPercentage,
             category = request.category,
             stock = request.stock,
             existingMediaUrls = request.existingMediaUrls ?: emptyList(),

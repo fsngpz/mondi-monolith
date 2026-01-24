@@ -1,5 +1,8 @@
 package com.mondi.machine.products
 
+import java.math.BigDecimal
+import java.math.RoundingMode
+
 /**
  * an extension function to map the [Product] to [ProductResponse].
  *
@@ -36,4 +39,51 @@ fun Product.toResponse(): ProductResponse {
  */
 fun String.sanitizeFileName(): String {
     return this.replace(Regex("[^a-zA-Z0-9._-]"), "_")
+}
+
+/**
+ * Calculates the discount percentage.
+ * 'this' represents the discounted price.
+ */
+fun BigDecimal.calculateDiscountPercentage(
+    originalPrice: BigDecimal,
+    scale: Int = 2
+): BigDecimal {
+    if (originalPrice <= BigDecimal.ZERO) {
+        return BigDecimal.ZERO.setScale(scale)
+    }
+
+    val discount = originalPrice - this
+
+    // Percentage = (Discount / Original) * 100
+    return (discount * BigDecimal(100))
+        .divide(originalPrice, scale, RoundingMode.HALF_UP)
+}
+
+/**
+ * Calculates the final discount percentage based on the provided inputs.
+ *
+ * @param originalPrice the original price.
+ * @param discountPrice the discounted price.
+ * @param discountPercentage the discount percentage.
+ * @return the final discount percentage.
+ */
+fun getFinalDiscountPercentage(
+    originalPrice: BigDecimal,
+    discountPrice: BigDecimal,
+    discountPercentage: BigDecimal
+): BigDecimal {
+    return when {
+        // -- If discountPrice is present (> 0), calculate percentage from it --
+        discountPrice.signum() > 0 && originalPrice.signum() > 0 -> {
+            discountPrice.calculateDiscountPercentage(originalPrice)
+        }
+        // -- If discountPrice is missing/zero, use the provided percentage --
+        discountPercentage.signum() > 0 -> {
+            discountPercentage
+        }
+        // -- Fallback: No discount info provided --
+        else -> BigDecimal.ZERO
+    }
+
 }

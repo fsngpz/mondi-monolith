@@ -25,6 +25,8 @@ data class BackofficeProductNullableRequest(
     val specificationInHtml: String?,
     @Schema(description = "Product discount percentage", example = "10.00")
     val discountPercentage: BigDecimal?,
+    @Schema(description = "Product discount price", example = "1000")
+    val discountPrice: BigDecimal?,
 
     val mediaFiles: List<MultipartFile>?,
 

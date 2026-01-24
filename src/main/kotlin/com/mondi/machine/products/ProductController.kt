@@ -46,7 +46,7 @@ class ProductController(private val service: ProductService) : ProductSwaggerCon
         @RequestParam(required = false) search: String?,
         @RequestParam(required = false) category: ProductCategory?,
         @RequestParam(required = false, defaultValue = "0") minPrice: BigDecimal,
-        @RequestParam(required = false, defaultValue = "10") maxPrice: BigDecimal,
+        @RequestParam(required = false, defaultValue = "999999999") maxPrice: BigDecimal,
         pageable: Pageable
     ): Page<ProductResponse> {
         // -- find all products --

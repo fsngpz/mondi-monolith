@@ -69,6 +69,11 @@ class ProductService(
      */
     @Transactional
     suspend fun create(request: BackofficeProductRequest): Product {
+        val price = request.price
+        val inputPrice = request.discountPrice ?: BigDecimal.ZERO
+        val inputPercent = request.discountPercentage
+        val discountPercentage = getFinalDiscountPercentage(price, inputPrice, inputPercent)
+
         // -- generate SKU --
         val sku = skuGenerationService.generateSku(request.category)
         // -- sanitize HTML to prevent XSS --
@@ -80,7 +85,7 @@ class ProductService(
             price = request.price,
             currency = request.currency.name,
             specificationInHtml = sanitizedSpecification,
-            discountPercentage = request.discountPercentage,
+            discountPercentage = discountPercentage,
             category = request.category,
             stock = request.stock,
             sku = sku,
@@ -89,7 +94,9 @@ class ProductService(
         // -- save the instance to database --
         val savedProduct = repository.save(product)
         // -- upload and save media files --
-        uploadAndSaveMediaFiles(savedProduct, request.mediaFiles)
+        if (request.mediaFiles != null) {
+            uploadAndSaveMediaFiles(savedProduct, request.mediaFiles)
+        }
         // -- return the saved product --
         return savedProduct
     }
