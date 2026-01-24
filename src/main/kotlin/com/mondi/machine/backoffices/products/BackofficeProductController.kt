@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -40,22 +39,6 @@ class BackofficeProductController(private val service: BackofficeProductService)
     override suspend fun create(@ModelAttribute request: BackofficeProductNullableRequest): BackofficeProductResponse {
         // -- create the data --
         return service.create(request.toNotNull())
-    }
-
-    /**
-     * a PUT request to handle update the existing product data.
-     *
-     * @param productId the product unique identifier.
-     * @param request the [BackofficeProductNullableRequest] instance.
-     * @return the [BackofficeProductResponse] instance.
-     */
-    @PutMapping(value = ["/{productId}"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    override suspend fun put(
-        @PathVariable productId: Long,
-        @ModelAttribute request: BackofficeProductNullableRequest
-    ): BackofficeProductResponse {
-        // -- update the data --
-        return service.update(productId, request.toNotNull())
     }
 
     /**

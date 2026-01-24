@@ -34,20 +34,6 @@ interface BackofficeProductSwaggerController {
     suspend fun create(request: BackofficeProductNullableRequest): BackofficeProductResponse
 
     @Operation(
-        summary = "Update existing product",
-        requestBody = RequestBody(
-            content = [Content(
-                mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
-                schema = Schema(implementation = BackofficeProductNullableRequest::class)
-            )]
-        )
-    )
-    suspend fun put(
-        @Parameter(description = "Product ID") productId: Long,
-        request: BackofficeProductNullableRequest
-    ): BackofficeProductResponse
-
-    @Operation(
         summary = "Update existing product with media management (recommended)",
         description = "Update product while keeping existing media by URLs and uploading new media files. " +
                 "Frontend should send existingMediaUrls to keep and newMediaFiles to upload.",
