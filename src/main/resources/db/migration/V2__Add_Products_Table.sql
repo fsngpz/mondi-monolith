@@ -12,6 +12,7 @@ CREATE TABLE products
     name                    text                                               NOT NULL,
     description             text,
     price                   text                                               NOT NULL,
+    discount_price          text                                               NOT NULL,
     currency                text                                               NOT NULL,
     specification_in_html   text,
     discount_percentage     numeric(5, 2)            DEFAULT 0.00              NOT NULL,
@@ -30,6 +31,11 @@ CREATE INDEX products_category_index ON products (category);
 CREATE INDEX products_price_index ON products (price);
 CREATE INDEX products_sku_index ON products (sku);
 CREATE INDEX products_status_index ON products (status);
+
+-- Add constraint to ensure discount_price is valid
+ALTER TABLE products
+ADD CONSTRAINT check_discount_price_valid
+CHECK (CAST(discount_price AS numeric) >= 0 AND CAST(discount_price AS numeric) <= CAST(price AS numeric));
 
 /*
  * Product Media

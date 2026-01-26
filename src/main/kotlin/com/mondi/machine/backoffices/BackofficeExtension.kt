@@ -11,6 +11,7 @@ import com.mondi.machine.backoffices.transactions.BackofficeTransactionNullableR
 import com.mondi.machine.backoffices.transactions.BackofficeTransactionRequest
 import com.mondi.machine.backoffices.transactions.BackofficeTransactionResponse
 import com.mondi.machine.products.Product
+import com.mondi.machine.products.getDiscountPrice
 import com.mondi.machine.transactions.Transaction
 
 /**
@@ -101,12 +102,14 @@ fun Product.toResponse(): BackofficeProductResponse {
     requireNotNull(id) {
         "field id is null"
     }
+    // -- use stored discount price (no calculation needed, preserves exact value) --
     // -- return the mapped value --
     return BackofficeProductResponse(
         id,
         this.name,
         this.description,
         this.price,
+        this.discountPrice,
         this.currency,
         this.specificationInHtml,
         this.discountPercentage,

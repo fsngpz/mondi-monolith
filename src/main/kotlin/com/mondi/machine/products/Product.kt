@@ -29,6 +29,7 @@ class Product(
     var specificationInHtml: String?,
 
     var price: BigDecimal,
+    var discountPrice: BigDecimal = price,
     var discountPercentage: BigDecimal = BigDecimal.ZERO,
 
     @Enumerated(EnumType.STRING)

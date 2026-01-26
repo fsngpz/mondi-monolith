@@ -5,7 +5,8 @@ import com.mondi.machine.products.Product
 import com.mondi.machine.products.ProductCategory
 import com.mondi.machine.products.ProductService
 import com.mondi.machine.products.ProductStatus
-import com.mondi.machine.products.getFinalDiscountPercentage
+import com.mondi.machine.products.calculateDiscountPercentage
+import com.mondi.machine.products.getDiscountPrice
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -44,9 +45,24 @@ class BackofficeProductService(private val productService: ProductService) {
         request: BackofficeProductUpdateRequest
     ): BackofficeProductResponse {
         val price = request.price
-        val inputPrice = request.discountPrice ?: BigDecimal.ZERO
+        val inputDiscountPrice = request.discountPrice ?: BigDecimal.ZERO
         val inputPercent = request.discountPercentage
-        val discountPercentage = getFinalDiscountPercentage(price, inputPrice, inputPercent)
+
+        // -- calculate both discount price and percentage based on input --
+        val (finalDiscountPrice, finalPercentage) = when {
+            // Priority 1: Use discount price if provided
+            inputDiscountPrice.signum() > 0 -> {
+                val percentage = inputDiscountPrice.calculateDiscountPercentage(price)
+                Pair(inputDiscountPrice, percentage)
+            }
+            // Priority 2: Use percentage if provided
+            inputPercent.signum() > 0 -> {
+                val discountPrice = getDiscountPrice(price, inputPercent)
+                Pair(discountPrice, inputPercent)
+            }
+            // No discount
+            else -> Pair(BigDecimal.ZERO, BigDecimal.ZERO)
+        }
 
         // -- make an update to the specified product --
         return productService.updateWithMediaManagement(
@@ -54,9 +70,10 @@ class BackofficeProductService(private val productService: ProductService) {
             name = request.name,
             description = request.description,
             price = request.price,
+            discountPrice = finalDiscountPrice,
             currency = request.currency.name,
             specificationInHtml = request.specificationInHtml,
-            discountPercentage = discountPercentage,
+            discountPercentage = finalPercentage,
             category = request.category,
             stock = request.stock,
             existingMediaUrls = request.existingMediaUrls ?: emptyList(),
@@ -102,6 +119,7 @@ class BackofficeProductService(private val productService: ProductService) {
                     name = productResponse.name,
                     description = productResponse.description,
                     price = productResponse.price,
+                    discountPrice = productResponse.discountPrice,
                     currency = productResponse.currency,
                     specificationInHtml = productResponse.specificationInHtml,
                     discountPercentage = productResponse.discountPercentage,

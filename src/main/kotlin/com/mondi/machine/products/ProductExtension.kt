@@ -10,16 +10,19 @@ import java.math.RoundingMode
  * @since 2026-01-21
  */
 fun Product.toResponse(): ProductResponse {
+    val id = this.id
     // -- validate field id --
-    requireNotNull(this.id) {
+    requireNotNull(id) {
         "field id is null"
     }
+    // -- use stored discount price (no calculation needed, preserves exact value) --
     // -- return the mapped value --
     return ProductResponse(
-        this.id!!,
+        id,
         this.name,
         this.description,
         this.price,
+        this.discountPrice,
         this.currency,
         this.specificationInHtml,
         this.discountPercentage,
@@ -86,5 +89,17 @@ fun getFinalDiscountPercentage(
         // -- Fallback: No discount info provided --
         else -> BigDecimal.ZERO
     }
+}
 
+/**
+ * a function to calculate the discount price.
+ *
+ * @param originalPrice the original price.
+ * @param discountPercentage the discount percentage.
+ * @return the discount price.
+ */
+fun getDiscountPrice(originalPrice: BigDecimal, discountPercentage: BigDecimal): BigDecimal {
+    val discountAmount = (originalPrice * discountPercentage)
+        .divide(BigDecimal(100), 2, RoundingMode.HALF_UP)
+    return originalPrice - discountAmount
 }

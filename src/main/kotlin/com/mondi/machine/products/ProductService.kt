@@ -72,9 +72,24 @@ class ProductService(
     @Transactional
     suspend fun create(request: BackofficeProductRequest): Product {
         val price = request.price
-        val inputPrice = request.discountPrice ?: BigDecimal.ZERO
+        val inputDiscountPrice = request.discountPrice ?: BigDecimal.ZERO
         val inputPercent = request.discountPercentage
-        val discountPercentage = getFinalDiscountPercentage(price, inputPrice, inputPercent)
+
+        // -- calculate both discount price and percentage based on input --
+        val (finalDiscountPrice, finalPercentage) = when {
+            // Priority 1: Use discount price if provided
+            inputDiscountPrice.signum() > 0 -> {
+                val percentage = inputDiscountPrice.calculateDiscountPercentage(price)
+                Pair(inputDiscountPrice, percentage)
+            }
+            // Priority 2: Use percentage if provided
+            inputPercent.signum() > 0 -> {
+                val discountPrice = getDiscountPrice(price, inputPercent)
+                Pair(discountPrice, inputPercent)
+            }
+            // No discount
+            else -> Pair(BigDecimal.ZERO, BigDecimal.ZERO)
+        }
 
         // -- generate SKU --
         val sku = skuGenerationService.generateSku(request.category)
@@ -85,9 +100,10 @@ class ProductService(
             name = request.name,
             description = request.description,
             price = request.price,
+            discountPrice = finalDiscountPrice,
             currency = request.currency.name,
             specificationInHtml = sanitizedSpecification,
-            discountPercentage = discountPercentage,
+            discountPercentage = finalPercentage,
             category = request.category,
             stock = request.stock,
             sku = sku,
@@ -101,42 +117,6 @@ class ProductService(
         }
         // -- return the saved product --
         return savedProduct
-    }
-
-    /**
-     * a function to update the instance of [Product].
-     *
-     * @param id the [Product] unique identifier.
-     * @param request the [ProductRequest] instance.
-     * @return the [Product] instance.
-     */
-    @Transactional
-    suspend fun update(id: Long, request: ProductRequest): Product {
-        // -- get the product instance --
-        val product = get(id)
-        // -- sanitize HTML to prevent XSS --
-        val sanitizedSpecification = htmlSanitizer.sanitize(request.specificationInHtml)
-        // -- update the instance --
-        product.apply {
-            this.name = request.name
-            this.description = request.description
-            this.price = request.price
-            this.currency = request.currency
-            this.specificationInHtml = sanitizedSpecification
-            this.discountPercentage = request.discountPercentage
-            this.category = request.category
-            this.stock = request.stock
-        }
-        // -- save the updated instance --
-        val updatedProduct = repository.save(product)
-        // -- clear old media from collection --
-        updatedProduct.media.clear()
-        // -- delete old media from database --
-        mediaRepository.deleteByProductId(id)
-        // -- upload and save new media files --
-        uploadAndSaveMediaFiles(updatedProduct, request.mediaFiles)
-        // -- return the updated product --
-        return updatedProduct
     }
 
     /**
@@ -155,6 +135,7 @@ class ProductService(
         name: String,
         description: String?,
         price: BigDecimal,
+        discountPrice: BigDecimal,
         currency: String,
         specificationInHtml: String?,
         discountPercentage: BigDecimal,
@@ -175,6 +156,7 @@ class ProductService(
             this.name = name
             this.description = description
             this.price = price
+            this.discountPrice = discountPrice
             this.currency = currency
             this.specificationInHtml = sanitizedSpecification
             this.discountPercentage = discountPercentage

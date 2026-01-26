@@ -16,6 +16,7 @@ data class BackofficeProductResponse(
     val name: String,
     val description: String?,
     val price: BigDecimal,
+    val discountPrice: BigDecimal,
     val currency: String,
     val specificationInHtml: String?,
     val discountPercentage: BigDecimal,
