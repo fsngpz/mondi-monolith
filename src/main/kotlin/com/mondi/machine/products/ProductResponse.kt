@@ -1,6 +1,7 @@
 package com.mondi.machine.products
 
 import java.math.BigDecimal
+import java.time.OffsetDateTime
 
 /**
  * The model class for response Product.
@@ -20,5 +21,6 @@ data class ProductResponse(
     val category: ProductCategory,
     val stock: Int,
     val sku: String,
-    val status: ProductStatus
+    val status: ProductStatus,
+    val createdAt: OffsetDateTime?
 )

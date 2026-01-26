@@ -3,6 +3,7 @@ package com.mondi.machine.backoffices.products
 import com.mondi.machine.products.ProductCategory
 import com.mondi.machine.products.ProductStatus
 import java.math.BigDecimal
+import java.time.OffsetDateTime
 
 /**
  * The model class for backoffice product response.
@@ -22,5 +23,6 @@ data class BackofficeProductResponse(
     val category: ProductCategory,
     val stock: Int,
     val sku: String,
-    val status: ProductStatus
+    val status: ProductStatus,
+    val createdAt: OffsetDateTime?
 )

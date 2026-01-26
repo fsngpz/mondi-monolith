@@ -38,6 +38,7 @@ class ProductController(private val service: ProductService) : ProductSwaggerCon
      * @param category the parameter to filter data by category.
      * @param minPrice the minimum price to filter data (default: 0).
      * @param maxPrice the maximum price to filter data (default: 999999999).
+     * @param status the status to filter data.
      * @param pageable the [Pageable].
      * @return the [Page] of [ProductResponse].
      */
@@ -47,9 +48,10 @@ class ProductController(private val service: ProductService) : ProductSwaggerCon
         @RequestParam(required = false) category: ProductCategory?,
         @RequestParam(required = false, defaultValue = "0") minPrice: BigDecimal,
         @RequestParam(required = false, defaultValue = "999999999") maxPrice: BigDecimal,
+        @RequestParam(required = false) status: ProductStatus?,
         pageable: Pageable
     ): Page<ProductResponse> {
         // -- find all products --
-        return service.findAll(search, category, minPrice, maxPrice, pageable)
+        return service.findAll(search, category, minPrice, maxPrice, status, pageable)
     }
 }

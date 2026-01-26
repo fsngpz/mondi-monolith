@@ -4,6 +4,7 @@ import com.mondi.machine.backoffices.toResponse
 import com.mondi.machine.products.Product
 import com.mondi.machine.products.ProductCategory
 import com.mondi.machine.products.ProductService
+import com.mondi.machine.products.ProductStatus
 import com.mondi.machine.products.getFinalDiscountPercentage
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -81,6 +82,7 @@ class BackofficeProductService(private val productService: ProductService) {
      * @param category the parameter to filter data by category.
      * @param minPrice the minimum price to filter data.
      * @param maxPrice the maximum price to filter data.
+     * @param status the status to filter data.
      * @param pageable the [Pageable].
      * @return the [Page] of [BackofficeProductResponse].
      */
@@ -89,10 +91,11 @@ class BackofficeProductService(private val productService: ProductService) {
         category: ProductCategory?,
         minPrice: BigDecimal,
         maxPrice: BigDecimal,
+        status: ProductStatus?,
         pageable: Pageable
     ): Page<BackofficeProductResponse> {
         // -- find all products --
-        return productService.findAll(search, category, minPrice, maxPrice, pageable)
+        return productService.findAll(search, category, minPrice, maxPrice, status, pageable)
             .map { productResponse ->
                 BackofficeProductResponse(
                     id = productResponse.id,
@@ -106,7 +109,8 @@ class BackofficeProductService(private val productService: ProductService) {
                     category = productResponse.category,
                     stock = productResponse.stock,
                     sku = productResponse.sku,
-                    status = productResponse.status
+                    status = productResponse.status,
+                    createdAt = productResponse.createdAt
                 )
             }
     }

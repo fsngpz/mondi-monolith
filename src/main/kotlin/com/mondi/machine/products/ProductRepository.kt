@@ -21,6 +21,7 @@ interface ProductRepository : JpaRepository<Product, Long> {
      * @param category the parameter to filter data by category.
      * @param minPrice the minimum price to filter data.
      * @param maxPrice the maximum price to filter data.
+     * @param status the parameter to filter data by status.
      * @param pageable the [Pageable].
      * @return the [Page] of [Product].
      */
@@ -31,6 +32,7 @@ interface ProductRepository : JpaRepository<Product, Long> {
     AND (p.category = COALESCE(:category, p.category))
     AND (cast(p.price as bigdecimal) >= :minPrice)
     AND (cast(p.price as bigdecimal) <= :maxPrice)
+    AND (p.status = COALESCE(:status, p.status))
   """
     )
     fun findAllCustom(
@@ -38,6 +40,7 @@ interface ProductRepository : JpaRepository<Product, Long> {
         category: ProductCategory?,
         minPrice: BigDecimal,
         maxPrice: BigDecimal,
+        status: ProductStatus?,
         pageable: Pageable
     ): Page<Product>
 

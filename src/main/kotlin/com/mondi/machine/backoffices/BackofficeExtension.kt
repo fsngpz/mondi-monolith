@@ -114,7 +114,8 @@ fun Product.toResponse(): BackofficeProductResponse {
         this.category,
         this.stock,
         this.sku,
-        this.status
+        this.status,
+        this.createdAt
     )
 }
 

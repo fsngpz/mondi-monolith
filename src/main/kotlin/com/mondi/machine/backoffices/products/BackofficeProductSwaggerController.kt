@@ -1,6 +1,7 @@
 package com.mondi.machine.backoffices.products
 
 import com.mondi.machine.products.ProductCategory
+import com.mondi.machine.products.ProductStatus
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
@@ -62,6 +63,7 @@ interface BackofficeProductSwaggerController {
         category: ProductCategory?,
         minPrice: BigDecimal,
         maxPrice: BigDecimal,
+        status: ProductStatus?,
         @ParameterObject pageable: Pageable
     ): Page<BackofficeProductResponse>
 }

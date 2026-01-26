@@ -27,7 +27,8 @@ fun Product.toResponse(): ProductResponse {
         this.category,
         this.stock,
         this.sku,
-        this.status
+        this.status,
+        this.createdAt
     )
 }
 

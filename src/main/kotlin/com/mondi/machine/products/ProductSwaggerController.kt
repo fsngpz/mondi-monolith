@@ -25,6 +25,7 @@ interface ProductSwaggerController {
         category: ProductCategory?,
         minPrice: BigDecimal,
         maxPrice: BigDecimal,
+        status: ProductStatus?,
         @ParameterObject pageable: Pageable
     ): Page<ProductResponse>
 }
