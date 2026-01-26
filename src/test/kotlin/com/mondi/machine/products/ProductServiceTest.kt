@@ -95,6 +95,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
                 anyOrNull(),
                 any<BigDecimal>(),
                 any<BigDecimal>(),
+                anyOrNull(),
                 any<Pageable>()
             )
         ).thenReturn(PageImpl(products))
@@ -105,6 +106,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             null,
             BigDecimal.ZERO,
             BigDecimal("999999999"),
+            null,
             Pageable.unpaged()
         )
 
@@ -116,6 +118,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             anyOrNull(),
             any<BigDecimal>(),
             any<BigDecimal>(),
+            anyOrNull(),
             any<Pageable>()
         )
     }
@@ -130,6 +133,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
                 null,
                 BigDecimal.ZERO,
                 BigDecimal("999999999"),
+                null,
                 Pageable.unpaged()
             )
         ).thenReturn(PageImpl(products))
@@ -140,6 +144,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             null,
             BigDecimal.ZERO,
             BigDecimal("999999999"),
+            null,
             Pageable.unpaged()
         )
 
@@ -152,6 +157,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             null,
             BigDecimal.ZERO,
             BigDecimal("999999999"),
+            null,
             Pageable.unpaged()
         )
     }
@@ -166,6 +172,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
                 null,
                 BigDecimal.ZERO,
                 BigDecimal("999999999"),
+                null,
                 Pageable.unpaged()
             )
         ).thenReturn(PageImpl(products))
@@ -176,6 +183,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             null,
             BigDecimal.ZERO,
             BigDecimal("999999999"),
+            null,
             Pageable.unpaged()
         )
 
@@ -187,6 +195,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             null,
             BigDecimal.ZERO,
             BigDecimal("999999999"),
+            null,
             Pageable.unpaged()
         )
     }
@@ -201,6 +210,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
                 null,
                 BigDecimal.ZERO,
                 BigDecimal("999999999"),
+                null,
                 Pageable.unpaged()
             )
         ).thenReturn(PageImpl(products))
@@ -211,6 +221,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             null,
             BigDecimal.ZERO,
             BigDecimal("999999999"),
+            null,
             Pageable.unpaged()
         )
 
@@ -222,6 +233,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             null,
             BigDecimal.ZERO,
             BigDecimal("999999999"),
+            null,
             Pageable.unpaged()
         )
     }
@@ -236,6 +248,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
                 ProductCategory.RING,
                 BigDecimal.ZERO,
                 BigDecimal("999999999"),
+                null,
                 Pageable.unpaged()
             )
         ).thenReturn(PageImpl(products))
@@ -246,6 +259,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             ProductCategory.RING,
             BigDecimal.ZERO,
             BigDecimal("999999999"),
+            null,
             Pageable.unpaged()
         )
 
@@ -258,6 +272,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             ProductCategory.RING,
             BigDecimal.ZERO,
             BigDecimal("999999999"),
+            null,
             Pageable.unpaged()
         )
     }
@@ -272,6 +287,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
                 null,
                 BigDecimal("1000"),
                 BigDecimal("2000"),
+                null,
                 Pageable.unpaged()
             )
         ).thenReturn(PageImpl(products))
@@ -282,6 +298,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             null,
             BigDecimal("1000"),
             BigDecimal("2000"),
+            null,
             Pageable.unpaged()
         )
 
@@ -293,6 +310,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             null,
             BigDecimal("1000"),
             BigDecimal("2000"),
+            null,
             Pageable.unpaged()
         )
     }
@@ -307,6 +325,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
                 ProductCategory.RING,
                 BigDecimal("1000"),
                 BigDecimal("2000"),
+                null,
                 Pageable.unpaged()
             )
         ).thenReturn(PageImpl(products))
@@ -317,6 +336,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             ProductCategory.RING,
             BigDecimal("1000"),
             BigDecimal("2000"),
+            null,
             Pageable.unpaged()
         )
 
@@ -330,6 +350,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             ProductCategory.RING,
             BigDecimal("1000"),
             BigDecimal("2000"),
+            null,
             Pageable.unpaged()
         )
     }
@@ -366,6 +387,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
                 currency = com.mondi.machine.utils.Currency.USD,
                 specificationInHtml = "<p>14k gold</p>",
                 discountPercentage = BigDecimal("10.00"),
+                discountPrice = null,
                 mediaFiles = listOf(mockMultipartFile),
                 category = ProductCategory.RING,
                 stock = 50
@@ -413,6 +435,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
                 currency = com.mondi.machine.utils.Currency.USD,
                 specificationInHtml = "<p>14k gold</p>",
                 discountPercentage = BigDecimal("10.00"),
+                discountPrice = null,
                 mediaFiles = listOf(mockMultipartFile),
                 category = ProductCategory.RING,
                 stock = 50
@@ -464,6 +487,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
                 currency = com.mondi.machine.utils.Currency.USD,
                 specificationInHtml = unsafeHtml,
                 discountPercentage = BigDecimal("10.00"),
+                discountPrice = null,
                 mediaFiles = listOf(mockMultipartFile),
                 category = ProductCategory.RING,
                 stock = 50
@@ -510,6 +534,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
                 currency = com.mondi.machine.utils.Currency.USD,
                 specificationInHtml = "<p>14k gold</p>",
                 discountPercentage = BigDecimal("10.00"),
+                discountPrice = null,
                 mediaFiles = listOf(mockMultipartFile),
                 category = ProductCategory.RING,
                 stock = 50
@@ -562,6 +587,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             name = "Updated Ring",
             description = "Updated description",
             price = BigDecimal("2000.00"),
+            discountPrice = BigDecimal("1700.00"),
             currency = "USD",
             specificationInHtml = "<p>18k gold</p>",
             discountPercentage = BigDecimal("15.00"),
@@ -590,6 +616,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             name = name,
             description = "Test description",
             price = BigDecimal("1500.00"),
+            discountPrice = BigDecimal("1350.00"),
             currency = "USD",
             specificationInHtml = "<p>Test specification</p>",
             discountPercentage = BigDecimal("10.00"),

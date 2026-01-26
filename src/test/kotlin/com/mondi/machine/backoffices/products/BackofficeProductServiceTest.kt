@@ -49,6 +49,7 @@ internal class BackofficeProductServiceTest(
             currency = Currency.USD,
             specificationInHtml = "<p>14k gold</p>",
             discountPercentage = BigDecimal("10.00"),
+            discountPrice = null,
             mediaFiles = listOf(mockMultipartFile),
             category = ProductCategory.RING,
             stock = 50
@@ -93,6 +94,7 @@ internal class BackofficeProductServiceTest(
                 anyOrNull(),
                 any<BigDecimal>(),
                 any<BigDecimal>(),
+                anyOrNull(),
                 any()
             )
         ).thenReturn(org.springframework.data.domain.PageImpl(productResponses))
@@ -103,6 +105,7 @@ internal class BackofficeProductServiceTest(
             null,
             BigDecimal.ZERO,
             BigDecimal("999999999"),
+            null,
             org.springframework.data.domain.Pageable.unpaged()
         )
 
@@ -115,6 +118,7 @@ internal class BackofficeProductServiceTest(
             anyOrNull(),
             any<BigDecimal>(),
             any<BigDecimal>(),
+            anyOrNull(),
             any()
         )
     }
@@ -130,6 +134,7 @@ internal class BackofficeProductServiceTest(
                 null,
                 BigDecimal.ZERO,
                 BigDecimal("999999999"),
+                null,
                 org.springframework.data.domain.Pageable.unpaged()
             )
         ).thenReturn(org.springframework.data.domain.PageImpl(productResponses))
@@ -140,6 +145,7 @@ internal class BackofficeProductServiceTest(
             null,
             BigDecimal.ZERO,
             BigDecimal("999999999"),
+            null,
             org.springframework.data.domain.Pageable.unpaged()
         )
 
@@ -152,6 +158,7 @@ internal class BackofficeProductServiceTest(
             null,
             BigDecimal.ZERO,
             BigDecimal("999999999"),
+            null,
             org.springframework.data.domain.Pageable.unpaged()
         )
     }
@@ -167,6 +174,7 @@ internal class BackofficeProductServiceTest(
                 ProductCategory.RING,
                 BigDecimal.ZERO,
                 BigDecimal("999999999"),
+                null,
                 org.springframework.data.domain.Pageable.unpaged()
             )
         ).thenReturn(org.springframework.data.domain.PageImpl(productResponses))
@@ -177,6 +185,7 @@ internal class BackofficeProductServiceTest(
             ProductCategory.RING,
             BigDecimal.ZERO,
             BigDecimal("999999999"),
+            null,
             org.springframework.data.domain.Pageable.unpaged()
         )
 
@@ -189,6 +198,7 @@ internal class BackofficeProductServiceTest(
             ProductCategory.RING,
             BigDecimal.ZERO,
             BigDecimal("999999999"),
+            null,
             org.springframework.data.domain.Pageable.unpaged()
         )
     }
@@ -204,6 +214,7 @@ internal class BackofficeProductServiceTest(
                 ProductCategory.RING,
                 BigDecimal("1000"),
                 BigDecimal("2000"),
+                null,
                 org.springframework.data.domain.Pageable.unpaged()
             )
         ).thenReturn(org.springframework.data.domain.PageImpl(productResponses))
@@ -214,6 +225,7 @@ internal class BackofficeProductServiceTest(
             ProductCategory.RING,
             BigDecimal("1000"),
             BigDecimal("2000"),
+            null,
             org.springframework.data.domain.Pageable.unpaged()
         )
 
@@ -227,6 +239,7 @@ internal class BackofficeProductServiceTest(
             ProductCategory.RING,
             BigDecimal("1000"),
             BigDecimal("2000"),
+            null,
             org.springframework.data.domain.Pageable.unpaged()
         )
     }
@@ -242,6 +255,7 @@ internal class BackofficeProductServiceTest(
                 null,
                 BigDecimal.ZERO,
                 BigDecimal("999999999"),
+                null,
                 org.springframework.data.domain.Pageable.unpaged()
             )
         ).thenReturn(org.springframework.data.domain.PageImpl(productResponses))
@@ -252,6 +266,7 @@ internal class BackofficeProductServiceTest(
             null,
             BigDecimal.ZERO,
             BigDecimal("999999999"),
+            null,
             org.springframework.data.domain.Pageable.unpaged()
         )
 
@@ -264,6 +279,7 @@ internal class BackofficeProductServiceTest(
             null,
             BigDecimal.ZERO,
             BigDecimal("999999999"),
+            null,
             org.springframework.data.domain.Pageable.unpaged()
         )
     }
@@ -275,6 +291,7 @@ internal class BackofficeProductServiceTest(
             this.name,
             this.description,
             this.price,
+            this.discountPrice,
             this.currency,
             this.specificationInHtml,
             this.discountPercentage,
@@ -282,7 +299,8 @@ internal class BackofficeProductServiceTest(
             this.category,
             this.stock,
             this.sku,
-            this.status
+            this.status,
+            this.createdAt
         )
     }
 
@@ -291,6 +309,7 @@ internal class BackofficeProductServiceTest(
             name = name,
             description = "Test description",
             price = BigDecimal("1500.00"),
+            discountPrice = BigDecimal("1350.00"),
             currency = "USD",
             specificationInHtml = "<p>Test specification</p>",
             discountPercentage = BigDecimal("10.00"),

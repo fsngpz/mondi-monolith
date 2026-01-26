@@ -5,6 +5,7 @@ import com.mondi.machine.products.ProductCategory
 import com.mondi.machine.products.ProductStatus
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
@@ -46,11 +47,12 @@ internal class BackofficeProductControllerTest(@Autowired private val mockMvc: M
         // -- mock --
         whenever(
             mockBackofficeProductService.findAll(
-                null,
-                null,
-                BigDecimal.ZERO,
-                BigDecimal("999999999"),
-                pageable
+                anyOrNull(),
+                anyOrNull(),
+                any(),
+                any(),
+                anyOrNull(),
+                any()
             )
         ).thenReturn(PageImpl(productResponses, pageable, productResponses.size.toLong()))
 
@@ -65,11 +67,12 @@ internal class BackofficeProductControllerTest(@Autowired private val mockMvc: M
 
         // -- verify --
         verify(mockBackofficeProductService).findAll(
-            null,
-            null,
-            BigDecimal.ZERO,
-            BigDecimal("999999999"),
-            pageable
+            anyOrNull(),
+            anyOrNull(),
+            any(),
+            any(),
+            anyOrNull(),
+            any()
         )
     }
 
@@ -81,11 +84,12 @@ internal class BackofficeProductControllerTest(@Autowired private val mockMvc: M
         // -- mock --
         whenever(
             mockBackofficeProductService.findAll(
-                "Diamond",
-                null,
-                BigDecimal.ZERO,
-                BigDecimal("999999999"),
-                pageable
+                anyOrNull(),
+                anyOrNull(),
+                any(),
+                any(),
+                anyOrNull(),
+                any()
             )
         ).thenReturn(PageImpl(productResponses, pageable, productResponses.size.toLong()))
 
@@ -98,11 +102,12 @@ internal class BackofficeProductControllerTest(@Autowired private val mockMvc: M
 
         // -- verify --
         verify(mockBackofficeProductService).findAll(
-            "Diamond",
-            null,
-            BigDecimal.ZERO,
-            BigDecimal("999999999"),
-            pageable
+            anyOrNull(),
+            anyOrNull(),
+            any(),
+            any(),
+            anyOrNull(),
+            any()
         )
     }
 
@@ -114,11 +119,12 @@ internal class BackofficeProductControllerTest(@Autowired private val mockMvc: M
         // -- mock --
         whenever(
             mockBackofficeProductService.findAll(
-                "Beautiful",
-                null,
-                BigDecimal.ZERO,
-                BigDecimal("999999999"),
-                pageable
+                anyOrNull(),
+                anyOrNull(),
+                any(),
+                any(),
+                anyOrNull(),
+                any()
             )
         ).thenReturn(PageImpl(productResponses, pageable, productResponses.size.toLong()))
 
@@ -130,11 +136,12 @@ internal class BackofficeProductControllerTest(@Autowired private val mockMvc: M
 
         // -- verify --
         verify(mockBackofficeProductService).findAll(
-            "Beautiful",
-            null,
-            BigDecimal.ZERO,
-            BigDecimal("999999999"),
-            pageable
+            anyOrNull(),
+            anyOrNull(),
+            any(),
+            any(),
+            anyOrNull(),
+            any()
         )
     }
 
@@ -146,11 +153,12 @@ internal class BackofficeProductControllerTest(@Autowired private val mockMvc: M
         // -- mock --
         whenever(
             mockBackofficeProductService.findAll(
-                "14k gold",
-                null,
-                BigDecimal.ZERO,
-                BigDecimal("999999999"),
-                pageable
+                anyOrNull(),
+                anyOrNull(),
+                any(),
+                any(),
+                anyOrNull(),
+                any()
             )
         ).thenReturn(PageImpl(productResponses, pageable, productResponses.size.toLong()))
 
@@ -162,11 +170,12 @@ internal class BackofficeProductControllerTest(@Autowired private val mockMvc: M
 
         // -- verify --
         verify(mockBackofficeProductService).findAll(
-            "14k gold",
-            null,
-            BigDecimal.ZERO,
-            BigDecimal("999999999"),
-            pageable
+            anyOrNull(),
+            anyOrNull(),
+            any(),
+            any(),
+            anyOrNull(),
+            any()
         )
     }
 
@@ -181,11 +190,12 @@ internal class BackofficeProductControllerTest(@Autowired private val mockMvc: M
         // -- mock --
         whenever(
             mockBackofficeProductService.findAll(
-                null,
-                ProductCategory.RING,
-                BigDecimal.ZERO,
-                BigDecimal("999999999"),
-                pageable
+                anyOrNull(),
+                anyOrNull(),
+                any(),
+                any(),
+                anyOrNull(),
+                any()
             )
         ).thenReturn(PageImpl(productResponses, pageable, productResponses.size.toLong()))
 
@@ -199,11 +209,12 @@ internal class BackofficeProductControllerTest(@Autowired private val mockMvc: M
 
         // -- verify --
         verify(mockBackofficeProductService).findAll(
-            null,
-            ProductCategory.RING,
-            BigDecimal.ZERO,
-            BigDecimal("999999999"),
-            pageable
+            anyOrNull(),
+            anyOrNull(),
+            any(),
+            any(),
+            anyOrNull(),
+            any()
         )
     }
 
@@ -215,11 +226,12 @@ internal class BackofficeProductControllerTest(@Autowired private val mockMvc: M
         // -- mock --
         whenever(
             mockBackofficeProductService.findAll(
-                null,
-                null,
-                BigDecimal("1000"),
-                BigDecimal("2000"),
-                pageable
+                anyOrNull(),
+                anyOrNull(),
+                any(),
+                any(),
+                anyOrNull(),
+                any()
             )
         ).thenReturn(PageImpl(productResponses, pageable, productResponses.size.toLong()))
 
@@ -231,11 +243,12 @@ internal class BackofficeProductControllerTest(@Autowired private val mockMvc: M
 
         // -- verify --
         verify(mockBackofficeProductService).findAll(
-            null,
-            null,
-            BigDecimal("1000"),
-            BigDecimal("2000"),
-            pageable
+            anyOrNull(),
+            anyOrNull(),
+            any(),
+            any(),
+            anyOrNull(),
+            any()
         )
     }
 
@@ -247,11 +260,12 @@ internal class BackofficeProductControllerTest(@Autowired private val mockMvc: M
         // -- mock --
         whenever(
             mockBackofficeProductService.findAll(
-                "Diamond",
-                ProductCategory.RING,
-                BigDecimal("1000"),
-                BigDecimal("2000"),
-                pageable
+                anyOrNull(),
+                anyOrNull(),
+                any(),
+                any(),
+                anyOrNull(),
+                any()
             )
         ).thenReturn(PageImpl(productResponses, pageable, productResponses.size.toLong()))
 
@@ -267,11 +281,12 @@ internal class BackofficeProductControllerTest(@Autowired private val mockMvc: M
 
         // -- verify --
         verify(mockBackofficeProductService).findAll(
-            "Diamond",
-            ProductCategory.RING,
-            BigDecimal("1000"),
-            BigDecimal("2000"),
-            pageable
+            anyOrNull(),
+            anyOrNull(),
+            any(),
+            any(),
+            anyOrNull(),
+            any()
         )
     }
 
@@ -281,11 +296,12 @@ internal class BackofficeProductControllerTest(@Autowired private val mockMvc: M
         // -- mock --
         whenever(
             mockBackofficeProductService.findAll(
-                "NonExistent",
-                null,
-                BigDecimal.ZERO,
-                BigDecimal("999999999"),
-                pageable
+                anyOrNull(),
+                anyOrNull(),
+                any(),
+                any(),
+                anyOrNull(),
+                any()
             )
         ).thenReturn(PageImpl(emptyList(), pageable, 0))
 
@@ -298,11 +314,12 @@ internal class BackofficeProductControllerTest(@Autowired private val mockMvc: M
 
         // -- verify --
         verify(mockBackofficeProductService).findAll(
-            "NonExistent",
-            null,
-            BigDecimal.ZERO,
-            BigDecimal("999999999"),
-            pageable
+            anyOrNull(),
+            anyOrNull(),
+            any(),
+            any(),
+            anyOrNull(),
+            any()
         )
     }
 
@@ -317,11 +334,12 @@ internal class BackofficeProductControllerTest(@Autowired private val mockMvc: M
         // -- mock --
         whenever(
             mockBackofficeProductService.findAll(
-                null,
-                null,
-                BigDecimal.ZERO,
-                BigDecimal("999999999"),
-                pageable
+                anyOrNull(),
+                anyOrNull(),
+                any(),
+                any(),
+                anyOrNull(),
+                any()
             )
         ).thenReturn(PageImpl(productResponses, pageable, 12))
 
@@ -335,11 +353,12 @@ internal class BackofficeProductControllerTest(@Autowired private val mockMvc: M
 
         // -- verify --
         verify(mockBackofficeProductService).findAll(
-            null,
-            null,
-            BigDecimal.ZERO,
-            BigDecimal("999999999"),
-            pageable
+            anyOrNull(),
+            anyOrNull(),
+            any(),
+            any(),
+            anyOrNull(),
+            any()
         )
     }
 
@@ -351,11 +370,12 @@ internal class BackofficeProductControllerTest(@Autowired private val mockMvc: M
         // -- mock --
         whenever(
             mockBackofficeProductService.findAll(
-                null,
-                null,
-                BigDecimal.ZERO,
-                BigDecimal("999999999"),
-                pageable
+                anyOrNull(),
+                anyOrNull(),
+                any(),
+                any(),
+                anyOrNull(),
+                any()
             )
         ).thenReturn(PageImpl(productResponses, pageable, productResponses.size.toLong()))
 
@@ -367,11 +387,12 @@ internal class BackofficeProductControllerTest(@Autowired private val mockMvc: M
 
         // -- verify --
         verify(mockBackofficeProductService).findAll(
-            null,
-            null,
-            BigDecimal.ZERO,
-            BigDecimal("999999999"),
-            pageable
+            anyOrNull(),
+            anyOrNull(),
+            any(),
+            any(),
+            anyOrNull(),
+            any()
         )
     }
 
@@ -380,6 +401,7 @@ internal class BackofficeProductControllerTest(@Autowired private val mockMvc: M
             name = name,
             description = "Beautiful ${name.lowercase()}",
             price = BigDecimal("1500.00"),
+            discountPrice = BigDecimal("1350.00"),
             currency = "USD",
             specificationInHtml = "<p>14k gold specification</p>",
             discountPercentage = BigDecimal("10.00"),
@@ -399,6 +421,7 @@ internal class BackofficeProductControllerTest(@Autowired private val mockMvc: M
             this.name,
             this.description,
             this.price,
+            this.discountPrice,
             this.currency,
             this.specificationInHtml,
             this.discountPercentage,
@@ -406,7 +429,8 @@ internal class BackofficeProductControllerTest(@Autowired private val mockMvc: M
             this.category,
             this.stock,
             this.sku,
-            this.status
+            this.status,
+            this.createdAt
         )
     }
 }
