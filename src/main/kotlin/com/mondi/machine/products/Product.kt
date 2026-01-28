@@ -1,6 +1,7 @@
 package com.mondi.machine.products
 
 import com.mondi.machine.utils.AuditableBaseEntity
+import com.mondi.machine.utils.Currency
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
@@ -8,6 +9,7 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
+import org.hibernate.annotations.Formula
 import org.hibernate.annotations.JdbcType
 import org.hibernate.dialect.PostgreSQLEnumJdbcType
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
@@ -25,10 +27,14 @@ import java.math.BigDecimal
 class Product(
     var name: String,
     var description: String?,
-    var currency: String,
+    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType::class)
+    var currency: Currency,
     var specificationInHtml: String?,
 
+    @Formula("CAST(price AS DECIMAL)")
     var price: BigDecimal,
+    @Formula("CAST(discount_price AS DECIMAL)")
     var discountPrice: BigDecimal = price,
     var discountPercentage: BigDecimal = BigDecimal.ZERO,
 
