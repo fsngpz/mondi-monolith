@@ -9,7 +9,6 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
-import org.hibernate.annotations.Formula
 import org.hibernate.annotations.JdbcType
 import org.hibernate.dialect.PostgreSQLEnumJdbcType
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
@@ -32,9 +31,7 @@ class Product(
     var currency: Currency,
     var specificationInHtml: String?,
 
-    @Formula("CAST(price AS DECIMAL)")
     var price: BigDecimal,
-    @Formula("CAST(discount_price AS DECIMAL)")
     var discountPrice: BigDecimal = price,
     var discountPercentage: BigDecimal = BigDecimal.ZERO,
 
