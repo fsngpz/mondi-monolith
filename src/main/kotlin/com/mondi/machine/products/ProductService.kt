@@ -3,6 +3,7 @@ package com.mondi.machine.products
 import com.mondi.machine.backoffices.products.BackofficeProductRequest
 import com.mondi.machine.storage.supabase.SupabaseService
 import com.mondi.machine.storage.supabase.SupabaseService.Companion.BUCKET_PRODUCTS
+import com.mondi.machine.utils.Currency
 import jakarta.transaction.Transactional
 import org.apache.commons.io.FilenameUtils
 import org.springframework.data.domain.Page
@@ -47,6 +48,7 @@ class ProductService(
      * @param minPrice the minimum price to filter data.
      * @param maxPrice the maximum price to filter data.
      * @param status the status to filter data.
+     * @param isSale the parameter to filter data by sale status.
      * @param pageable the [Pageable].
      * @return the [Page] of [ProductResponse].
      */
@@ -56,10 +58,11 @@ class ProductService(
         minPrice: BigDecimal,
         maxPrice: BigDecimal,
         status: ProductStatus?,
+        isSale: Boolean?,
         pageable: Pageable
     ): Page<ProductResponse> {
         // -- find the data --
-        return repository.findAllCustom(search, category, minPrice, maxPrice, status, pageable)
+        return repository.findAllCustom(search, category, minPrice, maxPrice, status, isSale, pageable)
             .map { it.toResponse() }
     }
 
@@ -101,7 +104,7 @@ class ProductService(
             description = request.description,
             price = request.price,
             discountPrice = finalDiscountPrice,
-            currency = request.currency.name,
+            currency = request.currency,
             specificationInHtml = sanitizedSpecification,
             discountPercentage = finalPercentage,
             category = request.category,
@@ -124,7 +127,6 @@ class ProductService(
      * Keeps existing media by URLs and uploads new media files.
      *
      * @param id the [Product] unique identifier.
-     * @param request the product update data.
      * @param existingMediaUrls the list of existing media URLs to keep.
      * @param newMediaFiles the list of new media files to upload.
      * @return the [Product] instance.
@@ -136,7 +138,7 @@ class ProductService(
         description: String?,
         price: BigDecimal,
         discountPrice: BigDecimal,
-        currency: String,
+        currency: Currency,
         specificationInHtml: String?,
         discountPercentage: BigDecimal,
         category: ProductCategory,

@@ -48,10 +48,11 @@ class ProductController(private val service: ProductService) : ProductSwaggerCon
         @RequestParam(required = false) category: ProductCategory?,
         @RequestParam(required = false, defaultValue = "0") minPrice: BigDecimal,
         @RequestParam(required = false, defaultValue = "999999999") maxPrice: BigDecimal,
+        @RequestParam(required = false) isSale: Boolean?,
         @RequestParam(required = false) status: ProductStatus?,
         pageable: Pageable
     ): Page<ProductResponse> {
         // -- find all products --
-        return service.findAll(search, category, minPrice, maxPrice, status, pageable)
+        return service.findAll(search, category, minPrice, maxPrice, status, isSale, pageable)
     }
 }

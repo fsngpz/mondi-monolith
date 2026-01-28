@@ -2,6 +2,7 @@ package com.mondi.machine.backoffices.products
 
 import com.mondi.machine.products.ProductCategory
 import com.mondi.machine.products.ProductStatus
+import com.mondi.machine.utils.Currency
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 
@@ -17,7 +18,7 @@ data class BackofficeProductResponse(
     val description: String?,
     val price: BigDecimal,
     val discountPrice: BigDecimal,
-    val currency: String,
+    val currency: Currency,
     val specificationInHtml: String?,
     val discountPercentage: BigDecimal,
     val mediaUrls: List<String>,

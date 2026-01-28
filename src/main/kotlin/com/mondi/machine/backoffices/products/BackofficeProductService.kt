@@ -71,7 +71,7 @@ class BackofficeProductService(private val productService: ProductService) {
             description = request.description,
             price = request.price,
             discountPrice = finalDiscountPrice,
-            currency = request.currency.name,
+            currency = request.currency,
             specificationInHtml = request.specificationInHtml,
             discountPercentage = finalPercentage,
             category = request.category,
@@ -112,7 +112,7 @@ class BackofficeProductService(private val productService: ProductService) {
         pageable: Pageable
     ): Page<BackofficeProductResponse> {
         // -- find all products --
-        return productService.findAll(search, category, minPrice, maxPrice, status, pageable)
+        return productService.findAll(search, category, minPrice, maxPrice, status, null, pageable)
             .map { productResponse ->
                 BackofficeProductResponse(
                     id = productResponse.id,
