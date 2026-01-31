@@ -94,6 +94,9 @@ dependencies {
 
     // -- mockk --
     testImplementation("io.mockk:mockk:${mockkVersion}")
+
+    // -- email --
+    implementation("org.springframework.boot:spring-boot-starter-mail")
 }
 
 tasks.withType<KotlinCompile>().configureEach {

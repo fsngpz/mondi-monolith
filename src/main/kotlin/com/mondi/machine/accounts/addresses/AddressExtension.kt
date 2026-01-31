@@ -95,9 +95,6 @@ fun AddressNullableRequest.toNonNull(): AddressRequest {
     require(!this.addressLine1.isNullOrBlank()) {
         "field 'addressLine1' cannot be null or blank"
     }
-    require(!this.addressLine2.isNullOrBlank()) {
-        "field 'addressLine2' cannot be null or blank"
-    }
     require(!this.city.isNullOrBlank()) {
         "field 'city' cannot be null or blank"
     }

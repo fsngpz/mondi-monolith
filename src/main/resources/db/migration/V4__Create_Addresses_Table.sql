@@ -18,7 +18,7 @@ CREATE TABLE addresses
     recipient_name  text                                               NOT NULL,
     phone           text                                               NOT NULL,
     address_line1   text                                               NOT NULL,
-    address_line2   text                                               NOT NULL,
+    address_line2   text,
     city            text                                               NOT NULL,
     state           text                                               NOT NULL,
     postal_code     text                                               NOT NULL,
