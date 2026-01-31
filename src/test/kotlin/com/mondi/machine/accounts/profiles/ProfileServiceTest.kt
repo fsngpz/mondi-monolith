@@ -1,7 +1,10 @@
 package com.mondi.machine.accounts.profiles
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.mondi.machine.auths.users.OAuthProvider
 import com.mondi.machine.auths.users.User
+import com.mondi.machine.auths.users.UserRepository
+import com.mondi.machine.exceptions.MobileAlreadyExistsException
 import com.mondi.machine.storage.supabase.SupabaseService
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
@@ -37,7 +40,7 @@ internal class ProfileServiceTest(@Autowired private val service: ProfileService
     lateinit var mockSupabaseService: SupabaseService
 
     @MockitoBean
-    lateinit var mockUserRepository: com.mondi.machine.auths.users.UserRepository
+    lateinit var mockUserRepository: UserRepository
     // -- end of region mock --
 
     // -- region of smoke testing --
@@ -401,4 +404,119 @@ internal class ProfileServiceTest(@Autowired private val service: ProfileService
     }
 
     // -- end of region: Optimistic Locking Fix Tests --
+
+    // -- region: Mobile Uniqueness Validation Tests --
+
+    @Test
+    fun `patch should throw exception when mobile is already in use by another user`() = runTest {
+        val mockUser1 = User("user1@email.com", "pw").apply { id = 1L; mobile = "+1111111111" }
+        val mockUser2 = User("user2@email.com", "pw").apply { id = 2L; mobile = "+2222222222" }
+        val mockProfile1 = Profile(user = mockUser1).apply { name = "User 1" }
+
+        val mockRequest = ProfileRequest(mobile = "+2222222222") // -- trying to use user2's mobile --
+
+        // -- mock --
+        whenever(mockRepository.findById(1L)).thenReturn(Optional.of(mockProfile1))
+        whenever(mockUserRepository.findByMobile("+2222222222")).thenReturn(mockUser2)
+
+        // -- execute and verify exception --
+        val exception = assertThrows<MobileAlreadyExistsException> {
+            service.patch(1L, mockRequest, null)
+        }
+
+        assertThat(exception.message).contains("+2222222222")
+        assertThat(exception.message).contains("already in use")
+
+        // -- verify no save occurred --
+        verify(mockRepository, never()).save(any<Profile>())
+    }
+
+    @Test
+    fun `patch should succeed when mobile is same as current user`() = runTest {
+        val mockUser = User("user@email.com", "pw").apply { id = 1L; mobile = "+1111111111" }
+        val mockProfile = Profile(user = mockUser).apply { name = "User" }
+
+        val mockRequest = ProfileRequest(mobile = "+1111111111") // -- same mobile --
+
+        // -- mock --
+        whenever(mockRepository.findById(1L)).thenReturn(Optional.of(mockProfile))
+        whenever(mockRepository.save(any<Profile>())).thenAnswer { it.arguments[0] as Profile }
+
+        // -- execute --
+        val result = service.patch(1L, mockRequest, null)
+
+        // -- verify success --
+        assertThat(result.user.mobile).isEqualTo("+1111111111")
+        verify(mockRepository).save(any<Profile>())
+        // -- findByMobile should not be called since mobile hasn't changed --
+        verify(mockUserRepository, never()).findByMobile(any())
+    }
+
+    @Test
+    fun `patch should succeed when mobile is not in use by another user`() = runTest {
+        val mockUser = User("user@email.com", "pw").apply { id = 1L; mobile = "+1111111111" }
+        val mockProfile = Profile(user = mockUser).apply { name = "User" }
+
+        val mockRequest = ProfileRequest(mobile = "+3333333333") // -- new unique mobile --
+
+        // -- mock --
+        whenever(mockRepository.findById(1L)).thenReturn(Optional.of(mockProfile))
+        whenever(mockUserRepository.findByMobile("+3333333333")).thenReturn(null) // -- not in use --
+        whenever(mockRepository.save(any<Profile>())).thenAnswer { it.arguments[0] as Profile }
+
+        // -- execute --
+        val result = service.patch(1L, mockRequest, null)
+
+        // -- verify success --
+        assertThat(result.user.mobile).isEqualTo("+3333333333")
+        verify(mockRepository).save(any<Profile>())
+        verify(mockUserRepository).findByMobile("+3333333333")
+    }
+
+    @Test
+    fun `update should throw exception when mobile is already in use by another user`() {
+        val mockUser1 = User("user1@email.com", "pw").apply { id = 1L; mobile = "+1111111111" }
+        val mockUser2 = User("user2@email.com", "pw").apply { id = 2L; mobile = "+2222222222" }
+        val mockProfile1 = Profile(user = mockUser1).apply { name = "User 1" }
+
+        val mockRequest = ProfileRequest(name = "Updated Name", mobile = "+2222222222")
+
+        // -- mock --
+        whenever(mockRepository.findById(1L)).thenReturn(Optional.of(mockProfile1))
+        whenever(mockUserRepository.findByMobile("+2222222222")).thenReturn(mockUser2)
+
+        // -- execute and verify exception --
+        val exception = assertThrows<MobileAlreadyExistsException> {
+            service.update(1L, mockRequest)
+        }
+
+        assertThat(exception.message).contains("+2222222222")
+        assertThat(exception.message).contains("already in use")
+
+        // -- verify no save occurred --
+        verify(mockRepository, never()).save(any<Profile>())
+    }
+
+    @Test
+    fun `update should succeed when mobile is not in use by another user`() {
+        val mockUser = User("user@email.com", "pw").apply { id = 1L; mobile = "+1111111111" }
+        val mockProfile = Profile(user = mockUser).apply { name = "User" }
+
+        val mockRequest = ProfileRequest(name = "Updated Name", mobile = "+3333333333")
+
+        // -- mock --
+        whenever(mockRepository.findById(1L)).thenReturn(Optional.of(mockProfile))
+        whenever(mockUserRepository.findByMobile("+3333333333")).thenReturn(null)
+        whenever(mockRepository.save(any<Profile>())).thenReturn(mockProfile)
+
+        // -- execute --
+        val result = service.update(1L, mockRequest)
+
+        // -- verify success --
+        assertThat(result.user.mobile).isEqualTo("+3333333333")
+        verify(mockRepository).save(any<Profile>())
+        verify(mockUserRepository).findByMobile("+3333333333")
+    }
+
+    // -- end of region: Mobile Uniqueness Validation Tests --
 }

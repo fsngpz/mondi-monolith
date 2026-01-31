@@ -47,4 +47,21 @@ class ControllerExceptionHandler {
     )    // -- return as response entity --
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse)
   }
+
+  /**
+   * Handle mobile already exists exception.
+   *
+   * @param e the [MobileAlreadyExistsException].
+   * @return the [ErrorResponse] with [HttpStatus.CONFLICT].
+   */
+  @ExceptionHandler
+  fun handleMobileAlreadyExistsException(e: MobileAlreadyExistsException): ResponseEntity<ErrorResponse> {
+    // -- setup the instance of error response --
+    val errorResponse = ErrorResponse(
+      type = e.javaClass.simpleName,
+      message = e.message ?: "Mobile number is already in use"
+    )
+    // -- return as response entity --
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse)
+  }
 }

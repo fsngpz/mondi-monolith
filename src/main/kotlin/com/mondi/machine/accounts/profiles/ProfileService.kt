@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.convertValue
 import com.mondi.machine.auths.users.User
+import com.mondi.machine.auths.users.UserRepository
+import com.mondi.machine.exceptions.MobileAlreadyExistsException
 import com.mondi.machine.storage.supabase.SupabaseService
 import com.mondi.machine.storage.supabase.SupabaseService.Companion.BUCKET_USERS
 import com.mondi.machine.utils.MobileNumberValidator
@@ -21,7 +23,8 @@ import org.springframework.web.multipart.MultipartFile
 class ProfileService(
     private val objectMapper: ObjectMapper,
     private val supabaseService: SupabaseService,
-    private val repository: ProfileRepository
+    private val repository: ProfileRepository,
+    private val userRepository: UserRepository
 ) {
 
     /**
@@ -69,6 +72,12 @@ class ProfileService(
         val normalizedMobile = MobileNumberValidator.validateAndNormalize(request.mobile)
         // -- get the profile instance --
         val profile = get(id)
+
+        // -- validate mobile uniqueness if mobile is being changed --
+        if (normalizedMobile != profile.user.mobile) {
+            validateMobileUniqueness(normalizedMobile, profile.user.id)
+        }
+
         profile.name = request.name
         profile.profilePictureUrl = request.profilePictureKey
         // -- update user fields --
@@ -128,6 +137,12 @@ class ProfileService(
         if (updatedJsonNode.has("mobile")) {
             val mobileValue = if (updatedJsonNode["mobile"].isNull) null else updatedJsonNode["mobile"].asText()
             val normalizedMobile = MobileNumberValidator.validateAndNormalize(mobileValue)
+
+            // -- validate mobile uniqueness if mobile is being changed --
+            if (normalizedMobile != profile.user.mobile) {
+                validateMobileUniqueness(normalizedMobile, profile.user.id)
+            }
+
             profile.user.mobile = normalizedMobile
         }
 
@@ -139,6 +154,27 @@ class ProfileService(
 
         // -- save the profile instance (cascade will handle user) --
         return repository.save(profile)
+    }
+
+    /**
+     * a private function to validate mobile number uniqueness.
+     *
+     * Checks if the provided mobile number is already in use by another user.
+     * Throws [MobileAlreadyExistsException] if the mobile is already taken.
+     *
+     * @param normalizedMobile the normalized mobile number to validate.
+     * @param currentUserId the ID of the current user (to allow them to keep their own mobile). Can be null for new users.
+     * @throws MobileAlreadyExistsException if the mobile is already in use by another user.
+     */
+    private fun validateMobileUniqueness(normalizedMobile: String?, currentUserId: Long?) {
+        if (normalizedMobile != null) {
+            val existingUser = userRepository.findByMobile(normalizedMobile)
+            if (existingUser != null && existingUser.id != currentUserId) {
+                throw MobileAlreadyExistsException(
+                    "Mobile number '$normalizedMobile' is already in use by another user"
+                )
+            }
+        }
     }
 
     /**
