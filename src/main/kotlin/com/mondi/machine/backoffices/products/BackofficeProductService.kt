@@ -112,7 +112,7 @@ class BackofficeProductService(private val productService: ProductService) {
         pageable: Pageable
     ): Page<BackofficeProductResponse> {
         // -- find all products --
-        return productService.findAll(search, category, minPrice, maxPrice, status, null, pageable)
+        return productService.findAll(search, category, minPrice, maxPrice, status, null, null, pageable)
             .map { productResponse ->
                 BackofficeProductResponse(
                     id = productResponse.id,

@@ -3,6 +3,7 @@ package com.mondi.machine.backoffices.products
 import com.mondi.machine.products.Product
 import com.mondi.machine.products.ProductCategory
 import com.mondi.machine.products.ProductStatus
+import com.mondi.machine.utils.Currency
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
@@ -402,7 +403,7 @@ internal class BackofficeProductControllerTest(@Autowired private val mockMvc: M
             description = "Beautiful ${name.lowercase()}",
             price = BigDecimal("1500.00"),
             discountPrice = BigDecimal("1350.00"),
-            currency = "USD",
+            currency = Currency.USD,
             specificationInHtml = "<p>14k gold specification</p>",
             discountPercentage = BigDecimal("10.00"),
             category = ProductCategory.RING,

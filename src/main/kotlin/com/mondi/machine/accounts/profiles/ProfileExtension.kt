@@ -17,6 +17,7 @@ fun Profile.toResponse(): ProfileResponse {
     return ProfileResponse(
         id = id,
         name = this.name,
+        email = this.user.email,
         profilePictureUrl = this.profilePictureUrl,
         mobile = this.user.mobile,
         membershipSince = this.user.membershipSince

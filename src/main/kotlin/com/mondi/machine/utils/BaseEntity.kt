@@ -25,7 +25,7 @@ abstract class BaseEntity : Persistable<Long?> {
   var id: Long? = null
 
   @Version
-  val version: Long = 0
+  var version: Long = 0
 
   /**
    * Returns the id of the entity.

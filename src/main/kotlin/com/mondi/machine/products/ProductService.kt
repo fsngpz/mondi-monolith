@@ -49,6 +49,7 @@ class ProductService(
      * @param maxPrice the maximum price to filter data.
      * @param status the status to filter data.
      * @param isSale the parameter to filter data by sale status.
+     * @param isInStock the parameter to filter data by stock availability.
      * @param pageable the [Pageable].
      * @return the [Page] of [ProductResponse].
      */
@@ -59,10 +60,11 @@ class ProductService(
         maxPrice: BigDecimal,
         status: ProductStatus?,
         isSale: Boolean?,
+        isInStock: Boolean?,
         pageable: Pageable
     ): Page<ProductResponse> {
         // -- find the data --
-        return repository.findAllCustom(search, category, minPrice, maxPrice, status, isSale, pageable)
+        return repository.findAllCustom(search, category, minPrice, maxPrice, status, isSale, isInStock, pageable)
             .map { it.toResponse() }
     }
 

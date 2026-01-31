@@ -26,7 +26,10 @@ class Address(
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     val user: User,
-    var street: String,
+    var recipientName: String,
+    var phone: String,
+    var addressLine1: String,
+    var addressLine2: String,
     var city: String,
     var state: String,
     var postalCode: String,

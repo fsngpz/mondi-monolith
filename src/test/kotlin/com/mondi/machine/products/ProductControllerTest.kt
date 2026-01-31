@@ -1,5 +1,6 @@
 package com.mondi.machine.products
 
+import com.mondi.machine.utils.Currency
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
@@ -69,6 +70,8 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
                 any(),
                 any(),
                 anyOrNull(),
+                anyOrNull(),
+                anyOrNull(),
                 any()
             )
         ).thenReturn(PageImpl(productResponses, pageable, productResponses.size.toLong()))
@@ -89,6 +92,8 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
             any(),
             any(),
             anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
             any()
         )
     }
@@ -105,6 +110,8 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
                 anyOrNull(),
                 any(),
                 any(),
+                anyOrNull(),
+                anyOrNull(),
                 anyOrNull(),
                 any()
             )
@@ -124,6 +131,8 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
             any(),
             any(),
             anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
             any()
         )
     }
@@ -140,6 +149,8 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
                 anyOrNull(),
                 any(),
                 any(),
+                anyOrNull(),
+                anyOrNull(),
                 anyOrNull(),
                 any()
             )
@@ -158,6 +169,8 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
             any(),
             any(),
             anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
             any()
         )
     }
@@ -175,6 +188,8 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
                 any(),
                 any(),
                 anyOrNull(),
+                anyOrNull(),
+                anyOrNull(),
                 any()
             )
         ).thenReturn(PageImpl(productResponses, pageable, productResponses.size.toLong()))
@@ -191,6 +206,8 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
             anyOrNull(),
             any(),
             any(),
+            anyOrNull(),
+            anyOrNull(),
             anyOrNull(),
             any()
         )
@@ -212,6 +229,8 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
                 any(),
                 any(),
                 anyOrNull(),
+                anyOrNull(),
+                anyOrNull(),
                 any()
             )
         ).thenReturn(PageImpl(productResponses, pageable, productResponses.size.toLong()))
@@ -231,6 +250,8 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
             any(),
             any(),
             anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
             any()
         )
     }
@@ -247,6 +268,8 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
                 anyOrNull(),
                 any(),
                 any(),
+                anyOrNull(),
+                anyOrNull(),
                 anyOrNull(),
                 any()
             )
@@ -265,6 +288,8 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
             any(),
             any(),
             anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
             any()
         )
     }
@@ -281,6 +306,8 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
                 anyOrNull(),
                 any(),
                 any(),
+                anyOrNull(),
+                anyOrNull(),
                 anyOrNull(),
                 any()
             )
@@ -303,6 +330,8 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
             any(),
             any(),
             anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
             any()
         )
     }
@@ -317,6 +346,8 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
                 anyOrNull(),
                 any(),
                 any(),
+                anyOrNull(),
+                anyOrNull(),
                 anyOrNull(),
                 any()
             )
@@ -335,6 +366,8 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
             anyOrNull(),
             any(),
             any(),
+            anyOrNull(),
+            anyOrNull(),
             anyOrNull(),
             any()
         )
@@ -356,6 +389,8 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
                 any(),
                 any(),
                 anyOrNull(),
+                anyOrNull(),
+                anyOrNull(),
                 any()
             )
         ).thenReturn(PageImpl(productResponses, pageable, 12))
@@ -375,6 +410,8 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
             any(),
             any(),
             anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
             any()
         )
     }
@@ -385,7 +422,7 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
             description = "Beautiful ${name.lowercase()}",
             price = BigDecimal("1500.00"),
             discountPrice = BigDecimal("1350.00"),
-            currency = "USD",
+            currency = Currency.USD,
             specificationInHtml = "<p>14k gold specification</p>",
             discountPercentage = BigDecimal("10.00"),
             category = ProductCategory.RING,

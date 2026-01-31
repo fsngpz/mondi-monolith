@@ -81,7 +81,9 @@ class AddressService(
     @Transactional
     fun create(userId: Long, request: AddressRequest): Address {
         // -- validate required fields --
-        requireNotNull(request.street) { "field 'street' cannot be null" }
+        requireNotNull(request.recipientName) { "field 'recipientName' cannot be null" }
+        requireNotNull(request.phone) { "field 'phone' cannot be null" }
+        requireNotNull(request.addressLine1) { "field 'addressLine1' cannot be null" }
         requireNotNull(request.city) { "field 'city' cannot be null" }
         requireNotNull(request.country) { "field 'country' cannot be null" }
 
@@ -90,7 +92,7 @@ class AddressService(
             ?: throw NoSuchElementException("User not found with id: $userId")
 
         // -- if this address is marked as main, unset other main addresses --
-        val isMain = request.isMain ?: false
+        val isMain = request.isMain
         if (isMain) {
             unsetMainAddress(user)
         }
@@ -98,12 +100,15 @@ class AddressService(
         // -- create new address --
         val address = Address(
             user = user,
-            street = request.street,
+            recipientName = request.recipientName,
+            phone = request.phone,
+            addressLine1 = request.addressLine1,
+            addressLine2 = request.addressLine2,
             city = request.city,
             state = request.state,
             postalCode = request.postalCode,
             country = request.country,
-            tag = request.tag ?: AddressTag.HOME,
+            tag = request.tag,
             isMain = isMain
         ).apply {
             this.label = request.label
@@ -137,7 +142,10 @@ class AddressService(
 
         // -- update fields --
         address.apply {
-            this.street = request.street
+            this.recipientName = request.recipientName
+            this.phone = request.phone
+            this.addressLine1 = request.addressLine1
+            this.addressLine2 = request.addressLine2
             this.city = request.city
             this.state = request.state
             this.postalCode = request.postalCode

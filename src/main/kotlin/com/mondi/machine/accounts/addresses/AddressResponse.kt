@@ -8,10 +8,13 @@ package com.mondi.machine.accounts.addresses
  */
 data class AddressResponse(
     val id: Long,
-    val street: String,
+    val recipientName: String,
+    val phone: String,
+    val addressLine1: String,
+    val addressLine2: String,
     val city: String,
-    val state: String?,
-    val postalCode: String?,
+    val state: String,
+    val postalCode: String,
     val country: String,
     val tag: AddressTag,
     val isMain: Boolean,

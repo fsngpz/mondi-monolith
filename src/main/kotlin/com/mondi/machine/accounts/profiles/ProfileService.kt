@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.convertValue
 import com.mondi.machine.auths.users.User
-import com.mondi.machine.auths.users.UserRepository
 import com.mondi.machine.storage.supabase.SupabaseService
 import com.mondi.machine.storage.supabase.SupabaseService.Companion.BUCKET_USERS
 import com.mondi.machine.utils.MobileNumberValidator
@@ -22,8 +21,7 @@ import org.springframework.web.multipart.MultipartFile
 class ProfileService(
     private val objectMapper: ObjectMapper,
     private val supabaseService: SupabaseService,
-    private val repository: ProfileRepository,
-    private val userRepository: UserRepository
+    private val repository: ProfileRepository
 ) {
 
     /**
@@ -70,76 +68,111 @@ class ProfileService(
         // -- validate and normalize mobile number if provided --
         val normalizedMobile = MobileNumberValidator.validateAndNormalize(request.mobile)
         // -- get the profile instance --
-        val profile = get(id).apply {
-            this.name = request.name
-            this.profilePictureUrl = request.profilePictureKey
-            // -- update user fields --
-            this.user.mobile = normalizedMobile
-            this.user.membershipSince = request.membershipSince
-        }
-        // -- save the user instance --
-        userRepository.save(profile.user)
-        // -- save the profile instance --
+        val profile = get(id)
+        profile.name = request.name
+        profile.profilePictureUrl = request.profilePictureKey
+        // -- update user fields --
+        profile.user.mobile = normalizedMobile
+        profile.user.membershipSince = request.membershipSince
+        // -- save the profile instance (cascade will handle user) --
         return repository.save(profile)
     }
 
     /**
      * a function to handle request patch / partial update of instance [Profile].
      *
+     * FIXED: Removed double loading of Profile entity to prevent OptimisticLockingFailureException.
+     * FIXED: Updates profile directly without calling update() which would reload the entity.
+     *
+     * Handles profile picture updates:
+     * 1. If MultipartFile is provided: upload and use the new URL
+     * 2. If profilePictureKey is provided in request: use that URL
+     * 3. Otherwise: preserve existing profile picture
+     *
      * @param id the unique identifier.
-     * @param request the [JsonNode] of payload.
-     * @param profilePicture the profile picture url.
+     * @param request the [ProfileRequest] of payload.
+     * @param profilePicture the profile picture file.
      * @return the [Profile] instance.
      */
     suspend fun patch(id: Long, request: ProfileRequest, profilePicture: MultipartFile?): Profile {
-        // -- convert the request to json node --
-        val jsonNode = objectMapper.convertValue<JsonNode>(request)
-        // -- get the profile instance --
+        // -- get the profile instance (load once) --
         val profile = get(id)
-        // -- convert the instance of Profile to ProfileRequest --
-        val body = profile.toRequest()
-        // -- read for updating --
-        val reader = objectMapper.readerForUpdating(body)
-        // -- upload the profile picture --
-        val newRequest = jsonNode.uploadProfilePicture(id, profilePicture)
-        // -- merge the instance --
-        val mergedInstance = reader.readValue<ProfileRequest>(newRequest)
-        // -- update the instance --
-        return update(id, mergedInstance)
+
+        // -- convert the request to json node to check which fields are present --
+        val jsonNode = objectMapper.convertValue<JsonNode>(request)
+
+        // -- upload profile picture if provided and update JSON --
+        val updatedJsonNode = jsonNode.uploadProfilePicture(id, profilePicture)
+
+        // -- update fields that are explicitly provided in the request --
+        if (updatedJsonNode.has("name") && !updatedJsonNode["name"].isNull) {
+            profile.name = updatedJsonNode["name"].asText()
+        }
+
+        // -- validate name is not null after update --
+        requireNotNull(profile.name) {
+            "field 'name' cannot be null"
+        }
+
+        // -- update profilePictureUrl if file was uploaded or profilePictureKey was provided --
+        if (profilePicture != null) {
+            // -- file was uploaded, use the new key from JSON --
+            profile.profilePictureUrl = updatedJsonNode["profilePictureKey"].asText()
+        } else if (updatedJsonNode.has("profilePictureKey") && !updatedJsonNode["profilePictureKey"].isNull) {
+            // -- profilePictureKey was explicitly provided in request and is not null --
+            profile.profilePictureUrl = updatedJsonNode["profilePictureKey"].asText()
+        }
+        // -- if neither, profilePictureUrl is preserved (not updated) --
+
+        // -- update mobile if provided --
+        if (updatedJsonNode.has("mobile")) {
+            val mobileValue = if (updatedJsonNode["mobile"].isNull) null else updatedJsonNode["mobile"].asText()
+            val normalizedMobile = MobileNumberValidator.validateAndNormalize(mobileValue)
+            profile.user.mobile = normalizedMobile
+        }
+
+        // -- update membershipSince if provided --
+        if (updatedJsonNode.has("membershipSince") && !updatedJsonNode["membershipSince"].isNull) {
+            val membershipSinceStr = updatedJsonNode["membershipSince"].asText()
+            profile.user.membershipSince = java.time.OffsetDateTime.parse(membershipSinceStr)
+        }
+
+        // -- save the profile instance (cascade will handle user) --
+        return repository.save(profile)
     }
 
     /**
-     * a private function to upload profile picture and store it to the new request then return as
-     * JSON Node.
+     * a private function to upload profile picture and update the JSON node with the profile picture key.
+     *
+     * Handles three scenarios:
+     * 1. If MultipartFile is provided: upload new file and set the new URL in the JSON
+     * 2. If profilePictureKey is provided in request: keep it as is
+     * 3. If neither is provided: don't modify the JSON (field won't be present in merge)
      *
      * @param id the profile unique identifier.
      * @param profilePicture the [MultipartFile] of Profile Picture.
-     * @return the new [JsonNode] with Profile Picture URL.
+     * @return the modified [JsonNode] with Profile Picture Key if applicable.
      */
     private suspend fun JsonNode.uploadProfilePicture(
         id: Long,
         profilePicture: MultipartFile?
     ): JsonNode {
-        val extension = profilePicture?.originalFilename?.substringAfterLast('.', "")
-        // -- upload profile picture if the profilePicture is null then the value will be null --
-        val profilePictureKey = profilePicture?.let {
-            supabaseService.uploadFile(
+        // -- if a file is provided, upload it and update the JSON node --
+        return if (profilePicture != null) {
+            val extension = profilePicture.originalFilename?.substringAfterLast('.', "")
+            val uploadedKey = supabaseService.uploadFile(
                 bucketName = BUCKET_USERS,
                 fileName = "/profile-picture/user-${id}.${extension}",
-                file = it,
+                file = profilePicture,
                 isOverwriteFile = true
             )
+            // -- create a mutable copy of the JSON node and set the profilePictureKey --
+            val mutableNode = (this as com.fasterxml.jackson.databind.node.ObjectNode).deepCopy()
+            mutableNode.put("profilePictureKey", uploadedKey)
+            mutableNode
+        } else {
+            // -- no file provided, return the original JSON node as is --
+            this
         }
-        // -- convert the value of JsonNode to ProfileRequest --
-        val nodeRequest = objectMapper.convertValue<ProfileRequest>(this)
-        // -- create new instance ProfileRequest and add the profile picture url to it --
-        val newRequest = ProfileRequest(
-            name = nodeRequest.name,
-            profilePictureKey = profilePictureKey,
-            mobile = nodeRequest.mobile,
-            membershipSince = nodeRequest.membershipSince
-        )
-        // -- return as the JsonNode --
-        return objectMapper.convertValue<JsonNode>(newRequest)
     }
 }

@@ -12,6 +12,7 @@ import java.time.OffsetDateTime
 data class ProfileResponse(
     val id: Long,
     val name: String?,
+    val email: String,
     val profilePictureUrl: String?,
     val mobile: String?,
     val membershipSince: OffsetDateTime?
