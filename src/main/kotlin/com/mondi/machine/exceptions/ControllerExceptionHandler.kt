@@ -64,4 +64,21 @@ class ControllerExceptionHandler {
     // -- return as response entity --
     return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse)
   }
+
+  /**
+   * Handle email send exception.
+   *
+   * @param e the [EmailSendException].
+   * @return the [ErrorResponse] with [HttpStatus.SERVICE_UNAVAILABLE].
+   */
+  @ExceptionHandler
+  fun handleEmailSendException(e: EmailSendException): ResponseEntity<ErrorResponse> {
+    // -- setup the instance of error response --
+    val errorResponse = ErrorResponse(
+      type = e.javaClass.simpleName,
+      message = e.message ?: "Failed to send email"
+    )
+    // -- return as response entity --
+    return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse)
+  }
 }

@@ -15,6 +15,7 @@ import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
+import org.springframework.data.domain.Sort
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import java.util.Optional
 
@@ -57,7 +58,7 @@ internal class AddressServiceTest(
 
         // -- verify --
         verify(mockUserRepository).findById(any<Long>())
-        verify(mockAddressRepository, never()).findAllByUser(any())
+        verify(mockAddressRepository, never()).findAllByUser(any(), any())
     }
 
     @Test
@@ -69,7 +70,9 @@ internal class AddressServiceTest(
 
         // -- mock --
         whenever(mockUserRepository.findById(any<Long>())).thenReturn(Optional.of(mockUser))
-        whenever(mockAddressRepository.findAllByUser(mockUser)).thenReturn(addresses)
+        whenever(mockAddressRepository.findAllByUser(mockUser, Sort.by(Sort.Direction.DESC, "updatedAt"))).thenReturn(
+            addresses
+        )
 
         // -- execute --
         val result = service.getAllByUserId(1L)
@@ -77,7 +80,7 @@ internal class AddressServiceTest(
         // -- verify --
         assertThat(result).hasSize(2)
         verify(mockUserRepository).findById(any<Long>())
-        verify(mockAddressRepository).findAllByUser(mockUser)
+        verify(mockAddressRepository).findAllByUser(mockUser, Sort.by(Sort.Direction.DESC, "updatedAt"))
     }
 
     @Test
@@ -356,7 +359,7 @@ internal class AddressServiceTest(
         whenever(mockAddressRepository.findById(any<Long>())).thenReturn(Optional.of(mockAddress))
 
         // -- execute --
-        val exception = assertThrows<IllegalStateException> { service.delete(1L, 1L) }
+        val exception = assertThrows<IllegalArgumentException> { service.delete(1L, 1L) }
 
         // -- verify --
         assertThat(exception.message).isEqualTo("Cannot delete main address. Please set another address as main first.")

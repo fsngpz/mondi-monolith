@@ -11,6 +11,7 @@ val mockkVersion = "1.13.14"
 val apacheCommonsIoVersion = "2.21.0"
 val googleApiClientVersion = "2.7.2"
 val owaspSanitizerVersion = "20260102.1"
+val velocityEngineVersion = "2.4.1"
 
 plugins {
     id("org.springframework.boot") version "3.5.9"
@@ -97,6 +98,9 @@ dependencies {
 
     // -- email --
     implementation("org.springframework.boot:spring-boot-starter-mail")
+
+    // -- velocity template engine --
+    implementation("org.apache.velocity:velocity-engine-core:${velocityEngineVersion}")
 }
 
 tasks.withType<KotlinCompile>().configureEach {

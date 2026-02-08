@@ -6,6 +6,7 @@ import com.mondi.machine.auths.users.User
 import com.mondi.machine.auths.users.UserRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -35,8 +36,8 @@ class AddressService(
         // -- find user --
         val user = userRepository.findByIdOrNull(userId)
             ?: throw NoSuchElementException("User not found with id: $userId")
-        // -- return all addresses --
-        return addressRepository.findAllByUser(user)
+        // -- return all addresses with latest updatedAt --
+        return addressRepository.findAllByUser(user, Sort.by(Sort.Direction.DESC, "updatedAt"))
     }
 
     /**
@@ -80,13 +81,6 @@ class AddressService(
      */
     @Transactional
     fun create(userId: Long, request: AddressRequest): Address {
-        // -- validate required fields --
-        requireNotNull(request.recipientName) { "field 'recipientName' cannot be null" }
-        requireNotNull(request.phone) { "field 'phone' cannot be null" }
-        requireNotNull(request.addressLine1) { "field 'addressLine1' cannot be null" }
-        requireNotNull(request.city) { "field 'city' cannot be null" }
-        requireNotNull(request.country) { "field 'country' cannot be null" }
-
         // -- find user --
         val user = userRepository.findByIdOrNull(userId)
             ?: throw NoSuchElementException("User not found with id: $userId")
@@ -196,8 +190,8 @@ class AddressService(
         val address = getById(addressId, userId)
 
         // -- check if it's the main address --
-        if (address.isMain) {
-            throw IllegalStateException("Cannot delete main address. Please set another address as main first.")
+        require(!address.isMain) {
+            "Cannot delete main address. Please set another address as main first."
         }
 
         // -- delete address --
@@ -212,7 +206,6 @@ class AddressService(
      * @param userId the user ID.
      * @return the updated [Address] instance.
      */
-    @Transactional
     fun setAsMain(addressId: Long, userId: Long): Address {
         // -- get existing address --
         val address = getById(addressId, userId)
