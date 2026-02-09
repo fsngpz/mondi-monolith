@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="x-apple-disable-message-reformatting">
-    <title>Verify Your Email - Mondi Jewellery</title>
+    <title>Welcome to Mondi Jewellery</title>
 
     <!--[if mso]>
     <style>
@@ -83,24 +83,6 @@
             font-size: 16px;
         }
 
-        /* Verification code box */
-        .code-box {
-            background-color: #FDF5F7;
-            border: 2px dashed #ED6D96;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .code-text {
-            font-family: 'Courier New', monospace;
-            font-size: 32px;
-            font-weight: bold;
-            color: #ED6D96;
-            letter-spacing: 8px;
-            margin: 10px 0;
-        }
-
         /* Mobile responsive */
         @media screen and (max-width: 600px) {
             .mobile-padding {
@@ -114,11 +96,6 @@
             .mobile-text {
                 font-size: 16px !important;
             }
-
-            .code-text {
-                font-size: 28px !important;
-                letter-spacing: 4px !important;
-            }
         }
     </style>
 </head>
@@ -126,7 +103,7 @@
 <body style="margin: 0; padding: 0; background-color: #fcfcfc;">
 <!-- Preheader text -->
 <div style="display: none; max-height: 0; overflow: hidden;">
-    Verify your email address to complete your registration.
+    Welcome to Mondi Jewellery! Discover elegant pieces crafted just for you.
 </div>
 
 <!-- Main container -->
@@ -148,55 +125,74 @@
                     </td>
                 </tr>
 
-                <!-- Verification message -->
+                <!-- Welcome message -->
                 <tr>
                     <td class="mobile-padding" style="padding: 40px;">
-                        <!-- Icon -->
-                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
-                            <tr>
-                                <td align="center" style="padding-bottom: 30px;">
-                                    <div style="display: inline-block; width: 80px; height: 80px; background-color: #FDF5F7; border-radius: 50%; text-align: center; line-height: 80px;">
-                                        <span style="color: #ED6D96; font-size: 40px;">✉</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
-
-                        <h2 class="heading mobile-heading"
-                            style="margin: 0 0 20px 0; font-size: 32px; color: #1a1a1a; text-align: center;">
-                            Verify Your Email
+                        <h2 class="heading mobile-heading" style="margin: 0 0 20px 0; font-size: 32px; color: #1a1a1a;">
+                            Welcome to Our Collection
                         </h2>
 
-                        <p class="body-text mobile-text"
-                           style="margin: 0 0 20px 0; font-size: 18px; color: #4a4a4a; text-align: center;">
-                            Hi <strong>${NAME}</strong>,
+                        <p class="body-text mobile-text" style="margin: 0 0 20px 0; font-size: 18px; color: #4a4a4a;">
+                            Hi <strong>${USER_NAME}</strong>,
                         </p>
 
-                        <p class="body-text mobile-text"
-                           style="margin: 0 0 30px 0; font-size: 18px; color: #4a4a4a; text-align: center;">
-                            Please click the button below to confirm your email address and complete your registration.
+                        <p class="body-text mobile-text" style="margin: 0 0 20px 0; font-size: 18px; color: #4a4a4a;">
+                            Thank you for joining Mondi Jewellery! We're thrilled to have you as part of our community.
+                            Our passion is creating timeless, elegant pieces that celebrate your unique style.
                         </p>
 
+                        <p class="body-text mobile-text" style="margin: 0 0 30px 0; font-size: 18px; color: #4a4a4a;">
+                            Explore our curated collection of fine jewelry, from delicate everyday pieces to stunning
+                            statement designs. Each piece is crafted with care and attention to detail.
+                        </p>
+
+                        <!-- CTA Button -->
                         <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                             <tr>
-                                <td align="center" style="padding: 0 0 30px 0;">
-                                    <a href="${VERIFICATION_URL}" class="button"
+                                <td align="center" style="padding: 10px 0 30px 0;">
+                                    <a href="${COLLECTIONS_URL}" class="button"
                                        style="display: inline-block; padding: 14px 32px; background-color: #ED6D96; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
-                                        Verify Email Address
+                                        Explore Collections
                                     </a>
                                 </td>
                             </tr>
                         </table>
 
-                        <!-- Security notice -->
+                        <!-- Benefits section -->
                         <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%"
-                               style="margin-top: 20px; padding: 20px; background-color: #FFF9E6; border-left: 4px solid #FFC107; border-radius: 4px;">
+                               style="margin-top: 20px; padding: 25px; background-color: #FDF5F7; border-radius: 8px;">
                             <tr>
                                 <td>
-                                    <p class="body-text" style="margin: 0; font-size: 14px; color: #666666;">
-                                        <strong>Security Note:</strong> If you didn't request this verification, please
-                                        ignore this email or contact our support team if you have concerns.
-                                    </p>
+                                    <h3 class="heading" style="margin: 0 0 15px 0; font-size: 20px; color: #1a1a1a;">
+                                        As a member, you'll enjoy:
+                                    </h3>
+
+                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                        <tr>
+                                            <td style="padding: 8px 0;">
+                                                <span style="color: #ED6D96; font-size: 20px; margin-right: 10px;">✦</span>
+                                                <span class="body-text" style="font-size: 16px;">Early access to new collections</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0;">
+                                                <span style="color: #ED6D96; font-size: 20px; margin-right: 10px;">✦</span>
+                                                <span class="body-text" style="font-size: 16px;">Exclusive member-only offers</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0;">
+                                                <span style="color: #ED6D96; font-size: 20px; margin-right: 10px;">✦</span>
+                                                <span class="body-text" style="font-size: 16px;">Personalized recommendations</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0;">
+                                                <span style="color: #ED6D96; font-size: 20px; margin-right: 10px;">✦</span>
+                                                <span class="body-text" style="font-size: 16px;">Complimentary gift wrapping</span>
+                                            </td>
+                                        </tr>
+                                    </table>
                                 </td>
                             </tr>
                         </table>
@@ -210,18 +206,24 @@
                             <tr>
                                 <td align="center" style="padding-bottom: 15px;">
                                     <p style="margin: 0; font-family: Arial, sans-serif; font-size: 14px; color: #ffffff;">
-                                        Need help? Contact us at <a href="mailto:${SUPPORT_EMAIL}"
-                                                                    style="color: #ED6D96; text-decoration: none;">${SUPPORT_EMAIL}</a>
+                                        Follow us for inspiration and updates
                                     </p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="center" style="padding-bottom: 20px;">
+                                    <!-- Social media links -->
+                                    <a href="${INSTAGRAM_URL}"
+                                       style="display: inline-block; margin: 0 10px; color: #ED6D96; text-decoration: none;">Instagram</a>
+                                    <span style="color: #666666;">|</span>
+                                    <a href="${FACEBOOK_URL}"
+                                       style="display: inline-block; margin: 0 10px; color: #ED6D96; text-decoration: none;">TikTok</a>
                                 </td>
                             </tr>
                             <tr>
                                 <td align="center">
                                     <p style="margin: 0 0 10px 0; font-family: Arial, sans-serif; font-size: 12px; color: #999999; line-height: 1.5;">
                                         Mondi Jewellery
-                                    </p>
-                                    <p style="margin: 0; font-family: Arial, sans-serif; font-size: 12px; color: #999999;">
-                                        This is an automated email. Please do not reply.
                                     </p>
                                 </td>
                             </tr>

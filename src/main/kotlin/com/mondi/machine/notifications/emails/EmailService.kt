@@ -123,6 +123,7 @@ class EmailService(
         context.forEach { (key, value) ->
             velocityContext.put(key, value)
         }
+        velocityContext.put("SUPPORT_EMAIL", "mondijewellery@gmail.com")
 
         // -- merge template with context --
         val writer = StringWriter()
