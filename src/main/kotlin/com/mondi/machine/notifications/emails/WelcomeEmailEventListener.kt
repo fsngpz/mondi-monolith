@@ -5,13 +5,14 @@ import com.mondi.machine.auths.users.UserEventRequest
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationListener
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 
 /**
  * The event listener for sending welcome emails when a new user registers.
  *
  * This listener subscribes to UserApplicationEvent and sends a welcome email
- * to the newly registered user using the email template service.
+ * to the newly registered user asynchronously using the email template service.
  *
  * @author Ferdinand Sangap.
  * @since 2026-02-09
@@ -29,10 +30,12 @@ class WelcomeEmailEventListener(
      * an override function to handle the [ApplicationListener] of [UserApplicationEvent].
      *
      * Sends a welcome email to the newly registered user with personalized content
-     * and links to collections and social media.
+     * and links to collections and social media. This method runs asynchronously
+     * in a separate thread to avoid blocking the main request.
      *
      * @param event the [UserApplicationEvent] instance containing user information.
      */
+    @Async
     override fun onApplicationEvent(event: UserApplicationEvent) {
         logger.info("Receiving user registration event for welcome email: $event")
 

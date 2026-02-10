@@ -6,14 +6,15 @@ import com.mondi.machine.auths.verification.EmailVerificationTokenService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationListener
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 
 /**
  * The event listener for sending email verification emails when a new user registers.
  *
  * This listener subscribes to UserApplicationEvent and sends an email verification
- * link to the newly registered user. The verification URL includes a secure token
- * with expiration that is stored in the database.
+ * link to the newly registered user asynchronously. The verification URL includes
+ * a secure token with expiration that is stored in the database.
  *
  * @author Ferdinand Sangap.
  * @since 2026-02-09
@@ -29,10 +30,12 @@ class EmailVerificationEventListener(
     /**
      * an override function to handle the [ApplicationListener] of [UserApplicationEvent].
      *
-     * Sends an email verification link to the newly registered user.
+     * Sends an email verification link to the newly registered user asynchronously.
+     * This method runs in a separate thread to avoid blocking the main request.
      *
      * @param event the [UserApplicationEvent] instance containing user information.
      */
+    @Async
     override fun onApplicationEvent(event: UserApplicationEvent) {
         logger.info("Receiving user registration event for email verification: $event")
 
@@ -50,7 +53,7 @@ class EmailVerificationEventListener(
 
         // -- generate secure verification token with expiration --
         val verificationToken = verificationTokenService.generateToken(user)
-        val verificationUrl = "$baseUrl/v1/auth/verify-email?token=${verificationToken.token}"
+        val verificationUrl = "$baseUrl/verify-email?token=${verificationToken.token}"
 
         // -- prepare email context --
         val context = mapOf(

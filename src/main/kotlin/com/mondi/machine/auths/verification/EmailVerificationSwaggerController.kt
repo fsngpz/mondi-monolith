@@ -38,4 +38,31 @@ interface EmailVerificationSwaggerController {
         ]
     )
     fun verifyEmail(token: String): EmailVerificationResponse
+
+    @Operation(
+        summary = "Resend verification email",
+        description = "Resends the verification email to the specified email address. Rate limited to prevent abuse."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Verification email sent successfully",
+                content = [Content(schema = Schema(implementation = ResendVerificationResponse::class))]
+            ),
+            ApiResponse(
+                responseCode = "404",
+                description = "User not found"
+            ),
+            ApiResponse(
+                responseCode = "409",
+                description = "Email already verified"
+            ),
+            ApiResponse(
+                responseCode = "429",
+                description = "Too many requests - rate limit exceeded"
+            )
+        ]
+    )
+    fun resendVerification(request: ResendVerificationRequest): ResendVerificationResponse
 }

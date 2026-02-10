@@ -79,7 +79,7 @@ internal class EmailVerificationEventListenerTest(
             context = argThat { context ->
                 context["USER_NAME"] == "John" &&
                         context.containsKey("VERIFICATION_URL") &&
-                        (context["VERIFICATION_URL"] as String) == "http://localhost:9000/v1/auth/verify-email?token=test-token-123"
+                        (context["VERIFICATION_URL"] as String) == "http://localhost:9000/verify-email?token=test-token-123"
             }
         )
     }

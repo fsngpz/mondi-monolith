@@ -18,6 +18,8 @@ fun Profile.toResponse(): ProfileResponse {
         id = id,
         name = this.name,
         email = this.user.email,
+        emailVerifiedAt = this.user.emailVerifiedAt,
+        isEmailVerified = this.user.isEmailVerified,
         profilePictureUrl = this.profilePictureUrl,
         mobile = this.user.mobile,
         membershipSince = this.user.membershipSince

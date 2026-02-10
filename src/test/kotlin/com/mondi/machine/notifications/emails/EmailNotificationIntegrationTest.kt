@@ -38,12 +38,6 @@ internal class EmailNotificationIntegrationTest {
     @Autowired
     private lateinit var applicationEventPublisher: ApplicationEventPublisher
 
-    @Autowired
-    private lateinit var welcomeEmailEventListener: WelcomeEmailEventListener
-
-    @Autowired
-    private lateinit var emailVerificationEventListener: EmailVerificationEventListener
-
     @MockitoBean
     private lateinit var mockEmailService: EmailService
 

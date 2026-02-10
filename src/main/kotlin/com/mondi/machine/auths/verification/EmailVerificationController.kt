@@ -1,7 +1,13 @@
 package com.mondi.machine.auths.verification
 
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.ResponseStatus
+import org.springframework.web.bind.annotation.RestController
 
 /**
  * The REST Controller for email verification endpoints.
@@ -12,7 +18,8 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/v1/auth")
 class EmailVerificationController(
-    private val emailVerificationTokenService: EmailVerificationTokenService
+    private val emailVerificationTokenService: EmailVerificationTokenService,
+    private val resendVerificationService: ResendVerificationService
 ) : EmailVerificationSwaggerController {
 
     /**
@@ -48,5 +55,21 @@ class EmailVerificationController(
     @ResponseStatus(HttpStatus.OK)
     fun verifyEmailPost(@RequestBody request: EmailVerificationRequest): EmailVerificationResponse {
         return verifyEmail(request.token)
+    }
+
+    /**
+     * Resend verification email to the specified email address.
+     *
+     * This endpoint is rate-limited to prevent abuse. Users can request
+     * a new verification email if they haven't received the original one
+     * or if the token has expired.
+     *
+     * @param request the [ResendVerificationRequest] containing the email address.
+     * @return [ResendVerificationResponse] with confirmation message.
+     */
+    @PostMapping("/resend-verification")
+    @ResponseStatus(HttpStatus.OK)
+    override fun resendVerification(@RequestBody request: ResendVerificationRequest): ResendVerificationResponse {
+        return resendVerificationService.resendVerification(request.email)
     }
 }

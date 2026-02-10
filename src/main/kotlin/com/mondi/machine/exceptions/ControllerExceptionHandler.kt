@@ -115,4 +115,38 @@ class ControllerExceptionHandler {
     // -- return as response entity --
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse)
   }
+
+  /**
+   * Handle email already verified exception.
+   *
+   * @param e the [EmailAlreadyVerifiedException].
+   * @return the [ErrorResponse] with [HttpStatus.CONFLICT].
+   */
+  @ExceptionHandler
+  fun handleEmailAlreadyVerifiedException(e: EmailAlreadyVerifiedException): ResponseEntity<ErrorResponse> {
+    // -- setup the instance of error response --
+    val errorResponse = ErrorResponse(
+      type = e.javaClass.simpleName,
+      message = e.message ?: "Email address is already verified"
+    )
+    // -- return as response entity --
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse)
+  }
+
+  /**
+   * Handle too many requests exception.
+   *
+   * @param e the [TooManyRequestsException].
+   * @return the [ErrorResponse] with [HttpStatus.TOO_MANY_REQUESTS].
+   */
+  @ExceptionHandler
+  fun handleTooManyRequestsException(e: TooManyRequestsException): ResponseEntity<ErrorResponse> {
+    // -- setup the instance of error response --
+    val errorResponse = ErrorResponse(
+      type = e.javaClass.simpleName,
+      message = e.message ?: "Too many requests. Please try again later."
+    )
+    // -- return as response entity --
+    return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(errorResponse)
+  }
 }
