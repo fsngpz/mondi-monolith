@@ -3,6 +3,7 @@ package com.mondi.machine.auths.verification
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestAttribute
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -64,12 +65,12 @@ class EmailVerificationController(
      * a new verification email if they haven't received the original one
      * or if the token has expired.
      *
-     * @param request the [ResendVerificationRequest] containing the email address.
+     * @param userId the user ID from request attribute.
      * @return [ResendVerificationResponse] with confirmation message.
      */
     @PostMapping("/resend-verification")
     @ResponseStatus(HttpStatus.OK)
-    override fun resendVerification(@RequestBody request: ResendVerificationRequest): ResendVerificationResponse {
-        return resendVerificationService.resendVerification(request.email)
+    override fun resendVerification(@RequestAttribute("ID") userId: Long): ResendVerificationResponse {
+        return resendVerificationService.resendVerification(userId)
     }
 }

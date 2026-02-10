@@ -64,5 +64,5 @@ interface EmailVerificationSwaggerController {
             )
         ]
     )
-    fun resendVerification(request: ResendVerificationRequest): ResendVerificationResponse
+    fun resendVerification(userId: Long): ResendVerificationResponse
 }

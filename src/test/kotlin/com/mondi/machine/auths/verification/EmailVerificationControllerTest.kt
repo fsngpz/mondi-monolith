@@ -184,20 +184,18 @@ internal class EmailVerificationControllerTest(@Autowired private val mockMvc: M
     @Test
     fun `resendVerification POST endpoint successfully resends verification email`() {
         // -- arrange --
+        val userId = 1L
         val response = ResendVerificationResponse(
             message = "Verification email has been sent. Please check your inbox.",
             email = "test@example.com",
             expiresInHours = 24
         )
-        whenever(mockResendVerificationService.resendVerification("test@example.com")).thenReturn(response)
-
-        val requestBody = """{"email": "test@example.com"}"""
+        whenever(mockResendVerificationService.resendVerification(userId)).thenReturn(response)
 
         // -- act & assert --
         mockMvc.perform(
             post("/v1/auth/resend-verification")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody)
+                .requestAttr("ID", userId)
         )
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -205,63 +203,59 @@ internal class EmailVerificationControllerTest(@Autowired private val mockMvc: M
             .andExpect(jsonPath("$.email").value("test@example.com"))
             .andExpect(jsonPath("$.expiresInHours").value(24))
 
-        verify(mockResendVerificationService).resendVerification("test@example.com")
+        verify(mockResendVerificationService).resendVerification(userId)
     }
 
     @Test
-    fun `resendVerification POST endpoint returns 404 when user not found`() {
+    fun `resendVerification POST endpoint returns 500 when user not found`() {
         // -- arrange --
-        whenever(mockResendVerificationService.resendVerification("notfound@example.com"))
-            .thenThrow(EmailVerificationTokenNotFoundException("User with email 'notfound@example.com' not found"))
-
-        val requestBody = """{"email": "notfound@example.com"}"""
+        val userId = 999L
+        whenever(mockResendVerificationService.resendVerification(userId))
+            .thenThrow(NoSuchElementException("no user was found with id '$userId'"))
 
         // -- act & assert --
         mockMvc.perform(
             post("/v1/auth/resend-verification")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody)
+                .requestAttr("ID", userId)
         )
-            .andExpect(status().isNotFound)
+            .andExpect(status().isInternalServerError)
+            .andExpect(jsonPath("$.type").value("NoSuchElementException"))
+            .andExpect(jsonPath("$.message").value("no user was found with id '999'"))
 
-        verify(mockResendVerificationService).resendVerification("notfound@example.com")
+        verify(mockResendVerificationService).resendVerification(userId)
     }
 
     @Test
     fun `resendVerification POST endpoint returns 409 when email already verified`() {
         // -- arrange --
-        whenever(mockResendVerificationService.resendVerification("verified@example.com"))
+        val userId = 2L
+        whenever(mockResendVerificationService.resendVerification(userId))
             .thenThrow(EmailAlreadyVerifiedException("Email address is already verified"))
-
-        val requestBody = """{"email": "verified@example.com"}"""
 
         // -- act & assert --
         mockMvc.perform(
             post("/v1/auth/resend-verification")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody)
+                .requestAttr("ID", userId)
         )
             .andExpect(status().isConflict)
 
-        verify(mockResendVerificationService).resendVerification("verified@example.com")
+        verify(mockResendVerificationService).resendVerification(userId)
     }
 
     @Test
     fun `resendVerification POST endpoint returns 429 when rate limit exceeded`() {
         // -- arrange --
-        whenever(mockResendVerificationService.resendVerification("ratelimited@example.com"))
+        val userId = 3L
+        whenever(mockResendVerificationService.resendVerification(userId))
             .thenThrow(TooManyRequestsException("Too many verification requests. Please try again in 60 minute(s)."))
-
-        val requestBody = """{"email": "ratelimited@example.com"}"""
 
         // -- act & assert --
         mockMvc.perform(
             post("/v1/auth/resend-verification")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody)
+                .requestAttr("ID", userId)
         )
             .andExpect(status().isTooManyRequests)
 
-        verify(mockResendVerificationService).resendVerification("ratelimited@example.com")
+        verify(mockResendVerificationService).resendVerification(userId)
     }
 }

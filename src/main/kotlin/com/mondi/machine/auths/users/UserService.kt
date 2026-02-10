@@ -1,7 +1,7 @@
 package com.mondi.machine.auths.users
 
-import java.util.Optional
 import org.springframework.stereotype.Service
+import java.util.Optional
 
 /**
  * The service class to handle business logic of [User].
@@ -12,35 +12,47 @@ import org.springframework.stereotype.Service
 @Service
 class UserService(private val userRepository: UserRepository) {
 
-  /**
-   * a function to get the [User] by email.
-   *
-   * @param email the email address of user.
-   * @return the [User] instance.
-   */
-  fun getByEmail(email: String): User {
-    return userRepository.findByEmail(email).orElseThrow {
-      NoSuchElementException("no user was found with email '$email'")
+    /**
+     * a function to get the [User] by id.
+     *
+     * @param id the unique identifier of user.
+     * @return the [User] instance.
+     */
+    fun get(id: Long): User {
+        return userRepository.findById(id).orElseThrow {
+            NoSuchElementException("no user was found with id '$id'")
+        }
     }
-  }
 
-  /**
-   * a function to find the [User] by email.
-   *
-   * @param email the email address of user.
-   * @return the Optional of [User] instance.
-   */
-  fun findByEmail(email: String): Optional<User> {
-    return userRepository.findByEmail(email)
-  }
+    /**
+     * a function to get the [User] by email.
+     *
+     * @param email the email address of user.
+     * @return the [User] instance.
+     */
+    fun getByEmail(email: String): User {
+        return userRepository.findByEmail(email).orElseThrow {
+            NoSuchElementException("no user was found with email '$email'")
+        }
+    }
 
-  /**
-   * a funciton returning boolean is the email already exist in database.
-   *
-   * @param email the email address.
-   * @return the boolean of is email already exist.
-   */
-  fun isEmailAlreadyExist(email: String): Boolean {
-    return findByEmail(email).isPresent
-  }
+    /**
+     * a function to find the [User] by email.
+     *
+     * @param email the email address of user.
+     * @return the Optional of [User] instance.
+     */
+    fun findByEmail(email: String): Optional<User> {
+        return userRepository.findByEmail(email)
+    }
+
+    /**
+     * a funciton returning boolean is the email already exist in database.
+     *
+     * @param email the email address.
+     * @return the boolean of is email already exist.
+     */
+    fun isEmailAlreadyExist(email: String): Boolean {
+        return findByEmail(email).isPresent
+    }
 }

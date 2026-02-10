@@ -2,7 +2,7 @@ package com.mondi.machine.auths.verification
 
 import com.mondi.machine.auths.users.UserApplicationEvent
 import com.mondi.machine.auths.users.UserEventRequest
-import com.mondi.machine.auths.users.UserRepository
+import com.mondi.machine.auths.users.UserService
 import com.mondi.machine.exceptions.EmailAlreadyVerifiedException
 import com.mondi.machine.exceptions.EmailVerificationTokenNotFoundException
 import com.mondi.machine.utils.RateLimiterService
@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class ResendVerificationService(
-    private val userRepository: UserRepository,
+    private val userService: UserService,
     private val emailVerificationTokenService: EmailVerificationTokenService,
     private val rateLimiterService: RateLimiterService,
     private val applicationEventPublisher: ApplicationEventPublisher
@@ -39,25 +39,22 @@ class ResendVerificationService(
      * 4. Generates a new verification token
      * 5. Publishes an event to send the verification email asynchronously
      *
-     * @param email the email address to resend verification to.
+     * @param userId the user unique identifier.
      * @return [ResendVerificationResponse] with confirmation message.
      * @throws EmailVerificationTokenNotFoundException if user not found.
      * @throws EmailAlreadyVerifiedException if email is already verified.
      * @throws com.mondi.machine.exceptions.TooManyRequestsException if rate limit is exceeded.
      */
     @Transactional
-    fun resendVerification(email: String): ResendVerificationResponse {
+    fun resendVerification(userId: Long): ResendVerificationResponse {
+        // -- get the user by id --
+        val user = userService.get(userId)
+        val email = user.email
+
         logger.info("Attempting to resend verification email to: $email")
 
         // -- check rate limit --
         rateLimiterService.checkRateLimit(email)
-
-        // -- find user by email --
-        val user = userRepository.findByEmail(email)
-            .orElseThrow {
-                logger.warn("User not found for email: $email")
-                EmailVerificationTokenNotFoundException("User with email '$email' not found")
-            }
 
         // -- check if already verified --
         if (user.isEmailVerified) {
@@ -68,6 +65,11 @@ class ResendVerificationService(
         // -- generate new verification token --
         emailVerificationTokenService.generateToken(user)
         logger.info("New verification token generated for: $email")
+
+        // -- initialize lazy-loaded associations before async processing --
+        // This ensures the profile is loaded in the current transaction
+        // before passing the user entity to async event listeners
+        user.profile?.name
 
         // -- publish event to send email asynchronously --
         val userEventRequest = UserEventRequest(user)
