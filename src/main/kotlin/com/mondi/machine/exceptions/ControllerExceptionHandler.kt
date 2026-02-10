@@ -81,4 +81,38 @@ class ControllerExceptionHandler {
     // -- return as response entity --
     return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse)
   }
+
+  /**
+   * Handle email verification token not found exception.
+   *
+   * @param e the [EmailVerificationTokenNotFoundException].
+   * @return the [ErrorResponse] with [HttpStatus.NOT_FOUND].
+   */
+  @ExceptionHandler
+  fun handleEmailVerificationTokenNotFoundException(e: EmailVerificationTokenNotFoundException): ResponseEntity<ErrorResponse> {
+    // -- setup the instance of error response --
+    val errorResponse = ErrorResponse(
+      type = e.javaClass.simpleName,
+      message = e.message ?: "Email verification token not found"
+    )
+    // -- return as response entity --
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse)
+  }
+
+  /**
+   * Handle invalid email verification token exception.
+   *
+   * @param e the [InvalidEmailVerificationTokenException].
+   * @return the [ErrorResponse] with [HttpStatus.BAD_REQUEST].
+   */
+  @ExceptionHandler
+  fun handleInvalidEmailVerificationTokenException(e: InvalidEmailVerificationTokenException): ResponseEntity<ErrorResponse> {
+    // -- setup the instance of error response --
+    val errorResponse = ErrorResponse(
+      type = e.javaClass.simpleName,
+      message = e.message ?: "Invalid email verification token"
+    )
+    // -- return as response entity --
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse)
+  }
 }

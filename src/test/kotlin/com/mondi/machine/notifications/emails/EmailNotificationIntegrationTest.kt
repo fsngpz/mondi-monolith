@@ -1,8 +1,11 @@
 package com.mondi.machine.notifications.emails
 
+import com.mondi.machine.accounts.profiles.ProfileService
 import com.mondi.machine.auths.users.User
 import com.mondi.machine.auths.users.UserApplicationEvent
 import com.mondi.machine.auths.users.UserEventRequest
+import com.mondi.machine.auths.verification.EmailVerificationToken
+import com.mondi.machine.auths.verification.EmailVerificationTokenService
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -10,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.bean.override.mockito.MockitoBean
+import java.time.OffsetDateTime
 
 /**
  * Integration test class for email notification flow.
@@ -43,10 +47,23 @@ internal class EmailNotificationIntegrationTest {
     @MockitoBean
     private lateinit var mockEmailService: EmailService
 
+    @MockitoBean
+    private lateinit var mockVerificationTokenService: EmailVerificationTokenService
+
+    @MockitoBean
+    private lateinit var mockProfileService: ProfileService
+
     @Test
     fun `publishing UserApplicationEvent triggers welcome email`() {
         // -- arrange --
         val mockUser = User("welcome@example.com", "password")
+        val mockToken = EmailVerificationToken(
+            user = mockUser,
+            token = "test-token",
+            expiresAt = OffsetDateTime.now().plusHours(24)
+        )
+        whenever(mockVerificationTokenService.generateToken(any())).thenReturn(mockToken)
+
         val userEventRequest = UserEventRequest(mockUser)
         val event = UserApplicationEvent(userEventRequest)
 
@@ -69,6 +86,13 @@ internal class EmailNotificationIntegrationTest {
     fun `publishing UserApplicationEvent triggers verification email for unverified user`() {
         // -- arrange --
         val mockUser = User("verify@example.com", "password")
+        val mockToken = EmailVerificationToken(
+            user = mockUser,
+            token = "verify-token",
+            expiresAt = OffsetDateTime.now().plusHours(24)
+        )
+        whenever(mockVerificationTokenService.generateToken(any())).thenReturn(mockToken)
+
         val userEventRequest = UserEventRequest(mockUser)
         val event = UserApplicationEvent(userEventRequest)
 
@@ -91,6 +115,13 @@ internal class EmailNotificationIntegrationTest {
     fun `publishing UserApplicationEvent triggers both welcome and verification emails`() {
         // -- arrange --
         val mockUser = User("both@example.com", "password")
+        val mockToken = EmailVerificationToken(
+            user = mockUser,
+            token = "both-token",
+            expiresAt = OffsetDateTime.now().plusHours(24)
+        )
+        whenever(mockVerificationTokenService.generateToken(any())).thenReturn(mockToken)
+
         val userEventRequest = UserEventRequest(mockUser)
         val event = UserApplicationEvent(userEventRequest)
 
@@ -158,6 +189,19 @@ internal class EmailNotificationIntegrationTest {
         val user1 = User("user1@example.com", "password")
         val user2 = User("user2@example.com", "password")
 
+        val token1 = EmailVerificationToken(
+            user = user1,
+            token = "user1-token",
+            expiresAt = OffsetDateTime.now().plusHours(24)
+        )
+        val token2 = EmailVerificationToken(
+            user = user2,
+            token = "user2-token",
+            expiresAt = OffsetDateTime.now().plusHours(24)
+        )
+        whenever(mockVerificationTokenService.generateToken(user1)).thenReturn(token1)
+        whenever(mockVerificationTokenService.generateToken(user2)).thenReturn(token2)
+
         val event1 = UserApplicationEvent(UserEventRequest(user1))
         val event2 = UserApplicationEvent(UserEventRequest(user2))
 
@@ -188,6 +232,13 @@ internal class EmailNotificationIntegrationTest {
     fun `email service failure in one listener does not affect others`() {
         // -- arrange --
         val mockUser = User("failure@example.com", "password")
+        val mockToken = EmailVerificationToken(
+            user = mockUser,
+            token = "failure-token",
+            expiresAt = OffsetDateTime.now().plusHours(24)
+        )
+        whenever(mockVerificationTokenService.generateToken(any())).thenReturn(mockToken)
+
         val userEventRequest = UserEventRequest(mockUser)
         val event = UserApplicationEvent(userEventRequest)
 
