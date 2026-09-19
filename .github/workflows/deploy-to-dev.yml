@@ -34,6 +34,7 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/mondi-machine:latest
 
   deploy:
+    if: false
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
