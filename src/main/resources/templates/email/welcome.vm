@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="x-apple-disable-message-reformatting">
+    <title>Welcome to Mondi Jewellery</title>
+
+    <!--[if mso]>
+    <style>
+        * {
+            font-family: Arial, sans-serif !important;
+        }
+    </style>
+    <![endif]-->
+
+    <style>
+        /* Reset styles */
+        body, table, td, a {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+
+        table, td {
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+
+        img {
+            -ms-interpolation-mode: bicubic;
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+        }
+
+        /* Base styles */
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            background-color: #fcfcfc;
+        }
+
+        /* Brand colors */
+        .primary-color {
+            color: #ED6D96;
+        }
+
+        .primary-bg {
+            background-color: #ED6D96;
+        }
+
+        .secondary-bg {
+            background-color: #FDF5F7;
+        }
+
+        /* Typography */
+        .heading {
+            font-family: 'Georgia', 'Playfair Display', serif;
+            font-weight: normal;
+            color: #1a1a1a;
+        }
+
+        .body-text {
+            font-family: Arial, sans-serif;
+            color: #4a4a4a;
+            line-height: 1.6;
+        }
+
+        /* Button */
+        .button {
+            display: inline-block;
+            padding: 14px 32px;
+            background-color: #ED6D96;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* Mobile responsive */
+        @media screen and (max-width: 600px) {
+            .mobile-padding {
+                padding: 20px !important;
+            }
+
+            .mobile-heading {
+                font-size: 28px !important;
+            }
+
+            .mobile-text {
+                font-size: 16px !important;
+            }
+        }
+    </style>
+</head>
+
+<body style="margin: 0; padding: 0; background-color: #fcfcfc;">
+<!-- Preheader text -->
+<div style="display: none; max-height: 0; overflow: hidden;">
+    Welcome to Mondi Jewellery! Discover elegant pieces crafted just for you.
+</div>
+
+<!-- Main container -->
+<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #fcfcfc;">
+    <tr>
+        <td align="center" style="padding: 40px 20px;">
+
+            <!-- Email content -->
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600"
+                   style="max-width: 600px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+
+                <!-- Header with gradient -->
+                <tr>
+                    <td align="center"
+                        style="padding: 50px 40px; background: linear-gradient(135deg, #FDF5F7 0%, #FADADD 100%); border-radius: 12px 12px 0 0;">
+                        <h1 class="heading" style="margin: 0; font-size: 36px; letter-spacing: 0.5px;">
+                            <span style="color: #ED6D96;">Mondi</span> <span style="color: #1a1a1a;">Jewellery</span>
+                        </h1>
+                    </td>
+                </tr>
+
+                <!-- Welcome message -->
+                <tr>
+                    <td class="mobile-padding" style="padding: 40px;">
+                        <h2 class="heading mobile-heading" style="margin: 0 0 20px 0; font-size: 32px; color: #1a1a1a;">
+                            Welcome to Our Collection
+                        </h2>
+
+                        <p class="body-text mobile-text" style="margin: 0 0 20px 0; font-size: 18px; color: #4a4a4a;">
+                            Hi <strong>${USER_NAME}</strong>,
+                        </p>
+
+                        <p class="body-text mobile-text" style="margin: 0 0 20px 0; font-size: 18px; color: #4a4a4a;">
+                            Thank you for joining Mondi Jewellery! We're thrilled to have you as part of our community.
+                            Our passion is creating timeless, elegant pieces that celebrate your unique style.
+                        </p>
+
+                        <p class="body-text mobile-text" style="margin: 0 0 30px 0; font-size: 18px; color: #4a4a4a;">
+                            Explore our curated collection of fine jewelry, from delicate everyday pieces to stunning
+                            statement designs. Each piece is crafted with care and attention to detail.
+                        </p>
+
+                        <!-- CTA Button -->
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                                <td align="center" style="padding: 10px 0 30px 0;">
+                                    <a href="${COLLECTIONS_URL}" class="button"
+                                       style="display: inline-block; padding: 14px 32px; background-color: #ED6D96; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px;">
+                                        Explore Collections
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Benefits section -->
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%"
+                               style="margin-top: 20px; padding: 25px; background-color: #FDF5F7; border-radius: 8px;">
+                            <tr>
+                                <td>
+                                    <h3 class="heading" style="margin: 0 0 15px 0; font-size: 20px; color: #1a1a1a;">
+                                        As a member, you'll enjoy:
+                                    </h3>
+
+                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                        <tr>
+                                            <td style="padding: 8px 0;">
+                                                <span style="color: #ED6D96; font-size: 20px; margin-right: 10px;">✦</span>
+                                                <span class="body-text" style="font-size: 16px;">Early access to new collections</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0;">
+                                                <span style="color: #ED6D96; font-size: 20px; margin-right: 10px;">✦</span>
+                                                <span class="body-text" style="font-size: 16px;">Exclusive member-only offers</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0;">
+                                                <span style="color: #ED6D96; font-size: 20px; margin-right: 10px;">✦</span>
+                                                <span class="body-text" style="font-size: 16px;">Personalized recommendations</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 8px 0;">
+                                                <span style="color: #ED6D96; font-size: 20px; margin-right: 10px;">✦</span>
+                                                <span class="body-text" style="font-size: 16px;">Complimentary gift wrapping</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- Footer -->
+                <tr>
+                    <td style="padding: 30px 40px; background-color: #1a1a1a; border-radius: 0 0 12px 12px;">
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                                <td align="center" style="padding-bottom: 15px;">
+                                    <p style="margin: 0; font-family: Arial, sans-serif; font-size: 14px; color: #ffffff;">
+                                        Follow us for inspiration and updates
+                                    </p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="center" style="padding-bottom: 20px;">
+                                    <!-- Social media links -->
+                                    <a href="${INSTAGRAM_URL}"
+                                       style="display: inline-block; margin: 0 10px; color: #ED6D96; text-decoration: none;">Instagram</a>
+                                    <span style="color: #666666;">|</span>
+                                    <a href="${FACEBOOK_URL}"
+                                       style="display: inline-block; margin: 0 10px; color: #ED6D96; text-decoration: none;">TikTok</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="center">
+                                    <p style="margin: 0 0 10px 0; font-family: Arial, sans-serif; font-size: 12px; color: #999999; line-height: 1.5;">
+                                        Mondi Jewellery
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+            </table>
+
+        </td>
+    </tr>
+</table>
+</body>
+</html>

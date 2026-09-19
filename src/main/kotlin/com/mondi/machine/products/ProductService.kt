@@ -3,6 +3,7 @@ package com.mondi.machine.products
 import com.mondi.machine.backoffices.products.BackofficeProductRequest
 import com.mondi.machine.storage.supabase.SupabaseService
 import com.mondi.machine.storage.supabase.SupabaseService.Companion.BUCKET_PRODUCTS
+import com.mondi.machine.utils.Currency
 import jakarta.transaction.Transactional
 import org.apache.commons.io.FilenameUtils
 import org.springframework.data.domain.Page
@@ -46,6 +47,9 @@ class ProductService(
      * @param category the parameter to filter data by category.
      * @param minPrice the minimum price to filter data.
      * @param maxPrice the maximum price to filter data.
+     * @param status the status to filter data.
+     * @param isSale the parameter to filter data by sale status.
+     * @param isInStock the parameter to filter data by stock availability.
      * @param pageable the [Pageable].
      * @return the [Page] of [ProductResponse].
      */
@@ -54,10 +58,13 @@ class ProductService(
         category: ProductCategory?,
         minPrice: BigDecimal,
         maxPrice: BigDecimal,
+        status: ProductStatus?,
+        isSale: Boolean?,
+        isInStock: Boolean?,
         pageable: Pageable
     ): Page<ProductResponse> {
         // -- find the data --
-        return repository.findAllCustom(search, category, minPrice, maxPrice, pageable)
+        return repository.findAllCustom(search, category, minPrice, maxPrice, status, isSale, isInStock, pageable)
             .map { it.toResponse() }
     }
 
@@ -69,6 +76,26 @@ class ProductService(
      */
     @Transactional
     suspend fun create(request: BackofficeProductRequest): Product {
+        val price = request.price
+        val inputDiscountPrice = request.discountPrice ?: BigDecimal.ZERO
+        val inputPercent = request.discountPercentage
+
+        // -- calculate both discount price and percentage based on input --
+        val (finalDiscountPrice, finalPercentage) = when {
+            // Priority 1: Use discount price if provided
+            inputDiscountPrice.signum() > 0 -> {
+                val percentage = inputDiscountPrice.calculateDiscountPercentage(price)
+                Pair(inputDiscountPrice, percentage)
+            }
+            // Priority 2: Use percentage if provided
+            inputPercent.signum() > 0 -> {
+                val discountPrice = getDiscountPrice(price, inputPercent)
+                Pair(discountPrice, inputPercent)
+            }
+            // No discount
+            else -> Pair(BigDecimal.ZERO, BigDecimal.ZERO)
+        }
+
         // -- generate SKU --
         val sku = skuGenerationService.generateSku(request.category)
         // -- sanitize HTML to prevent XSS --
@@ -78,9 +105,10 @@ class ProductService(
             name = request.name,
             description = request.description,
             price = request.price,
-            currency = request.currency.name,
+            discountPrice = finalDiscountPrice,
+            currency = request.currency,
             specificationInHtml = sanitizedSpecification,
-            discountPercentage = request.discountPercentage,
+            discountPercentage = finalPercentage,
             category = request.category,
             stock = request.stock,
             sku = sku,
@@ -89,45 +117,11 @@ class ProductService(
         // -- save the instance to database --
         val savedProduct = repository.save(product)
         // -- upload and save media files --
-        uploadAndSaveMediaFiles(savedProduct, request.mediaFiles)
+        if (request.mediaFiles != null) {
+            uploadAndSaveMediaFiles(savedProduct, request.mediaFiles)
+        }
         // -- return the saved product --
         return savedProduct
-    }
-
-    /**
-     * a function to update the instance of [Product].
-     *
-     * @param id the [Product] unique identifier.
-     * @param request the [ProductRequest] instance.
-     * @return the [Product] instance.
-     */
-    @Transactional
-    suspend fun update(id: Long, request: ProductRequest): Product {
-        // -- get the product instance --
-        val product = get(id)
-        // -- sanitize HTML to prevent XSS --
-        val sanitizedSpecification = htmlSanitizer.sanitize(request.specificationInHtml)
-        // -- update the instance --
-        product.apply {
-            this.name = request.name
-            this.description = request.description
-            this.price = request.price
-            this.currency = request.currency
-            this.specificationInHtml = sanitizedSpecification
-            this.discountPercentage = request.discountPercentage
-            this.category = request.category
-            this.stock = request.stock
-        }
-        // -- save the updated instance --
-        val updatedProduct = repository.save(product)
-        // -- clear old media from collection --
-        updatedProduct.media.clear()
-        // -- delete old media from database --
-        mediaRepository.deleteByProductId(id)
-        // -- upload and save new media files --
-        uploadAndSaveMediaFiles(updatedProduct, request.mediaFiles)
-        // -- return the updated product --
-        return updatedProduct
     }
 
     /**
@@ -135,7 +129,6 @@ class ProductService(
      * Keeps existing media by URLs and uploads new media files.
      *
      * @param id the [Product] unique identifier.
-     * @param request the product update data.
      * @param existingMediaUrls the list of existing media URLs to keep.
      * @param newMediaFiles the list of new media files to upload.
      * @return the [Product] instance.
@@ -146,7 +139,8 @@ class ProductService(
         name: String,
         description: String?,
         price: BigDecimal,
-        currency: String,
+        discountPrice: BigDecimal,
+        currency: Currency,
         specificationInHtml: String?,
         discountPercentage: BigDecimal,
         category: ProductCategory,
@@ -166,6 +160,7 @@ class ProductService(
             this.name = name
             this.description = description
             this.price = price
+            this.discountPrice = discountPrice
             this.currency = currency
             this.specificationInHtml = sanitizedSpecification
             this.discountPercentage = discountPercentage

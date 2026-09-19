@@ -6,30 +6,36 @@ CREATE TYPE product_status as enum ('ACTIVE', 'INACTIVE');
  */
 CREATE TABLE products
 (
-    id                      BIGSERIAL
-        CONSTRAINT products_id_pk
-            PRIMARY KEY,
-    name                    text                                               NOT NULL,
-    description             text,
-    price                   text                                               NOT NULL,
-    currency                text                                               NOT NULL,
-    specification_in_html   text,
-    discount_percentage     numeric(5, 2)            DEFAULT 0.00              NOT NULL,
-    category                product_category         DEFAULT 'OTHER'           NOT NULL,
-    stock                   integer                  DEFAULT 0                 NOT NULL,
-    sku                     text                                               NOT NULL UNIQUE,
-    status                  product_status           DEFAULT 'ACTIVE'          NOT NULL,
-    created_at              timestamp WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    creator_id              text                                               NOT NULL,
-    updated_at              timestamp WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updater_id              text                                               NOT NULL,
-    version                 bigint                   DEFAULT 0                 NOT NULL
+    id                                         BIGSERIAL
+                                                    CONSTRAINT products_id_pk
+                                                        PRIMARY KEY,
+    name                                  text                                                                   NOT NULL,
+    description                        text,
+    price                                  numeric(19, 4)                                                  NOT NULL,
+    discount_price                  numeric(19, 4)                                                  NOT NULL,
+    currency                            text                                                                   NOT NULL,
+    specification_in_html        text,
+    discount_percentage        numeric(5, 2)            DEFAULT 0.00              NOT NULL,
+    category                            product_category     DEFAULT 'OTHER'        NOT NULL,
+    stock                                 integer                        DEFAULT 0                   NOT NULL,
+    sku                                    text                                                                    NOT NULL UNIQUE,
+    status                               product_status           DEFAULT 'ACTIVE'       NOT NULL,
+    created_at                       timestamp WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    creator_id                        text                                                                     NOT NULL,
+    updated_at                      timestamp WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updater_id                      text                                               NOT NULL,
+    version                            bigint                               DEFAULT 0                 NOT NULL
 );
 
 CREATE INDEX products_category_index ON products (category);
 CREATE INDEX products_price_index ON products (price);
 CREATE INDEX products_sku_index ON products (sku);
 CREATE INDEX products_status_index ON products (status);
+
+-- Add constraint to ensure discount_price is valid
+ALTER TABLE products
+ADD CONSTRAINT check_discount_price_valid
+CHECK (CAST(discount_price AS numeric) >= 0 AND CAST(discount_price AS numeric) <= CAST(price AS numeric));
 
 /*
  * Product Media

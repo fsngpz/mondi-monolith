@@ -6,6 +6,7 @@ import com.mondi.machine.auths.users.User
 import com.mondi.machine.auths.users.UserRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -35,8 +36,8 @@ class AddressService(
         // -- find user --
         val user = userRepository.findByIdOrNull(userId)
             ?: throw NoSuchElementException("User not found with id: $userId")
-        // -- return all addresses --
-        return addressRepository.findAllByUser(user)
+        // -- return all addresses with latest updatedAt --
+        return addressRepository.findAllByUser(user, Sort.by(Sort.Direction.DESC, "updatedAt"))
     }
 
     /**
@@ -80,17 +81,12 @@ class AddressService(
      */
     @Transactional
     fun create(userId: Long, request: AddressRequest): Address {
-        // -- validate required fields --
-        requireNotNull(request.street) { "field 'street' cannot be null" }
-        requireNotNull(request.city) { "field 'city' cannot be null" }
-        requireNotNull(request.country) { "field 'country' cannot be null" }
-
         // -- find user --
         val user = userRepository.findByIdOrNull(userId)
             ?: throw NoSuchElementException("User not found with id: $userId")
 
         // -- if this address is marked as main, unset other main addresses --
-        val isMain = request.isMain ?: false
+        val isMain = request.isMain
         if (isMain) {
             unsetMainAddress(user)
         }
@@ -98,12 +94,15 @@ class AddressService(
         // -- create new address --
         val address = Address(
             user = user,
-            street = request.street,
+            recipientName = request.recipientName,
+            phone = request.phone,
+            addressLine1 = request.addressLine1,
+            addressLine2 = request.addressLine2,
             city = request.city,
             state = request.state,
             postalCode = request.postalCode,
             country = request.country,
-            tag = request.tag ?: AddressTag.HOME,
+            tag = request.tag,
             isMain = isMain
         ).apply {
             this.label = request.label
@@ -137,7 +136,10 @@ class AddressService(
 
         // -- update fields --
         address.apply {
-            this.street = request.street
+            this.recipientName = request.recipientName
+            this.phone = request.phone
+            this.addressLine1 = request.addressLine1
+            this.addressLine2 = request.addressLine2
             this.city = request.city
             this.state = request.state
             this.postalCode = request.postalCode
@@ -188,8 +190,8 @@ class AddressService(
         val address = getById(addressId, userId)
 
         // -- check if it's the main address --
-        if (address.isMain) {
-            throw IllegalStateException("Cannot delete main address. Please set another address as main first.")
+        require(!address.isMain) {
+            "Cannot delete main address. Please set another address as main first."
         }
 
         // -- delete address --
@@ -204,7 +206,6 @@ class AddressService(
      * @param userId the user ID.
      * @return the updated [Address] instance.
      */
-    @Transactional
     fun setAsMain(addressId: Long, userId: Long): Address {
         // -- get existing address --
         val address = getById(addressId, userId)

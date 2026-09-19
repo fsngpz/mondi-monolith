@@ -15,6 +15,7 @@ import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
+import org.springframework.data.domain.Sort
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import java.util.Optional
 
@@ -57,7 +58,7 @@ internal class AddressServiceTest(
 
         // -- verify --
         verify(mockUserRepository).findById(any<Long>())
-        verify(mockAddressRepository, never()).findAllByUser(any())
+        verify(mockAddressRepository, never()).findAllByUser(any(), any())
     }
 
     @Test
@@ -69,7 +70,9 @@ internal class AddressServiceTest(
 
         // -- mock --
         whenever(mockUserRepository.findById(any<Long>())).thenReturn(Optional.of(mockUser))
-        whenever(mockAddressRepository.findAllByUser(mockUser)).thenReturn(addresses)
+        whenever(mockAddressRepository.findAllByUser(mockUser, Sort.by(Sort.Direction.DESC, "updatedAt"))).thenReturn(
+            addresses
+        )
 
         // -- execute --
         val result = service.getAllByUserId(1L)
@@ -77,7 +80,7 @@ internal class AddressServiceTest(
         // -- verify --
         assertThat(result).hasSize(2)
         verify(mockUserRepository).findById(any<Long>())
-        verify(mockAddressRepository).findAllByUser(mockUser)
+        verify(mockAddressRepository).findAllByUser(mockUser, Sort.by(Sort.Direction.DESC, "updatedAt"))
     }
 
     @Test
@@ -258,7 +261,7 @@ internal class AddressServiceTest(
         mockUser.id = 1L
         val mockAddress = createMockAddress(mockUser)
         val request = createAddressRequest(
-            street = "Updated Street",
+            addressLine1 = "Updated Street",
             city = "Updated City"
         )
 
@@ -270,7 +273,7 @@ internal class AddressServiceTest(
         val result = service.update(1L, 1L, request)
 
         // -- verify --
-        assertThat(result.street).isEqualTo("Updated Street")
+        assertThat(result.addressLine1).isEqualTo("Updated Street")
         assertThat(result.city).isEqualTo("Updated City")
         verify(mockAddressRepository).findById(any<Long>())
         verify(mockAddressRepository).save(mockAddress)
@@ -305,15 +308,15 @@ internal class AddressServiceTest(
         val mockUser = createMockUser()
         mockUser.id = 1L
         val mockAddress = createMockAddress(mockUser)
-        mockAddress.street = "Old Street"
+        mockAddress.addressLine1 = "Old Street"
         mockAddress.city = "Old City"
         mockAddress.country = "Old Country"
         mockAddress.label = "Old Label"
 
-        // -- partial request with only street and label updated --
+        // -- partial request with only addressLine1 and label updated --
         // -- note: ObjectMapper will merge this with existing values --
         val partialRequestJson = objectMapper.createObjectNode().apply {
-            put("street", "New Street")
+            put("addressLine1", "New Street")
             put("label", "New Label")
         }
 
@@ -324,8 +327,8 @@ internal class AddressServiceTest(
         // -- execute --
         val result = service.patch(1L, 1L, partialRequestJson)
 
-        // -- verify that only street and label were updated, other fields remain unchanged --
-        assertThat(result.street).isEqualTo("New Street")
+        // -- verify that only addressLine1 and label were updated, other fields remain unchanged --
+        assertThat(result.addressLine1).isEqualTo("New Street")
         assertThat(result.city).isEqualTo("Old City")
         assertThat(result.country).isEqualTo("Old Country")
         assertThat(result.label).isEqualTo("New Label")
@@ -356,7 +359,7 @@ internal class AddressServiceTest(
         whenever(mockAddressRepository.findById(any<Long>())).thenReturn(Optional.of(mockAddress))
 
         // -- execute --
-        val exception = assertThrows<IllegalStateException> { service.delete(1L, 1L) }
+        val exception = assertThrows<IllegalArgumentException> { service.delete(1L, 1L) }
 
         // -- verify --
         assertThat(exception.message).isEqualTo("Cannot delete main address. Please set another address as main first.")
@@ -448,7 +451,10 @@ internal class AddressServiceTest(
     private fun createMockAddress(user: User, isMain: Boolean = false): Address {
         return Address(
             user = user,
-            street = "123 Test St",
+            recipientName = "John Doe",
+            phone = "+1234567890",
+            addressLine1 = "123 Test St",
+            addressLine2 = "Apt 4B",
             city = "Test City",
             state = "Test State",
             postalCode = "12345",
@@ -462,7 +468,10 @@ internal class AddressServiceTest(
     }
 
     private fun createAddressRequest(
-        street: String = "123 Test St",
+        recipientName: String = "John Doe",
+        phone: String = "+1234567890",
+        addressLine1: String = "123 Test St",
+        addressLine2: String = "Apt 4B",
         city: String = "Test City",
         state: String = "Test State",
         postalCode: String = "12345",
@@ -473,7 +482,10 @@ internal class AddressServiceTest(
         notes: String? = "Test Notes"
     ): AddressRequest {
         return AddressRequest(
-            street = street,
+            recipientName = recipientName,
+            phone = phone,
+            addressLine1 = addressLine1,
+            addressLine2 = addressLine2,
             city = city,
             state = state,
             postalCode = postalCode,

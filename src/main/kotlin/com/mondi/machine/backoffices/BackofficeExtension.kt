@@ -11,6 +11,7 @@ import com.mondi.machine.backoffices.transactions.BackofficeTransactionNullableR
 import com.mondi.machine.backoffices.transactions.BackofficeTransactionRequest
 import com.mondi.machine.backoffices.transactions.BackofficeTransactionResponse
 import com.mondi.machine.products.Product
+import com.mondi.machine.products.getDiscountPrice
 import com.mondi.machine.transactions.Transaction
 
 /**
@@ -101,12 +102,14 @@ fun Product.toResponse(): BackofficeProductResponse {
     requireNotNull(id) {
         "field id is null"
     }
+    // -- use stored discount price (no calculation needed, preserves exact value) --
     // -- return the mapped value --
     return BackofficeProductResponse(
         id,
         this.name,
         this.description,
         this.price,
+        this.discountPrice,
         this.currency,
         this.specificationInHtml,
         this.discountPercentage,
@@ -114,7 +117,8 @@ fun Product.toResponse(): BackofficeProductResponse {
         this.category,
         this.stock,
         this.sku,
-        this.status
+        this.status,
+        this.createdAt
     )
 }
 
@@ -141,10 +145,6 @@ fun BackofficeProductNullableRequest.toNotNull(): BackofficeProductRequest {
     requireNotNull(this.discountPercentage) {
         "the field 'discountPercentage' cannot be null"
     }
-    // -- validate field mediaFiles --
-    requireNotNull(this.mediaFiles) {
-        "the field 'mediaFiles' cannot be null"
-    }
     // -- validate field category --
     requireNotNull(this.category) {
         "the field 'category' cannot be null"
@@ -161,6 +161,7 @@ fun BackofficeProductNullableRequest.toNotNull(): BackofficeProductRequest {
         this.currency,
         this.specificationInHtml,
         this.discountPercentage,
+        this.discountPrice,
         this.mediaFiles,
         this.category,
         this.stock
@@ -210,6 +211,7 @@ fun BackofficeProductUpdateNullableRequest.toNotNull(): BackofficeProductUpdateR
         this.currency,
         this.specificationInHtml,
         this.discountPercentage,
+        this.discountPrice,
         this.existingMediaUrls ?: emptyList(),
         this.newMediaFiles ?: emptyList(),
         this.category,

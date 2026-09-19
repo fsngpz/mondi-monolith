@@ -15,7 +15,10 @@ CREATE TABLE addresses
         CONSTRAINT addresses_user_id_fk
             REFERENCES users
             ON UPDATE CASCADE ON DELETE CASCADE                        NOT NULL,
-    street          text                                               NOT NULL,
+    recipient_name  text                                               NOT NULL,
+    phone           text                                               NOT NULL,
+    address_line1   text                                               NOT NULL,
+    address_line2   text,
     city            text                                               NOT NULL,
     state           text                                               NOT NULL,
     postal_code     text                                               NOT NULL,

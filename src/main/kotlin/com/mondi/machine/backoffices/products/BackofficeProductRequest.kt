@@ -18,7 +18,8 @@ data class BackofficeProductRequest(
     val currency: Currency,
     val specificationInHtml: String?,
     val discountPercentage: BigDecimal,
-    val mediaFiles: List<MultipartFile>,
+    val discountPrice: BigDecimal?,
+    val mediaFiles: List<MultipartFile>?,
     val category: ProductCategory,
     val stock: Int
 )

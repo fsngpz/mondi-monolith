@@ -21,7 +21,10 @@ fun Address.toResponse(): AddressResponse {
     // -- return the instance of AddressResponse --
     return AddressResponse(
         id = id,
-        street = this.street,
+        recipientName = this.recipientName,
+        phone = this.phone,
+        addressLine1 = this.addressLine1,
+        addressLine2 = this.addressLine2,
         city = this.city,
         state = this.state,
         postalCode = this.postalCode,
@@ -40,7 +43,10 @@ fun Address.toResponse(): AddressResponse {
  */
 fun Address.toRequest(): AddressRequest {
     return AddressRequest(
-        street = this.street,
+        recipientName = this.recipientName,
+        phone = this.phone,
+        addressLine1 = this.addressLine1,
+        addressLine2 = this.addressLine2,
         city = this.city,
         state = this.state,
         postalCode = this.postalCode,
@@ -59,7 +65,10 @@ fun Address.toRequest(): AddressRequest {
  */
 fun Address.toNullableRequest(): AddressNullableRequest {
     return AddressNullableRequest(
-        street = this.street,
+        recipientName = this.recipientName,
+        phone = this.phone,
+        addressLine1 = this.addressLine1,
+        addressLine2 = this.addressLine2,
         city = this.city,
         state = this.state,
         postalCode = this.postalCode,
@@ -77,8 +86,14 @@ fun Address.toNullableRequest(): AddressNullableRequest {
  * @return the [AddressRequest] instance.
  */
 fun AddressNullableRequest.toNonNull(): AddressRequest {
-    require(!this.street.isNullOrBlank()) {
-        "field 'street' cannot be null or blank"
+    require(!this.recipientName.isNullOrBlank()) {
+        "field 'recipientName' cannot be null or blank"
+    }
+    require(!this.phone.isNullOrBlank()) {
+        "field 'phone' cannot be null or blank"
+    }
+    require(!this.addressLine1.isNullOrBlank()) {
+        "field 'addressLine1' cannot be null or blank"
     }
     require(!this.city.isNullOrBlank()) {
         "field 'city' cannot be null or blank"
@@ -99,7 +114,10 @@ fun AddressNullableRequest.toNonNull(): AddressRequest {
         "field 'isMain' cannot be null"
     }
     return AddressRequest(
-        street = this.street,
+        recipientName = this.recipientName,
+        phone = this.phone,
+        addressLine1 = this.addressLine1,
+        addressLine2 = this.addressLine2,
         city = this.city,
         state = this.state,
         postalCode = this.postalCode,

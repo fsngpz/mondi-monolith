@@ -2,6 +2,7 @@ package com.mondi.machine.backoffices.products
 
 import com.mondi.machine.backoffices.toNotNull
 import com.mondi.machine.products.ProductCategory
+import com.mondi.machine.products.ProductStatus
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
@@ -77,6 +78,7 @@ class BackofficeProductController(private val service: BackofficeProductService)
      * @param category the parameter to filter data by category.
      * @param minPrice the minimum price to filter data (default: 0).
      * @param maxPrice the maximum price to filter data (default: 999999999).
+     * @param status the status to filter data.
      * @param pageable the [Pageable].
      * @return the [Page] of [BackofficeProductResponse].
      */
@@ -86,9 +88,10 @@ class BackofficeProductController(private val service: BackofficeProductService)
         @RequestParam(required = false) category: ProductCategory?,
         @RequestParam(required = false, defaultValue = "0") minPrice: BigDecimal,
         @RequestParam(required = false, defaultValue = "999999999") maxPrice: BigDecimal,
+        @RequestParam(required = false) status: ProductStatus?,
         pageable: Pageable
     ): Page<BackofficeProductResponse> {
         // -- find all products --
-        return service.findAll(search, category, minPrice, maxPrice, pageable)
+        return service.findAll(search, category, minPrice, maxPrice, status, pageable)
     }
 }

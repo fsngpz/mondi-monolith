@@ -1,6 +1,7 @@
 package com.mondi.machine.accounts.addresses
 
 import com.mondi.machine.auths.users.User
+import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
@@ -17,9 +18,10 @@ interface AddressRepository : JpaRepository<Address, Long> {
      * Find all addresses for a user.
      *
      * @param user the [User] instance.
+     * @param sort the [Sort] instance.
      * @return list of [Address].
      */
-    fun findAllByUser(user: User): List<Address>
+    fun findAllByUser(user: User, sort: Sort): List<Address>
 
     /**
      * Find main address for a user.

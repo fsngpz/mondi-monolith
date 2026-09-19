@@ -27,4 +27,12 @@ interface UserRepository : JpaRepository<User, Long> {
    * @return the [User] instance or null.
    */
   fun findByProviderAndProviderId(provider: OAuthProvider, providerId: String): User?
+
+  /**
+   * a function to find the instance of [User] by mobile number.
+   *
+   * @param mobile the mobile number.
+   * @return the [User] instance or null.
+   */
+  fun findByMobile(mobile: String): User?
 }

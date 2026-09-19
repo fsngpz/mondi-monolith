@@ -7,7 +7,10 @@ package com.mondi.machine.accounts.addresses
  * @since 2026-01-23
  */
 data class AddressNullableRequest(
-    val street: String? = null,
+    val recipientName: String? = null,
+    val phone: String? = null,
+    val addressLine1: String? = null,
+    val addressLine2: String? = null,
     val city: String? = null,
     val state: String? = null,
     val postalCode: String? = null,

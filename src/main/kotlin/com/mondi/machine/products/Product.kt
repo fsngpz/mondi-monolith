@@ -1,6 +1,7 @@
 package com.mondi.machine.products
 
 import com.mondi.machine.utils.AuditableBaseEntity
+import com.mondi.machine.utils.Currency
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
@@ -25,10 +26,13 @@ import java.math.BigDecimal
 class Product(
     var name: String,
     var description: String?,
-    var currency: String,
+    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType::class)
+    var currency: Currency,
     var specificationInHtml: String?,
 
     var price: BigDecimal,
+    var discountPrice: BigDecimal = price,
     var discountPercentage: BigDecimal = BigDecimal.ZERO,
 
     @Enumerated(EnumType.STRING)

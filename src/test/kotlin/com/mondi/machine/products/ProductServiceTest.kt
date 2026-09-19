@@ -1,6 +1,8 @@
 package com.mondi.machine.products
 
 import com.mondi.machine.storage.supabase.SupabaseService
+import com.mondi.machine.utils.Currency
+import com.mondi.machine.utils.HtmlSanitizer
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -43,7 +45,7 @@ internal class ProductServiceTest(@Autowired private val productService: Product
     lateinit var mockSkuGenerationService: SkuGenerationService
 
     @MockitoBean
-    lateinit var mockHtmlSanitizer: com.mondi.machine.utils.HtmlSanitizer
+    lateinit var mockHtmlSanitizer: HtmlSanitizer
     // -- end of region mock --
 
     // -- region of smoke testing --
@@ -95,6 +97,9 @@ internal class ProductServiceTest(@Autowired private val productService: Product
                 anyOrNull(),
                 any<BigDecimal>(),
                 any<BigDecimal>(),
+                anyOrNull(),
+                anyOrNull(),
+                anyOrNull(),
                 any<Pageable>()
             )
         ).thenReturn(PageImpl(products))
@@ -105,6 +110,9 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             null,
             BigDecimal.ZERO,
             BigDecimal("999999999"),
+            null,
+            null,
+            null,
             Pageable.unpaged()
         )
 
@@ -116,6 +124,9 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             anyOrNull(),
             any<BigDecimal>(),
             any<BigDecimal>(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
             any<Pageable>()
         )
     }
@@ -130,6 +141,9 @@ internal class ProductServiceTest(@Autowired private val productService: Product
                 null,
                 BigDecimal.ZERO,
                 BigDecimal("999999999"),
+                null,
+                null,
+                null,
                 Pageable.unpaged()
             )
         ).thenReturn(PageImpl(products))
@@ -140,6 +154,9 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             null,
             BigDecimal.ZERO,
             BigDecimal("999999999"),
+            null,
+            null,
+            null,
             Pageable.unpaged()
         )
 
@@ -152,6 +169,9 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             null,
             BigDecimal.ZERO,
             BigDecimal("999999999"),
+            null,
+            null,
+            null,
             Pageable.unpaged()
         )
     }
@@ -166,6 +186,9 @@ internal class ProductServiceTest(@Autowired private val productService: Product
                 null,
                 BigDecimal.ZERO,
                 BigDecimal("999999999"),
+                null,
+                null,
+                null,
                 Pageable.unpaged()
             )
         ).thenReturn(PageImpl(products))
@@ -176,6 +199,9 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             null,
             BigDecimal.ZERO,
             BigDecimal("999999999"),
+            null,
+            null,
+            null,
             Pageable.unpaged()
         )
 
@@ -187,6 +213,9 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             null,
             BigDecimal.ZERO,
             BigDecimal("999999999"),
+            null,
+            null,
+            null,
             Pageable.unpaged()
         )
     }
@@ -201,6 +230,9 @@ internal class ProductServiceTest(@Autowired private val productService: Product
                 null,
                 BigDecimal.ZERO,
                 BigDecimal("999999999"),
+                null,
+                null,
+                null,
                 Pageable.unpaged()
             )
         ).thenReturn(PageImpl(products))
@@ -211,6 +243,9 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             null,
             BigDecimal.ZERO,
             BigDecimal("999999999"),
+            null,
+            null,
+            null,
             Pageable.unpaged()
         )
 
@@ -222,6 +257,9 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             null,
             BigDecimal.ZERO,
             BigDecimal("999999999"),
+            null,
+            null,
+            null,
             Pageable.unpaged()
         )
     }
@@ -236,6 +274,9 @@ internal class ProductServiceTest(@Autowired private val productService: Product
                 ProductCategory.RING,
                 BigDecimal.ZERO,
                 BigDecimal("999999999"),
+                null,
+                null,
+                null,
                 Pageable.unpaged()
             )
         ).thenReturn(PageImpl(products))
@@ -246,6 +287,9 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             ProductCategory.RING,
             BigDecimal.ZERO,
             BigDecimal("999999999"),
+            null,
+            null,
+            null,
             Pageable.unpaged()
         )
 
@@ -258,6 +302,9 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             ProductCategory.RING,
             BigDecimal.ZERO,
             BigDecimal("999999999"),
+            null,
+            null,
+            null,
             Pageable.unpaged()
         )
     }
@@ -272,6 +319,9 @@ internal class ProductServiceTest(@Autowired private val productService: Product
                 null,
                 BigDecimal("1000"),
                 BigDecimal("2000"),
+                null,
+                null,
+                null,
                 Pageable.unpaged()
             )
         ).thenReturn(PageImpl(products))
@@ -282,6 +332,9 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             null,
             BigDecimal("1000"),
             BigDecimal("2000"),
+            null,
+            null,
+            null,
             Pageable.unpaged()
         )
 
@@ -293,6 +346,9 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             null,
             BigDecimal("1000"),
             BigDecimal("2000"),
+            null,
+            null,
+            null,
             Pageable.unpaged()
         )
     }
@@ -307,6 +363,9 @@ internal class ProductServiceTest(@Autowired private val productService: Product
                 ProductCategory.RING,
                 BigDecimal("1000"),
                 BigDecimal("2000"),
+                null,
+                null,
+                null,
                 Pageable.unpaged()
             )
         ).thenReturn(PageImpl(products))
@@ -317,6 +376,9 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             ProductCategory.RING,
             BigDecimal("1000"),
             BigDecimal("2000"),
+            null,
+            null,
+            null,
             Pageable.unpaged()
         )
 
@@ -330,6 +392,9 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             ProductCategory.RING,
             BigDecimal("1000"),
             BigDecimal("2000"),
+            null,
+            null,
+            null,
             Pageable.unpaged()
         )
     }
@@ -363,9 +428,10 @@ internal class ProductServiceTest(@Autowired private val productService: Product
                 name = "Diamond Ring",
                 description = "Beautiful diamond ring",
                 price = BigDecimal("1500.00"),
-                currency = com.mondi.machine.utils.Currency.USD,
+                currency = Currency.USD,
                 specificationInHtml = "<p>14k gold</p>",
                 discountPercentage = BigDecimal("10.00"),
+                discountPrice = null,
                 mediaFiles = listOf(mockMultipartFile),
                 category = ProductCategory.RING,
                 stock = 50
@@ -410,9 +476,10 @@ internal class ProductServiceTest(@Autowired private val productService: Product
                 name = "Test Ring",
                 description = "Test description",
                 price = BigDecimal("1500.00"),
-                currency = com.mondi.machine.utils.Currency.USD,
+                currency = Currency.USD,
                 specificationInHtml = "<p>14k gold</p>",
                 discountPercentage = BigDecimal("10.00"),
+                discountPrice = null,
                 mediaFiles = listOf(mockMultipartFile),
                 category = ProductCategory.RING,
                 stock = 50
@@ -461,9 +528,10 @@ internal class ProductServiceTest(@Autowired private val productService: Product
                 name = "Test Ring",
                 description = "Test description",
                 price = BigDecimal("1500.00"),
-                currency = com.mondi.machine.utils.Currency.USD,
+                currency = Currency.USD,
                 specificationInHtml = unsafeHtml,
                 discountPercentage = BigDecimal("10.00"),
+                discountPrice = null,
                 mediaFiles = listOf(mockMultipartFile),
                 category = ProductCategory.RING,
                 stock = 50
@@ -507,9 +575,10 @@ internal class ProductServiceTest(@Autowired private val productService: Product
                 name = "Diamond Ring",
                 description = "Beautiful diamond ring",
                 price = BigDecimal("1500.00"),
-                currency = com.mondi.machine.utils.Currency.USD,
+                currency = Currency.USD,
                 specificationInHtml = "<p>14k gold</p>",
                 discountPercentage = BigDecimal("10.00"),
+                discountPrice = null,
                 mediaFiles = listOf(mockMultipartFile),
                 category = ProductCategory.RING,
                 stock = 50
@@ -517,76 +586,6 @@ internal class ProductServiceTest(@Autowired private val productService: Product
         )
 
         assertThat(result.status).isEqualTo(ProductStatus.ACTIVE)
-    }
-
-    @Test
-    fun `attempting to update and success`() = runTest {
-        val mockMultipartFile = MockMultipartFile("image.jpg", ByteArray(1024))
-        val mockProduct = createMockProduct("Updated Ring")
-        val mockProductMedia = ProductMedia("https://example.com/image.jpg", 0, mockProduct)
-        val mockRequest = ProductRequest(
-            name = "Updated Ring",
-            description = "Updated description",
-            price = BigDecimal("2000.00"),
-            currency = "USD",
-            specificationInHtml = "<p>18k gold</p>",
-            discountPercentage = BigDecimal("15.00"),
-            mediaFiles = listOf(mockMultipartFile),
-            category = ProductCategory.RING,
-            stock = 30
-        )
-        val mediaKey = "products/image.jpg"
-        val publicUrl = "https://example.com/image.jpg"
-        // -- mock --
-        whenever(mockProductRepository.findById(any<Long>())).thenReturn(Optional.of(mockProduct))
-        whenever(mockProductRepository.save(any<Product>())).thenReturn(mockProduct)
-        whenever(
-            mockSupabaseService.uploadFile(
-                any<String>(),
-                any<String>(),
-                any<MultipartFile>(),
-                any<Boolean>()
-            )
-        ).thenReturn(mediaKey)
-        whenever(mockSupabaseService.getPublicUrl(any<String>())).thenReturn(publicUrl)
-        whenever(mockProductMediaRepository.save(any<ProductMedia>())).thenReturn(mockProductMedia)
-
-        // -- execute --
-        val result = productService.update(1L, mockRequest)
-        assertThat(result.name).isEqualTo(mockRequest.name)
-        assertThat(result.price).isEqualTo(mockRequest.price)
-
-        // -- verify --
-        verify(mockProductRepository).findById(any<Long>())
-        verify(mockProductMediaRepository).deleteByProductId(any<Long>())
-        verify(mockSupabaseService).uploadFile(any<String>(), any<String>(), any<MultipartFile>(), any<Boolean>())
-        verify(mockSupabaseService).getPublicUrl(any<String>())
-        verify(mockProductMediaRepository).save(any<ProductMedia>())
-        verify(mockProductRepository).save(any<Product>())
-    }
-
-    @Test
-    fun `attempting to update but no product was found`() = runTest {
-        val mockMultipartFile = MockMultipartFile("image.jpg", ByteArray(1024))
-        val mockRequest = ProductRequest(
-            name = "Updated Ring",
-            description = "Updated description",
-            price = BigDecimal("2000.00"),
-            currency = "USD",
-            specificationInHtml = "<p>18k gold</p>",
-            discountPercentage = BigDecimal("15.00"),
-            mediaFiles = listOf(mockMultipartFile),
-            category = ProductCategory.RING,
-            stock = 30
-        )
-        // -- mock --
-        whenever(mockProductRepository.findById(any<Long>())).thenReturn(Optional.empty())
-
-        // -- execute --
-        assertThrows<NoSuchElementException> { productService.update(1L, mockRequest) }
-
-        // -- verify --
-        verify(mockProductRepository).findById(any<Long>())
     }
 
     @Test
@@ -632,7 +631,8 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             name = "Updated Ring",
             description = "Updated description",
             price = BigDecimal("2000.00"),
-            currency = "USD",
+            discountPrice = BigDecimal("1700.00"),
+            currency = Currency.USD,
             specificationInHtml = "<p>18k gold</p>",
             discountPercentage = BigDecimal("15.00"),
             category = ProductCategory.RING,
@@ -660,7 +660,8 @@ internal class ProductServiceTest(@Autowired private val productService: Product
             name = name,
             description = "Test description",
             price = BigDecimal("1500.00"),
-            currency = "USD",
+            discountPrice = BigDecimal("1350.00"),
+            currency = Currency.USD,
             specificationInHtml = "<p>Test specification</p>",
             discountPercentage = BigDecimal("10.00"),
             category = ProductCategory.RING,

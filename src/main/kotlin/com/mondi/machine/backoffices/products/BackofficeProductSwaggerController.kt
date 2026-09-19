@@ -1,6 +1,7 @@
 package com.mondi.machine.backoffices.products
 
 import com.mondi.machine.products.ProductCategory
+import com.mondi.machine.products.ProductStatus
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
@@ -24,6 +25,10 @@ interface BackofficeProductSwaggerController {
 
     @Operation(
         summary = "Create new product",
+        description = """
+            When discountPrice and discountPercentage are provided, the system will use the discountPrice then 
+            save it to discountPercentage.
+        """,
         requestBody = RequestBody(
             content = [Content(
                 mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
@@ -58,6 +63,7 @@ interface BackofficeProductSwaggerController {
         category: ProductCategory?,
         minPrice: BigDecimal,
         maxPrice: BigDecimal,
+        status: ProductStatus?,
         @ParameterObject pageable: Pageable
     ): Page<BackofficeProductResponse>
 }

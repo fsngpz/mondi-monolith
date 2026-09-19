@@ -3,6 +3,7 @@ package com.mondi.machine.accounts.profiles
 import com.mondi.machine.auths.users.User
 import com.mondi.machine.transactions.Transaction
 import com.mondi.machine.utils.AuditableBaseEntity
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
 import jakarta.persistence.JoinColumn
@@ -26,7 +27,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener
 class Profile(
 
     // -- one to one --
-    @OneToOne
+    @OneToOne(cascade = [CascadeType.MERGE, CascadeType.PERSIST])
     @MapsId
     @JoinColumn(name = "id")
     val user: User

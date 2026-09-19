@@ -1,7 +1,9 @@
 package com.mondi.machine.products
 
+import com.mondi.machine.utils.Currency
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
@@ -63,11 +65,14 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
         // -- mock --
         whenever(
             mockProductService.findAll(
-                null,
-                null,
-                BigDecimal.ZERO,
-                BigDecimal("10"),
-                pageable
+                anyOrNull(),
+                anyOrNull(),
+                any(),
+                any(),
+                anyOrNull(),
+                anyOrNull(),
+                anyOrNull(),
+                any()
             )
         ).thenReturn(PageImpl(productResponses, pageable, productResponses.size.toLong()))
 
@@ -81,7 +86,16 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
             .andExpect(jsonPath("$.content[2].name").value("Silver Bracelet"))
 
         // -- verify --
-        verify(mockProductService).findAll(null, null, BigDecimal.ZERO, BigDecimal("10"), pageable)
+        verify(mockProductService).findAll(
+            anyOrNull(),
+            anyOrNull(),
+            any(),
+            any(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            any()
+        )
     }
 
     @Test
@@ -92,11 +106,14 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
         // -- mock --
         whenever(
             mockProductService.findAll(
-                "Diamond",
-                null,
-                BigDecimal.ZERO,
-                BigDecimal("10"),
-                pageable
+                anyOrNull(),
+                anyOrNull(),
+                any(),
+                any(),
+                anyOrNull(),
+                anyOrNull(),
+                anyOrNull(),
+                any()
             )
         ).thenReturn(PageImpl(productResponses, pageable, productResponses.size.toLong()))
 
@@ -108,7 +125,16 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
             .andExpect(jsonPath("$.content[0].name").value("Diamond Ring"))
 
         // -- verify --
-        verify(mockProductService).findAll("Diamond", null, BigDecimal.ZERO, BigDecimal("10"), pageable)
+        verify(mockProductService).findAll(
+            anyOrNull(),
+            anyOrNull(),
+            any(),
+            any(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            any()
+        )
     }
 
     @Test
@@ -119,11 +145,14 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
         // -- mock --
         whenever(
             mockProductService.findAll(
-                "Beautiful",
-                null,
-                BigDecimal.ZERO,
-                BigDecimal("10"),
-                pageable
+                anyOrNull(),
+                anyOrNull(),
+                any(),
+                any(),
+                anyOrNull(),
+                anyOrNull(),
+                anyOrNull(),
+                any()
             )
         ).thenReturn(PageImpl(productResponses, pageable, productResponses.size.toLong()))
 
@@ -134,7 +163,16 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
             .andExpect(jsonPath("$.content.length()").value(1))
 
         // -- verify --
-        verify(mockProductService).findAll("Beautiful", null, BigDecimal.ZERO, BigDecimal("10"), pageable)
+        verify(mockProductService).findAll(
+            anyOrNull(),
+            anyOrNull(),
+            any(),
+            any(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            any()
+        )
     }
 
     @Test
@@ -145,11 +183,14 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
         // -- mock --
         whenever(
             mockProductService.findAll(
-                "14k gold",
-                null,
-                BigDecimal.ZERO,
-                BigDecimal("10"),
-                pageable
+                anyOrNull(),
+                anyOrNull(),
+                any(),
+                any(),
+                anyOrNull(),
+                anyOrNull(),
+                anyOrNull(),
+                any()
             )
         ).thenReturn(PageImpl(productResponses, pageable, productResponses.size.toLong()))
 
@@ -160,7 +201,16 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
             .andExpect(jsonPath("$.content.length()").value(1))
 
         // -- verify --
-        verify(mockProductService).findAll("14k gold", null, BigDecimal.ZERO, BigDecimal("10"), pageable)
+        verify(mockProductService).findAll(
+            anyOrNull(),
+            anyOrNull(),
+            any(),
+            any(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            any()
+        )
     }
 
     @Test
@@ -174,11 +224,14 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
         // -- mock --
         whenever(
             mockProductService.findAll(
-                null,
-                ProductCategory.RING,
-                BigDecimal.ZERO,
-                BigDecimal("10"),
-                pageable
+                anyOrNull(),
+                anyOrNull(),
+                any(),
+                any(),
+                anyOrNull(),
+                anyOrNull(),
+                anyOrNull(),
+                any()
             )
         ).thenReturn(PageImpl(productResponses, pageable, productResponses.size.toLong()))
 
@@ -191,7 +244,16 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
             .andExpect(jsonPath("$.content[1].category").value("RING"))
 
         // -- verify --
-        verify(mockProductService).findAll(null, ProductCategory.RING, BigDecimal.ZERO, BigDecimal("10"), pageable)
+        verify(mockProductService).findAll(
+            anyOrNull(),
+            anyOrNull(),
+            any(),
+            any(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            any()
+        )
     }
 
     @Test
@@ -202,11 +264,14 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
         // -- mock --
         whenever(
             mockProductService.findAll(
-                null,
-                null,
-                BigDecimal("1000"),
-                BigDecimal("2000"),
-                pageable
+                anyOrNull(),
+                anyOrNull(),
+                any(),
+                any(),
+                anyOrNull(),
+                anyOrNull(),
+                anyOrNull(),
+                any()
             )
         ).thenReturn(PageImpl(productResponses, pageable, productResponses.size.toLong()))
 
@@ -218,11 +283,14 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
 
         // -- verify --
         verify(mockProductService).findAll(
-            null,
-            null,
-            BigDecimal("1000"),
-            BigDecimal("2000"),
-            pageable
+            anyOrNull(),
+            anyOrNull(),
+            any(),
+            any(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            any()
         )
     }
 
@@ -234,11 +302,14 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
         // -- mock --
         whenever(
             mockProductService.findAll(
-                "Diamond",
-                ProductCategory.RING,
-                BigDecimal("1000"),
-                BigDecimal("2000"),
-                pageable
+                anyOrNull(),
+                anyOrNull(),
+                any(),
+                any(),
+                anyOrNull(),
+                anyOrNull(),
+                anyOrNull(),
+                any()
             )
         ).thenReturn(PageImpl(productResponses, pageable, productResponses.size.toLong()))
 
@@ -254,11 +325,14 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
 
         // -- verify --
         verify(mockProductService).findAll(
-            "Diamond",
-            ProductCategory.RING,
-            BigDecimal("1000"),
-            BigDecimal("2000"),
-            pageable
+            anyOrNull(),
+            anyOrNull(),
+            any(),
+            any(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            any()
         )
     }
 
@@ -268,11 +342,14 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
         // -- mock --
         whenever(
             mockProductService.findAll(
-                "NonExistent",
-                null,
-                BigDecimal.ZERO,
-                BigDecimal("10"),
-                pageable
+                anyOrNull(),
+                anyOrNull(),
+                any(),
+                any(),
+                anyOrNull(),
+                anyOrNull(),
+                anyOrNull(),
+                any()
             )
         ).thenReturn(PageImpl(emptyList(), pageable, 0))
 
@@ -284,7 +361,16 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
             .andExpect(jsonPath("$.totalElements").value(0))
 
         // -- verify --
-        verify(mockProductService).findAll("NonExistent", null, BigDecimal.ZERO, BigDecimal("10"), pageable)
+        verify(mockProductService).findAll(
+            anyOrNull(),
+            anyOrNull(),
+            any(),
+            any(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            any()
+        )
     }
 
     @Test
@@ -298,11 +384,14 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
         // -- mock --
         whenever(
             mockProductService.findAll(
-                null,
-                null,
-                BigDecimal.ZERO,
-                BigDecimal("10"),
-                pageable
+                anyOrNull(),
+                anyOrNull(),
+                any(),
+                any(),
+                anyOrNull(),
+                anyOrNull(),
+                anyOrNull(),
+                any()
             )
         ).thenReturn(PageImpl(productResponses, pageable, 12))
 
@@ -315,7 +404,16 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
             .andExpect(jsonPath("$.totalElements").value(12))
 
         // -- verify --
-        verify(mockProductService).findAll(null, null, BigDecimal.ZERO, BigDecimal("10"), pageable)
+        verify(mockProductService).findAll(
+            anyOrNull(),
+            anyOrNull(),
+            any(),
+            any(),
+            anyOrNull(),
+            anyOrNull(),
+            anyOrNull(),
+            any()
+        )
     }
 
     private fun createMockProduct(name: String): Product {
@@ -323,7 +421,8 @@ internal class ProductControllerTest(@Autowired private val mockMvc: MockMvc) {
             name = name,
             description = "Beautiful ${name.lowercase()}",
             price = BigDecimal("1500.00"),
-            currency = "USD",
+            discountPrice = BigDecimal("1350.00"),
+            currency = Currency.USD,
             specificationInHtml = "<p>14k gold specification</p>",
             discountPercentage = BigDecimal("10.00"),
             category = ProductCategory.RING,

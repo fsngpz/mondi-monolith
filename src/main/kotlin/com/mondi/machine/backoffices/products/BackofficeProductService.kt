@@ -4,6 +4,9 @@ import com.mondi.machine.backoffices.toResponse
 import com.mondi.machine.products.Product
 import com.mondi.machine.products.ProductCategory
 import com.mondi.machine.products.ProductService
+import com.mondi.machine.products.ProductStatus
+import com.mondi.machine.products.calculateDiscountPercentage
+import com.mondi.machine.products.getDiscountPrice
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -41,15 +44,36 @@ class BackofficeProductService(private val productService: ProductService) {
         id: Long,
         request: BackofficeProductUpdateRequest
     ): BackofficeProductResponse {
+        val price = request.price
+        val inputDiscountPrice = request.discountPrice ?: BigDecimal.ZERO
+        val inputPercent = request.discountPercentage
+
+        // -- calculate both discount price and percentage based on input --
+        val (finalDiscountPrice, finalPercentage) = when {
+            // Priority 1: Use discount price if provided
+            inputDiscountPrice.signum() > 0 -> {
+                val percentage = inputDiscountPrice.calculateDiscountPercentage(price)
+                Pair(inputDiscountPrice, percentage)
+            }
+            // Priority 2: Use percentage if provided
+            inputPercent.signum() > 0 -> {
+                val discountPrice = getDiscountPrice(price, inputPercent)
+                Pair(discountPrice, inputPercent)
+            }
+            // No discount
+            else -> Pair(BigDecimal.ZERO, BigDecimal.ZERO)
+        }
+
         // -- make an update to the specified product --
         return productService.updateWithMediaManagement(
             id = id,
             name = request.name,
             description = request.description,
             price = request.price,
-            currency = request.currency.name,
+            discountPrice = finalDiscountPrice,
+            currency = request.currency,
             specificationInHtml = request.specificationInHtml,
-            discountPercentage = request.discountPercentage,
+            discountPercentage = finalPercentage,
             category = request.category,
             stock = request.stock,
             existingMediaUrls = request.existingMediaUrls ?: emptyList(),
@@ -75,6 +99,7 @@ class BackofficeProductService(private val productService: ProductService) {
      * @param category the parameter to filter data by category.
      * @param minPrice the minimum price to filter data.
      * @param maxPrice the maximum price to filter data.
+     * @param status the status to filter data.
      * @param pageable the [Pageable].
      * @return the [Page] of [BackofficeProductResponse].
      */
@@ -83,16 +108,18 @@ class BackofficeProductService(private val productService: ProductService) {
         category: ProductCategory?,
         minPrice: BigDecimal,
         maxPrice: BigDecimal,
+        status: ProductStatus?,
         pageable: Pageable
     ): Page<BackofficeProductResponse> {
         // -- find all products --
-        return productService.findAll(search, category, minPrice, maxPrice, pageable)
+        return productService.findAll(search, category, minPrice, maxPrice, status, null, null, pageable)
             .map { productResponse ->
                 BackofficeProductResponse(
                     id = productResponse.id,
                     name = productResponse.name,
                     description = productResponse.description,
                     price = productResponse.price,
+                    discountPrice = productResponse.discountPrice,
                     currency = productResponse.currency,
                     specificationInHtml = productResponse.specificationInHtml,
                     discountPercentage = productResponse.discountPercentage,
@@ -100,7 +127,8 @@ class BackofficeProductService(private val productService: ProductService) {
                     category = productResponse.category,
                     stock = productResponse.stock,
                     sku = productResponse.sku,
-                    status = productResponse.status
+                    status = productResponse.status,
+                    createdAt = productResponse.createdAt
                 )
             }
     }

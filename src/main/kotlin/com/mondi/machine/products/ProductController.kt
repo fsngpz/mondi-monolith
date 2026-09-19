@@ -32,12 +32,15 @@ class ProductController(private val service: ProductService) : ProductSwaggerCon
     }
 
     /**
-     * a GET request to find all products with filters.
+     * a GET request to find all ACTIVE products with filters.
      *
      * @param search the parameter to filter data by name, description, or specificationInHtml.
      * @param category the parameter to filter data by category.
      * @param minPrice the minimum price to filter data (default: 0).
      * @param maxPrice the maximum price to filter data (default: 999999999).
+     * @param isSale the parameter to filter data by sale status.
+     * @param isInStock the parameter to filter data by stock availability.
+     * @param status the status to filter data.
      * @param pageable the [Pageable].
      * @return the [Page] of [ProductResponse].
      */
@@ -46,10 +49,12 @@ class ProductController(private val service: ProductService) : ProductSwaggerCon
         @RequestParam(required = false) search: String?,
         @RequestParam(required = false) category: ProductCategory?,
         @RequestParam(required = false, defaultValue = "0") minPrice: BigDecimal,
-        @RequestParam(required = false, defaultValue = "10") maxPrice: BigDecimal,
+        @RequestParam(required = false, defaultValue = "999999999") maxPrice: BigDecimal,
+        @RequestParam(required = false) isSale: Boolean?,
+        @RequestParam(required = false) isInStock: Boolean?,
         pageable: Pageable
     ): Page<ProductResponse> {
         // -- find all products --
-        return service.findAll(search, category, minPrice, maxPrice, pageable)
+        return service.findAll(search, category, minPrice, maxPrice, ProductStatus.ACTIVE, isSale, isInStock, pageable)
     }
 }

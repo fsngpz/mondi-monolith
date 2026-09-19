@@ -1,6 +1,8 @@
 package com.mondi.machine.products
 
+import com.mondi.machine.utils.Currency
 import java.math.BigDecimal
+import java.time.OffsetDateTime
 
 /**
  * The model class for response Product.
@@ -13,12 +15,14 @@ data class ProductResponse(
     val name: String,
     val description: String?,
     val price: BigDecimal,
-    val currency: String,
+    val discountPrice: BigDecimal,
+    val currency: Currency,
     val specificationInHtml: String?,
     val discountPercentage: BigDecimal,
     val mediaUrls: List<String>,
     val category: ProductCategory,
     val stock: Int,
     val sku: String,
-    val status: ProductStatus
+    val status: ProductStatus,
+    val createdAt: OffsetDateTime?
 )
