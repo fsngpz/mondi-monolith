@@ -6,6 +6,6 @@ RUN ./gradlew bootJar --no-daemon
 
 # STAGE 2: Run the application
 FROM eclipse-temurin:21-jdk-alpine
-EXPOSE 9000
+EXPOSE ${PORT:-9000}
 COPY --from=build /home/gradle/src/build/libs/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "/app.jar"]
