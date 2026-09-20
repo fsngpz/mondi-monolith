@@ -164,11 +164,15 @@ class GoogleOAuthService(
         val eventRequest = UserEventRequest.from(user, profilePictureUrl = profilePictureUrl)
 
         // -- publish event after transaction commits --
-        TransactionSynchronizationManager.registerSynchronization(object : TransactionSynchronization {
-            override fun afterCommit() {
-                userEventPublisher.publish(eventRequest)
-            }
-        })
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(object : TransactionSynchronization {
+                override fun afterCommit() {
+                    userEventPublisher.publish(eventRequest)
+                }
+            })
+        } else {
+            userEventPublisher.publish(eventRequest)
+        }
     }
 
     companion object {

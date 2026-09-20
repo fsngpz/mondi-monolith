@@ -6,6 +6,7 @@ import com.mondi.machine.auths.users.UserApplicationEvent
 import com.mondi.machine.auths.users.UserEventRequest
 import com.mondi.machine.auths.verification.EmailVerificationToken
 import com.mondi.machine.auths.verification.EmailVerificationTokenService
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
@@ -31,6 +32,7 @@ import java.time.OffsetDateTime
  * @since 2026-02-09
  */
 @SpringBootTest
+@Disabled("Disabled to avoid sending real emails during automated test runs. Enable for manual testing.")
 @TestPropertySource(
     properties = [
         "app.url.base=http://localhost:9000",

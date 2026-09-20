@@ -73,12 +73,17 @@ class ResendVerificationService(
         val event = UserApplicationEvent(userEventRequest)
 
         // -- publish event after transaction commits to avoid detached entity issues --
-        TransactionSynchronizationManager.registerSynchronization(object : TransactionSynchronization {
-            override fun afterCommit() {
-                applicationEventPublisher.publishEvent(event)
-                logger.info("Email verification event published for: $email")
-            }
-        })
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(object : TransactionSynchronization {
+                override fun afterCommit() {
+                    applicationEventPublisher.publishEvent(event)
+                    logger.info("Email verification event published for: $email")
+                }
+            })
+        } else {
+            applicationEventPublisher.publishEvent(event)
+            logger.info("Email verification event published for: $email")
+        }
 
         return ResendVerificationResponse(
             message = "Verification email has been sent. Please check your inbox.",
