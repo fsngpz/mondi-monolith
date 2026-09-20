@@ -1,10 +1,13 @@
 package com.mondi.machine.auths.users
 
 import com.mondi.machine.auths.roles.RoleService
+import com.mondi.machine.auths.verification.EmailVerificationTokenService
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionSynchronization
+import org.springframework.transaction.support.TransactionSynchronizationManager
 
 /**
  * The service class of User Registration.
@@ -18,7 +21,8 @@ class UserRegistrationService(
     private val userRoleService: UserRoleService,
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
-    private val userEventPublisher: UserEventPublisher
+    private val userEventPublisher: UserEventPublisher,
+    private val emailVerificationTokenService: EmailVerificationTokenService
 ) : UserService(userRepository) {
 
     /**
@@ -54,13 +58,23 @@ class UserRegistrationService(
     /**
      * a private function to publish event.
      *
+     * This publishes the event after the transaction commits to avoid
+     * Hibernate session conflicts with async listeners.
+     *
      * @param user the [User] instance.
      */
     private fun sendEvent(user: User) {
+        // -- generate verification token for new user --
+        val token = emailVerificationTokenService.generateToken(user)
         // -- setup the instance of UserEventRequest --
-        val eventRequest = UserEventRequest(user)
-        // -- publish the event --
-        userEventPublisher.publish(eventRequest)
+        val eventRequest = UserEventRequest.from(user, verificationToken = token.token)
+
+        // -- publish event after transaction commits --
+        TransactionSynchronizationManager.registerSynchronization(object : TransactionSynchronization {
+            override fun afterCommit() {
+                userEventPublisher.publish(eventRequest)
+            }
+        })
     }
 
     companion object {

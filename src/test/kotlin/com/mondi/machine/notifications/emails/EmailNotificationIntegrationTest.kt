@@ -7,7 +7,13 @@ import com.mondi.machine.auths.users.UserEventRequest
 import com.mondi.machine.auths.verification.EmailVerificationToken
 import com.mondi.machine.auths.verification.EmailVerificationTokenService
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argThat
+import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationEventPublisher
@@ -58,7 +64,7 @@ internal class EmailNotificationIntegrationTest {
         )
         whenever(mockVerificationTokenService.generateToken(any())).thenReturn(mockToken)
 
-        val userEventRequest = UserEventRequest(mockUser)
+        val userEventRequest = UserEventRequest.from(mockUser)
         val event = UserApplicationEvent(userEventRequest)
 
         // -- act --
@@ -87,7 +93,7 @@ internal class EmailNotificationIntegrationTest {
         )
         whenever(mockVerificationTokenService.generateToken(any())).thenReturn(mockToken)
 
-        val userEventRequest = UserEventRequest(mockUser)
+        val userEventRequest = UserEventRequest.from(mockUser)
         val event = UserApplicationEvent(userEventRequest)
 
         // -- act --
@@ -116,7 +122,7 @@ internal class EmailNotificationIntegrationTest {
         )
         whenever(mockVerificationTokenService.generateToken(any())).thenReturn(mockToken)
 
-        val userEventRequest = UserEventRequest(mockUser)
+        val userEventRequest = UserEventRequest.from(mockUser)
         val event = UserApplicationEvent(userEventRequest)
 
         // -- act --
@@ -196,8 +202,22 @@ internal class EmailNotificationIntegrationTest {
         whenever(mockVerificationTokenService.generateToken(user1)).thenReturn(token1)
         whenever(mockVerificationTokenService.generateToken(user2)).thenReturn(token2)
 
-        val event1 = UserApplicationEvent(UserEventRequest(user1))
-        val event2 = UserApplicationEvent(UserEventRequest(user2))
+        val event1 = UserApplicationEvent(
+            UserEventRequest(
+                userId = 1L,
+                email = user1.email,
+                userName = "user1",
+                isEmailVerified = user1.isEmailVerified,
+                verificationToken = token1.token
+            )
+        )
+        val event2 = UserEventRequest(
+            userId = 2L,
+            email = user2.email,
+            userName = "user2",
+            isEmailVerified = user2.isEmailVerified,
+            verificationToken = token2.token
+        )
 
         // -- act --
         applicationEventPublisher.publishEvent(event1)
@@ -233,7 +253,7 @@ internal class EmailNotificationIntegrationTest {
         )
         whenever(mockVerificationTokenService.generateToken(any())).thenReturn(mockToken)
 
-        val userEventRequest = UserEventRequest(mockUser)
+        val userEventRequest = UserEventRequest.from(mockUser)
         val event = UserApplicationEvent(userEventRequest)
 
         // Mock welcome email to fail

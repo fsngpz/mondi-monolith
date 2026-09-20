@@ -62,7 +62,7 @@ internal class EmailVerificationEventListenerTest(
             token = "test-token-123",
             expiresAt = OffsetDateTime.now().plusHours(24)
         )
-        val mockRequest = UserEventRequest(mockUser)
+        val mockRequest = UserEventRequest.from(mockUser)
         val mockEvent = UserApplicationEvent(mockRequest)
 
         whenever(mockVerificationTokenService.generateToken(mockUser)).thenReturn(mockToken)
@@ -97,7 +97,7 @@ internal class EmailVerificationEventListenerTest(
             token = "test-token-456",
             expiresAt = OffsetDateTime.now().plusHours(24)
         )
-        val mockRequest = UserEventRequest(mockUser)
+        val mockRequest = UserEventRequest.from(mockUser)
         val mockEvent = UserApplicationEvent(mockRequest)
 
         whenever(mockVerificationTokenService.generateToken(mockUser)).thenReturn(mockToken)
@@ -124,7 +124,7 @@ internal class EmailVerificationEventListenerTest(
             this.id = 3L
             this.emailVerifiedAt = OffsetDateTime.now()
         }
-        val mockRequest = UserEventRequest(mockUser)
+        val mockRequest = UserEventRequest.from(mockUser)
         val mockEvent = UserApplicationEvent(mockRequest)
 
         // -- act --
@@ -146,7 +146,7 @@ internal class EmailVerificationEventListenerTest(
             token = "unique-token-789",
             expiresAt = OffsetDateTime.now().plusHours(24)
         )
-        val mockRequest = UserEventRequest(mockUser)
+        val mockRequest = UserEventRequest.from(mockUser)
         val mockEvent = UserApplicationEvent(mockRequest)
 
         whenever(mockVerificationTokenService.generateToken(mockUser)).thenReturn(mockToken)
@@ -179,7 +179,7 @@ internal class EmailVerificationEventListenerTest(
             token = "error-token",
             expiresAt = OffsetDateTime.now().plusHours(24)
         )
-        val mockRequest = UserEventRequest(mockUser)
+        val mockRequest = UserEventRequest.from(mockUser)
         val mockEvent = UserApplicationEvent(mockRequest)
 
         whenever(mockVerificationTokenService.generateToken(mockUser)).thenReturn(mockToken)
@@ -209,7 +209,7 @@ internal class EmailVerificationEventListenerTest(
             token = "complete-token",
             expiresAt = OffsetDateTime.now().plusHours(24)
         )
-        val mockRequest = UserEventRequest(mockUser)
+        val mockRequest = UserEventRequest.from(mockUser)
         val mockEvent = UserApplicationEvent(mockRequest)
 
         whenever(mockVerificationTokenService.generateToken(mockUser)).thenReturn(mockToken)

@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionSynchronization
+import org.springframework.transaction.support.TransactionSynchronizationManager
 
 /**
  * The service class for resending email verification.
@@ -47,8 +49,8 @@ class ResendVerificationService(
      */
     @Transactional
     fun resendVerification(userId: Long): ResendVerificationResponse {
-        // -- get the user by id --
-        val user = userService.get(userId)
+        // -- get the user by id with profile eagerly loaded for async event listeners --
+        val user = userService.getWithProfile(userId)
         val email = user.email
 
         logger.info("Attempting to resend verification email to: $email")
@@ -63,19 +65,20 @@ class ResendVerificationService(
         }
 
         // -- generate new verification token --
-        emailVerificationTokenService.generateToken(user)
+        val token = emailVerificationTokenService.generateToken(user)
         logger.info("New verification token generated for: $email")
 
-        // -- initialize lazy-loaded associations before async processing --
-        // This ensures the profile is loaded in the current transaction
-        // before passing the user entity to async event listeners
-        user.profile?.name
-
-        // -- publish event to send email asynchronously --
-        val userEventRequest = UserEventRequest(user)
+        // -- extract event data before transaction completes --
+        val userEventRequest = UserEventRequest.from(user, verificationToken = token.token)
         val event = UserApplicationEvent(userEventRequest)
-        applicationEventPublisher.publishEvent(event)
-        logger.info("Email verification event published for: $email")
+
+        // -- publish event after transaction commits to avoid detached entity issues --
+        TransactionSynchronizationManager.registerSynchronization(object : TransactionSynchronization {
+            override fun afterCommit() {
+                applicationEventPublisher.publishEvent(event)
+                logger.info("Email verification event published for: $email")
+            }
+        })
 
         return ResendVerificationResponse(
             message = "Verification email has been sent. Please check your inbox.",
