@@ -4,7 +4,6 @@ import com.mondi.machine.accounts.profiles.Profile
 import com.mondi.machine.auths.users.User
 import com.mondi.machine.auths.users.UserApplicationEvent
 import com.mondi.machine.auths.users.UserEventRequest
-import com.mondi.machine.auths.verification.EmailVerificationToken
 import com.mondi.machine.auths.verification.EmailVerificationTokenService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -57,21 +56,14 @@ internal class EmailVerificationEventListenerTest(
                 this.name = "John"
             }
         }
-        val mockToken = EmailVerificationToken(
-            user = mockUser,
-            token = "test-token-123",
-            expiresAt = OffsetDateTime.now().plusHours(24)
-        )
-        val mockRequest = UserEventRequest(mockUser)
+        val mockRequest = UserEventRequest.from(mockUser, verificationToken = "test-token-123")
         val mockEvent = UserApplicationEvent(mockRequest)
-
-        whenever(mockVerificationTokenService.generateToken(mockUser)).thenReturn(mockToken)
 
         // -- act --
         listener.onApplicationEvent(mockEvent)
 
         // -- assert --
-        verify(mockVerificationTokenService).generateToken(mockUser)
+        verifyNoInteractions(mockVerificationTokenService)
         verify(mockEmailService).sendTemplateEmail(
             to = eq("john@example.com"),
             subject = eq("Verify Your Email - Mondi Jewellery"),
@@ -92,21 +84,14 @@ internal class EmailVerificationEventListenerTest(
             this.emailVerifiedAt = null
             this.profile = null
         }
-        val mockToken = EmailVerificationToken(
-            user = mockUser,
-            token = "test-token-456",
-            expiresAt = OffsetDateTime.now().plusHours(24)
-        )
-        val mockRequest = UserEventRequest(mockUser)
+        val mockRequest = UserEventRequest.from(mockUser, verificationToken = "test-token-456")
         val mockEvent = UserApplicationEvent(mockRequest)
-
-        whenever(mockVerificationTokenService.generateToken(mockUser)).thenReturn(mockToken)
 
         // -- act --
         listener.onApplicationEvent(mockEvent)
 
         // -- assert --
-        verify(mockVerificationTokenService).generateToken(mockUser)
+        verifyNoInteractions(mockVerificationTokenService)
         verify(mockEmailService).sendTemplateEmail(
             to = eq("jane.smith@example.com"),
             subject = any(),
@@ -124,7 +109,7 @@ internal class EmailVerificationEventListenerTest(
             this.id = 3L
             this.emailVerifiedAt = OffsetDateTime.now()
         }
-        val mockRequest = UserEventRequest(mockUser)
+        val mockRequest = UserEventRequest.from(mockUser)
         val mockEvent = UserApplicationEvent(mockRequest)
 
         // -- act --
@@ -141,21 +126,14 @@ internal class EmailVerificationEventListenerTest(
             this.id = 4L
             this.emailVerifiedAt = null
         }
-        val mockToken = EmailVerificationToken(
-            user = mockUser,
-            token = "unique-token-789",
-            expiresAt = OffsetDateTime.now().plusHours(24)
-        )
-        val mockRequest = UserEventRequest(mockUser)
+        val mockRequest = UserEventRequest.from(mockUser, verificationToken = "unique-token-789")
         val mockEvent = UserApplicationEvent(mockRequest)
-
-        whenever(mockVerificationTokenService.generateToken(mockUser)).thenReturn(mockToken)
 
         // -- act --
         listener.onApplicationEvent(mockEvent)
 
         // -- assert --
-        verify(mockVerificationTokenService).generateToken(mockUser)
+        verifyNoInteractions(mockVerificationTokenService)
         verify(mockEmailService).sendTemplateEmail(
             to = any(),
             subject = any(),
@@ -174,15 +152,9 @@ internal class EmailVerificationEventListenerTest(
             this.id = 5L
             this.emailVerifiedAt = null
         }
-        val mockToken = EmailVerificationToken(
-            user = mockUser,
-            token = "error-token",
-            expiresAt = OffsetDateTime.now().plusHours(24)
-        )
-        val mockRequest = UserEventRequest(mockUser)
+        val mockRequest = UserEventRequest.from(mockUser, verificationToken = "error-token")
         val mockEvent = UserApplicationEvent(mockRequest)
 
-        whenever(mockVerificationTokenService.generateToken(mockUser)).thenReturn(mockToken)
         whenever(mockEmailService.sendTemplateEmail(any(), any(), any(), any()))
             .thenThrow(RuntimeException("Email service failure"))
 
@@ -190,7 +162,7 @@ internal class EmailVerificationEventListenerTest(
         // Should not throw exception - error is logged and swallowed
         listener.onApplicationEvent(mockEvent)
 
-        verify(mockVerificationTokenService).generateToken(mockUser)
+        verifyNoInteractions(mockVerificationTokenService)
         verify(mockEmailService).sendTemplateEmail(any(), any(), any(), any())
     }
 
@@ -204,21 +176,14 @@ internal class EmailVerificationEventListenerTest(
                 this.name = "Complete"
             }
         }
-        val mockToken = EmailVerificationToken(
-            user = mockUser,
-            token = "complete-token",
-            expiresAt = OffsetDateTime.now().plusHours(24)
-        )
-        val mockRequest = UserEventRequest(mockUser)
+        val mockRequest = UserEventRequest.from(mockUser, verificationToken = "complete-token")
         val mockEvent = UserApplicationEvent(mockRequest)
-
-        whenever(mockVerificationTokenService.generateToken(mockUser)).thenReturn(mockToken)
 
         // -- act --
         listener.onApplicationEvent(mockEvent)
 
         // -- assert --
-        verify(mockVerificationTokenService).generateToken(mockUser)
+        verifyNoInteractions(mockVerificationTokenService)
         verify(mockEmailService).sendTemplateEmail(
             to = any(),
             subject = any(),

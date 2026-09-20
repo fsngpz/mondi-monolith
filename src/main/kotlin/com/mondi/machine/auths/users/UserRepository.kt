@@ -1,7 +1,10 @@
 package com.mondi.machine.auths.users
 
 import java.util.Optional
+import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 
 /**
  * The interface for repository/database [User].
@@ -10,6 +13,16 @@ import org.springframework.data.jpa.repository.JpaRepository
  * @since 2024-04-10
  */
 interface UserRepository : JpaRepository<User, Long> {
+
+  /**
+   * a function to find the instance of [User] by id with profile eagerly fetched.
+   *
+   * @param id the user unique identifier.
+   * @return the Optional of [User] with profile loaded.
+   */
+  @EntityGraph(attributePaths = ["profile"])
+  @Query("SELECT u FROM User u WHERE u.id = :id")
+  fun findByIdWithProfile(@Param("id") id: Long): Optional<User>
 
   /**
    * a funtion to find the instance of [User] by email.

@@ -20,6 +20,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionSynchronization
+import org.springframework.transaction.support.TransactionSynchronizationManager
 import java.util.Collections
 
 /**
@@ -151,14 +153,26 @@ class GoogleOAuthService(
     /**
      * a private function to publish event.
      *
+     * This publishes the event after the transaction commits to avoid
+     * Hibernate session conflicts with async listeners.
+     *
      * @param user the [User] instance.
      * @param profilePictureUrl the profile picture URL.
      */
     private fun sendEvent(user: User, profilePictureUrl: String?) {
         // -- setup the instance of UserEventRequest --
-        val eventRequest = UserEventRequest(user, profilePictureUrl)
-        // -- publish the event --
-        userEventPublisher.publish(eventRequest)
+        val eventRequest = UserEventRequest.from(user, profilePictureUrl = profilePictureUrl)
+
+        // -- publish event after transaction commits --
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(object : TransactionSynchronization {
+                override fun afterCommit() {
+                    userEventPublisher.publish(eventRequest)
+                }
+            })
+        } else {
+            userEventPublisher.publish(eventRequest)
+        }
     }
 
     companion object {

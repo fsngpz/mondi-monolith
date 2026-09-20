@@ -2,6 +2,7 @@ package com.mondi.machine.accounts.profiles
 
 import com.mondi.machine.auths.users.UserApplicationEvent
 import com.mondi.machine.auths.users.UserEventRequest
+import com.mondi.machine.auths.users.UserService
 import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationListener
 import org.springframework.stereotype.Component
@@ -14,7 +15,8 @@ import org.springframework.stereotype.Component
  */
 @Component
 class NewProfileEventListener(
-    private val profileService: ProfileService
+    private val profileService: ProfileService,
+    private val userService: UserService
 ) : ApplicationListener<UserApplicationEvent> {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -25,10 +27,10 @@ class NewProfileEventListener(
      */
     override fun onApplicationEvent(event: UserApplicationEvent) {
         logger.info("Receiving the event with value: $event")
-        // convert the source to instance of User --
+        // convert the source to instance of UserEventRequest --
         val eventResponse = event.source as UserEventRequest
-        // -- get the user instance --
-        val user = eventResponse.user
+        // -- get the user instance by ID --
+        val user = userService.get(eventResponse.userId)
         val profilePictureUrl = eventResponse.profilePictureUrl
         // -- create the new profile --
         profileService.create(user, profilePictureUrl)

@@ -1,5 +1,6 @@
 package com.mondi.machine.notifications.emails
 
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertNotNull
 import org.springframework.beans.factory.annotation.Autowired
@@ -12,7 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest
  * @since 2026-01-31
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//@Disabled // TODO: Always disable this test in CI/CD pipelines.
+@Disabled("Disabled to avoid sending real emails during automated test runs. Enable for manual testing.")
 internal class EmailServiceIntegrationTest {
     @Autowired
     private lateinit var emailService: EmailService

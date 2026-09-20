@@ -40,14 +40,10 @@ class WelcomeEmailEventListener(
         logger.info("Receiving user registration event for welcome email: $event")
 
         val payload = event.source as UserEventRequest
-        val user = payload.user
-
-        // -- extract user's name from profile or use email as fallback --
-        val userName = user.profile?.name ?: user.email.substringBefore("@")
 
         // -- prepare email context --
         val context = mapOf(
-            "USER_NAME" to userName,
+            "USER_NAME" to payload.userName,
             "COLLECTIONS_URL" to collectionsUrl,
             "INSTAGRAM_URL" to instagramUrl,
             "FACEBOOK_URL" to tiktokUrl // Note: template uses FACEBOOK_URL for TikTok
@@ -56,14 +52,14 @@ class WelcomeEmailEventListener(
         try {
             // -- send welcome email --
             emailService.sendTemplateEmail(
-                to = user.email,
+                to = payload.email,
                 subject = "Welcome to Mondi Jewellery - Discover Elegant Pieces",
                 templateName = EmailTemplateNames.WELCOME,
                 context = context
             )
-            logger.info("Welcome email sent successfully to: ${user.email}")
+            logger.info("Welcome email sent successfully to: ${payload.email}")
         } catch (e: Exception) {
-            logger.error("Failed to send welcome email to: ${user.email}", e)
+            logger.error("Failed to send welcome email to: ${payload.email}", e)
             // Note: We don't re-throw the exception to avoid blocking other listeners
         }
     }
