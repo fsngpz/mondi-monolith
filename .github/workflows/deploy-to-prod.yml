@@ -34,6 +34,7 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/mondi-machine:latest
 
   deploy:
+    if: false
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
@@ -50,6 +51,31 @@ jobs:
             echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
             echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
             echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> .env
-            
+
             docker compose pull
             docker compose up -d
+
+  deploy-heroku:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to Heroku Container Registry
+        run: echo "${{ secrets.HEROKU_API_KEY }}" | docker login --username=_ --password-stdin registry.heroku.com
+
+      - name: Build Docker image
+        run: docker build -t registry.heroku.com/mondi-engine/web .
+
+      - name: Push to Heroku Container Registry
+        run: docker push registry.heroku.com/mondi-engine/web
+
+      - name: Release on Heroku
+        run: |
+          IMAGE_ID=$(docker inspect registry.heroku.com/mondi-engine/web --format={{.Id}})
+          curl -s -X PATCH https://api.heroku.com/apps/mondi-engine/formation \
+            -H "Content-Type: application/json" \
+            -H "Accept: application/vnd.heroku+json; version=3.docker-releases" \
+            -H "Authorization: Bearer ${{ secrets.HEROKU_API_KEY }}" \
+            -d "{\"updates\":[{\"type\":\"web\",\"docker_image\":\"${IMAGE_ID}\"}]}"
