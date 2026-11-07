@@ -34,7 +34,8 @@ interface BackofficeOrderSwaggerController {
     @Operation(
         summary = "Update order status",
         description = "Allowed: PENDING_PAYMENT → PAYMENT_CONFIRMED/CANCELLED, PAYMENT_CONFIRMED → PROCESSING/CANCELLED, " +
-            "PROCESSING → SHIPPED/CANCELLED, SHIPPED → DELIVERED. Cancelling puts the items back in stock."
+            "PROCESSING → SHIPPED/CANCELLED, SHIPPED → DELIVERED. Cancelling puts the items back in stock. " +
+            "SHIPPED needs a courier and tracking number, set before or sent with this request."
     )
     @ApiResponses(
         value = [
@@ -51,6 +52,13 @@ interface BackofficeOrderSwaggerController {
         ]
     )
     fun updateStatus(orderId: Long, request: BackofficeOrderStatusRequest): OrderResponse
+
+    @Operation(
+        summary = "Set order shipment",
+        description = "Set or correct the courier and tracking number. Allowed from PAYMENT_CONFIRMED until DELIVERED. " +
+            "The tracking number is required unless the courier is IN_HOUSE."
+    )
+    fun updateShipment(orderId: Long, request: BackofficeOrderShipmentRequest): OrderResponse
 
     @Operation(
         summary = "Upload item certificate",

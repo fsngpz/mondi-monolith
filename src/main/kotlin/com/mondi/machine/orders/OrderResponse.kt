@@ -20,6 +20,7 @@ data class OrderResponse(
     val voucherCode: String?,
     val paymentProofUrl: String?,
     val notes: String?,
+    val shipment: OrderShipmentResponse?,
     val items: List<OrderItemResponse>,
     val customer: OrderCustomerResponse?,
     val createdAt: OffsetDateTime?,
@@ -41,6 +42,18 @@ data class OrderShippingAddressResponse(
     val state: String,
     val postalCode: String,
     val country: String
+)
+
+/**
+ * The response model class for the shipment of an [Order]. Null on the order until a courier is set.
+ *
+ * @author Ferdinand Sangap
+ * @since 2026-11-08
+ */
+data class OrderShipmentResponse(
+    val courier: ShippingCourier,
+    val trackingNumber: String?,
+    val shippedAt: OffsetDateTime?
 )
 
 /**

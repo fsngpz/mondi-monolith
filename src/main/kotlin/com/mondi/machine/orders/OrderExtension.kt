@@ -42,6 +42,9 @@ fun Order.toResponse(): OrderResponse {
         voucherCode = this.voucherCode,
         paymentProofUrl = this.paymentProofUrl,
         notes = this.notes,
+        shipment = this.shippingCourier?.let { courier ->
+            OrderShipmentResponse(courier, this.trackingNumber, this.shippedAt)
+        },
         items = this.items.map { it.toResponse() },
         customer = customer,
         createdAt = this.createdAt,

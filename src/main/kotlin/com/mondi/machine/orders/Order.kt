@@ -13,6 +13,7 @@ import jakarta.persistence.OneToMany
 import jakarta.persistence.OrderBy
 import jakarta.persistence.Table
 import java.math.BigDecimal
+import java.time.OffsetDateTime
 import org.hibernate.annotations.JdbcType
 import org.hibernate.dialect.PostgreSQLEnumJdbcType
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
@@ -64,6 +65,13 @@ class Order(
     var voucherCode: String? = null
     var paymentProofUrl: String? = null
     var notes: String? = null
+
+    // -- shipment, set from the backoffice --
+    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType::class)
+    var shippingCourier: ShippingCourier? = null
+    var trackingNumber: String? = null
+    var shippedAt: OffsetDateTime? = null
 
     // -- One to Many --
     @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL], orphanRemoval = true)
