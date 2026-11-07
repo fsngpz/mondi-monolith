@@ -9,6 +9,8 @@ import com.mondi.machine.products.ProductRepository
 import com.mondi.machine.products.ProductStatus
 import com.mondi.machine.storage.supabase.SupabaseService
 import com.mondi.machine.storage.supabase.SupabaseService.Companion.BUCKET_PAYMENT_PROOFS
+import com.mondi.machine.vouchers.AppliedVoucher
+import com.mondi.machine.vouchers.VoucherService
 import java.math.BigDecimal
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
@@ -56,6 +58,9 @@ internal class OrderServiceTest(@Autowired private val service: OrderService) {
 
     @MockitoBean
     lateinit var mockTransactionManager: PlatformTransactionManager
+
+    @MockitoBean
+    lateinit var mockVoucherService: VoucherService
     // -- end of region mock --
 
     @BeforeEach
@@ -197,18 +202,47 @@ internal class OrderServiceTest(@Autowired private val service: OrderService) {
     }
 
     @Test
-    fun `create order with a voucher code is rejected until vouchers exist`() {
+    fun `create order with a voucher applies the discount`() {
         val user = OrderTestFixtures.user(userId)
-        mockCreateDependencies(user, listOf(OrderTestFixtures.product()))
+        mockCreateDependencies(user, listOf(OrderTestFixtures.product(price = BigDecimal("2000000"))))
+        whenever(mockVoucherService.redeem("welcome10", BigDecimal("2000000")))
+            .thenReturn(AppliedVoucher("WELCOME10", BigDecimal("200000")))
 
         // -- execute --
-        assertThrows<IllegalArgumentException> {
-            service.create(userId, createRequest().copy(voucherCode = "WELCOME10"))
+        val result = service.create(userId, createRequest().copy(voucherCode = " welcome10 "))
+
+        // -- verify --
+        assertThat(result.voucherCode).isEqualTo("WELCOME10")
+        assertThat(result.discountAmount).isEqualByComparingTo("200000")
+        assertThat(result.totalPrice).isEqualByComparingTo("1800000")
+    }
+
+    @Test
+    fun `create order with an invalid voucher fails`() {
+        val user = OrderTestFixtures.user(userId)
+        mockCreateDependencies(user, listOf(OrderTestFixtures.product()))
+        whenever(mockVoucherService.redeem(any(), any())).thenThrow(IllegalArgumentException("this voucher has expired"))
+
+        // -- execute --
+        val exception = assertThrows<IllegalArgumentException> {
+            service.create(userId, createRequest().copy(voucherCode = "OLD"))
         }
 
         // -- verify --
+        assertThat(exception.message).isEqualTo("this voucher has expired")
         verify(mockOrderRepository, never()).save(any<Order>())
     }
+
+    @Test
+    fun `create order without a voucher does not touch vouchers`() {
+        val user = OrderTestFixtures.user(userId)
+        mockCreateDependencies(user, listOf(OrderTestFixtures.product()))
+
+        service.create(userId, createRequest().copy(voucherCode = "   "))
+
+        verify(mockVoucherService, never()).redeem(any(), any())
+    }
+
     // -- end of region create --
 
     // -- region of get --

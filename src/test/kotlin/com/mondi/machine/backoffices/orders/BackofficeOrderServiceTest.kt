@@ -1,6 +1,9 @@
 package com.mondi.machine.backoffices.orders
 
 import com.mondi.machine.exceptions.InvalidOrderStatusTransitionException
+import com.mondi.machine.loyalty.LoyaltyService
+import com.mondi.machine.vouchers.VoucherService
+import java.math.BigDecimal
 import com.mondi.machine.orders.Order
 import com.mondi.machine.orders.OrderRepository
 import com.mondi.machine.orders.OrderStatus
@@ -51,6 +54,12 @@ internal class BackofficeOrderServiceTest(@Autowired private val service: Backof
 
     @MockitoBean
     lateinit var mockTransactionManager: PlatformTransactionManager
+
+    @MockitoBean
+    lateinit var mockLoyaltyService: LoyaltyService
+
+    @MockitoBean
+    lateinit var mockVoucherService: VoucherService
     // -- end of region mock --
 
     @BeforeEach
@@ -127,6 +136,27 @@ internal class BackofficeOrderServiceTest(@Autowired private val service: Backof
         // -- verify --
         assertThat(product.stock).isEqualTo(5)
         verify(mockProductRepository).saveAll(listOf(product))
+    }
+
+    @Test
+    fun `delivering an order gives the customer loyalty points`() {
+        val order = OrderTestFixtures.order(status = OrderStatus.SHIPPED).apply { totalPrice = BigDecimal("2600000") }
+        mockFindAndSave(order)
+
+        service.updateStatus(10L, OrderStatus.DELIVERED)
+
+        verify(mockLoyaltyService).earnPoints(order.profile!!, 10L, BigDecimal("2600000"))
+    }
+
+    @Test
+    fun `cancelling an order gives back its voucher use`() {
+        val order = OrderTestFixtures.order(status = OrderStatus.PENDING_PAYMENT).apply { voucherCode = "WELCOME10" }
+        mockFindAndSave(order)
+
+        service.updateStatus(10L, OrderStatus.CANCELLED)
+
+        verify(mockVoucherService).release("WELCOME10")
+        verify(mockLoyaltyService, never()).earnPoints(any(), any(), any())
     }
 
     @Test
