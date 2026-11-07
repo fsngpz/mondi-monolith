@@ -2,7 +2,9 @@ package com.mondi.machine.products
 
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import jakarta.persistence.LockModeType
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Lock
 import org.springframework.data.jpa.repository.Query
 import java.math.BigDecimal
 
@@ -62,4 +64,16 @@ interface ProductRepository : JpaRepository<Product, Long> {
      */
     @Query("SELECT COUNT(p) FROM Product p WHERE p.sku LIKE CONCAT(:skuPrefix, '%')")
     fun countBySkuPrefix(skuPrefix: String): Long
+
+    /**
+     * a function to find products by id and lock their rows until the transaction ends,
+     * so concurrent orders cannot both take the last units of stock.
+     * Rows are locked in id order to avoid deadlocks between orders.
+     *
+     * @param ids the product unique identifiers.
+     * @return the list of [Product] found.
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("FROM Product p WHERE p.id IN :ids ORDER BY p.id")
+    fun findAllByIdInForUpdate(ids: Collection<Long>): List<Product>
 }

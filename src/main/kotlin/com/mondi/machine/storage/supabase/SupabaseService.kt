@@ -32,6 +32,7 @@ class SupabaseService(
         const val BUCKET_USERS = "users"
         const val BUCKET_PRODUCTS = "products"
         const val BUCKET_CERTIFICATES = "certificates"
+        const val BUCKET_PAYMENT_PROOFS = "payment-proofs"
     }
 
     /**
