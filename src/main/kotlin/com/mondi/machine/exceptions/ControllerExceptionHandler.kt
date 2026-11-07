@@ -149,4 +149,72 @@ class ControllerExceptionHandler {
     // -- return as response entity --
     return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(errorResponse)
   }
+
+  /**
+   * Handle illegal argument exception, thrown by `require` checks on invalid input.
+   *
+   * @param e the [IllegalArgumentException].
+   * @return the [ErrorResponse] with [HttpStatus.BAD_REQUEST].
+   */
+  @ExceptionHandler
+  fun handleIllegalArgumentException(e: IllegalArgumentException): ResponseEntity<ErrorResponse> {
+    // -- setup the instance of error response --
+    val errorResponse = ErrorResponse(
+      type = e.javaClass.simpleName,
+      message = e.message ?: "Invalid request"
+    )
+    // -- return as response entity --
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse)
+  }
+
+  /**
+   * Handle no such element exception, thrown when a requested resource does not exist.
+   *
+   * @param e the [NoSuchElementException].
+   * @return the [ErrorResponse] with [HttpStatus.NOT_FOUND].
+   */
+  @ExceptionHandler
+  fun handleNoSuchElementException(e: NoSuchElementException): ResponseEntity<ErrorResponse> {
+    // -- setup the instance of error response --
+    val errorResponse = ErrorResponse(
+      type = e.javaClass.simpleName,
+      message = e.message ?: "Resource not found"
+    )
+    // -- return as response entity --
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse)
+  }
+
+  /**
+   * Handle insufficient stock exception.
+   *
+   * @param e the [InsufficientStockException].
+   * @return the [ErrorResponse] with [HttpStatus.CONFLICT].
+   */
+  @ExceptionHandler
+  fun handleInsufficientStockException(e: InsufficientStockException): ResponseEntity<ErrorResponse> {
+    // -- setup the instance of error response --
+    val errorResponse = ErrorResponse(
+      type = e.javaClass.simpleName,
+      message = e.message ?: "Not enough stock for this product"
+    )
+    // -- return as response entity --
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse)
+  }
+
+  /**
+   * Handle invalid order status transition exception.
+   *
+   * @param e the [InvalidOrderStatusTransitionException].
+   * @return the [ErrorResponse] with [HttpStatus.CONFLICT].
+   */
+  @ExceptionHandler
+  fun handleInvalidOrderStatusTransitionException(e: InvalidOrderStatusTransitionException): ResponseEntity<ErrorResponse> {
+    // -- setup the instance of error response --
+    val errorResponse = ErrorResponse(
+      type = e.javaClass.simpleName,
+      message = e.message ?: "This order status change is not allowed"
+    )
+    // -- return as response entity --
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse)
+  }
 }
