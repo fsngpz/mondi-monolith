@@ -40,38 +40,39 @@ class EmailVerificationEventListener(
         logger.info("Receiving user registration event for email verification: $event")
 
         val payload = event.source as UserEventRequest
-        val user = payload.user
 
         // Skip if email is already verified (e.g., OAuth users)
-        if (user.isEmailVerified) {
-            logger.info("User ${user.email} already verified, skipping verification email")
+        if (payload.isEmailVerified) {
+            logger.info("User ${payload.email} already verified, skipping verification email")
             return
         }
 
-        // -- extract user's name from profile or use email as fallback --
-        val userName = user.profile?.name ?: user.email.substringBefore("@")
+        // Skip if no verification token provided
+        if (payload.verificationToken == null) {
+            logger.warn("No verification token provided for user ${payload.email}, skipping verification email")
+            return
+        }
 
-        // -- generate secure verification token with expiration --
-        val verificationToken = verificationTokenService.generateToken(user)
-        val verificationUrl = "$baseUrl/verify-email?token=${verificationToken.token}"
+        // -- build verification URL --
+        val verificationUrl = "$baseUrl/verify-email?token=${payload.verificationToken}"
 
         // -- prepare email context --
         val context = mapOf(
-            "USER_NAME" to userName,
+            "USER_NAME" to payload.userName,
             "VERIFICATION_URL" to verificationUrl
         )
 
         try {
             // -- send verification email --
             emailService.sendTemplateEmail(
-                to = user.email,
+                to = payload.email,
                 subject = "Verify Your Email - Mondi Jewellery",
                 templateName = EmailTemplateNames.EMAIL_VERIFICATION,
                 context = context
             )
-            logger.info("Email verification sent successfully to: ${user.email}")
+            logger.info("Email verification sent successfully to: ${payload.email}")
         } catch (e: Exception) {
-            logger.error("Failed to send email verification to: ${user.email}", e)
+            logger.error("Failed to send email verification to: ${payload.email}", e)
             // Note: We don't re-throw the exception to avoid blocking other listeners
         }
     }

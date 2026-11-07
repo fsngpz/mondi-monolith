@@ -57,7 +57,7 @@ internal class ResendVerificationServiceTest(
             expiresAt = OffsetDateTime.now().plusHours(24)
         )
 
-        whenever(mockUserService.get(userId)).thenReturn(mockUser)
+        whenever(mockUserService.getWithProfile(userId)).thenReturn(mockUser)
         whenever(mockEmailVerificationTokenService.generateToken(mockUser)).thenReturn(mockToken)
         whenever(mockEmailVerificationTokenService.getTokenExpiryHours()).thenReturn(24)
 
@@ -69,7 +69,7 @@ internal class ResendVerificationServiceTest(
         assertThat(response.message).contains("Verification email has been sent")
         assertThat(response.expiresInHours).isEqualTo(24)
 
-        verify(mockUserService).get(userId)
+        verify(mockUserService).getWithProfile(userId)
         verify(mockRateLimiterService).checkRateLimit(email)
         verify(mockEmailVerificationTokenService).generateToken(mockUser)
         // Note: ApplicationEventPublisher interaction is tested in integration tests
@@ -79,7 +79,7 @@ internal class ResendVerificationServiceTest(
     fun `resendVerification throws NoSuchElementException when user not found`() {
         // -- arrange --
         val userId = 999L
-        whenever(mockUserService.get(userId)).thenThrow(NoSuchElementException("no user was found with id '$userId'"))
+        whenever(mockUserService.getWithProfile(userId)).thenThrow(NoSuchElementException("no user was found with id '$userId'"))
 
         // -- act & assert --
         val exception = assertThrows<NoSuchElementException> {
@@ -87,7 +87,7 @@ internal class ResendVerificationServiceTest(
         }
         assertThat(exception.message).contains("no user was found")
 
-        verify(mockUserService).get(userId)
+        verify(mockUserService).getWithProfile(userId)
         verifyNoInteractions(mockRateLimiterService)
         verifyNoInteractions(mockEmailVerificationTokenService)
     }
@@ -102,7 +102,7 @@ internal class ResendVerificationServiceTest(
             this.emailVerifiedAt = OffsetDateTime.now().minusDays(1)
         }
 
-        whenever(mockUserService.get(userId)).thenReturn(mockUser)
+        whenever(mockUserService.getWithProfile(userId)).thenReturn(mockUser)
 
         // -- act & assert --
         val exception = assertThrows<EmailAlreadyVerifiedException> {
@@ -110,7 +110,7 @@ internal class ResendVerificationServiceTest(
         }
         assertThat(exception.message).contains("already verified")
 
-        verify(mockUserService).get(userId)
+        verify(mockUserService).getWithProfile(userId)
         verify(mockRateLimiterService).checkRateLimit(email)
         verifyNoInteractions(mockEmailVerificationTokenService)
     }
@@ -125,7 +125,7 @@ internal class ResendVerificationServiceTest(
             this.emailVerifiedAt = null
         }
 
-        whenever(mockUserService.get(userId)).thenReturn(mockUser)
+        whenever(mockUserService.getWithProfile(userId)).thenReturn(mockUser)
         doThrow(TooManyRequestsException("Too many requests"))
             .whenever(mockRateLimiterService).checkRateLimit(email)
 
@@ -135,7 +135,7 @@ internal class ResendVerificationServiceTest(
         }
         assertThat(exception.message).contains("Too many requests")
 
-        verify(mockUserService).get(userId)
+        verify(mockUserService).getWithProfile(userId)
         verify(mockRateLimiterService).checkRateLimit(email)
         verifyNoInteractions(mockEmailVerificationTokenService)
     }
@@ -150,7 +150,7 @@ internal class ResendVerificationServiceTest(
             this.emailVerifiedAt = null
         }
 
-        whenever(mockUserService.get(userId)).thenReturn(mockUser)
+        whenever(mockUserService.getWithProfile(userId)).thenReturn(mockUser)
         doThrow(TooManyRequestsException("Rate limit exceeded"))
             .whenever(mockRateLimiterService).checkRateLimit(email)
 
@@ -161,7 +161,7 @@ internal class ResendVerificationServiceTest(
 
         // Verify operations are in correct order: get user -> check rate limit
         val inOrder = inOrder(mockUserService, mockRateLimiterService)
-        inOrder.verify(mockUserService).get(userId)
+        inOrder.verify(mockUserService).getWithProfile(userId)
         inOrder.verify(mockRateLimiterService).checkRateLimit(email)
         inOrder.verifyNoMoreInteractions()
     }
@@ -181,7 +181,7 @@ internal class ResendVerificationServiceTest(
             expiresAt = OffsetDateTime.now().plusHours(24)
         )
 
-        whenever(mockUserService.get(userId)).thenReturn(mockUser)
+        whenever(mockUserService.getWithProfile(userId)).thenReturn(mockUser)
         whenever(mockEmailVerificationTokenService.generateToken(mockUser)).thenReturn(mockToken)
         whenever(mockEmailVerificationTokenService.getTokenExpiryHours()).thenReturn(24)
 

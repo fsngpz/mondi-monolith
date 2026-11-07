@@ -2,7 +2,8 @@ package com.mondi.machine.auths.users
 
 import com.mondi.machine.auths.roles.Role
 import com.mondi.machine.auths.roles.RoleService
-import java.util.Optional
+import com.mondi.machine.auths.verification.EmailVerificationToken
+import com.mondi.machine.auths.verification.EmailVerificationTokenService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -13,9 +14,11 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.test.context.bean.override.mockito.MockitoBean
+import java.time.OffsetDateTime
+import java.util.Optional
 
 /**
  * The test class for [UserRegistrationService].
@@ -25,67 +28,81 @@ import org.springframework.security.crypto.password.PasswordEncoder
  */
 @SpringBootTest(classes = [UserRegistrationService::class])
 internal class UserRegistrationServiceTest(
-  @Autowired private val service: UserRegistrationService
+    @Autowired private val service: UserRegistrationService
 ) {
-  // -- region of mock --
-  @MockBean
-  lateinit var mockRoleService: RoleService
+    // -- region of mock --
+    @MockitoBean
+    lateinit var mockRoleService: RoleService
 
-  @MockBean
-  lateinit var mockUserRoleService: UserRoleService
+    @MockitoBean
+    lateinit var mockUserRoleService: UserRoleService
 
-  @MockBean
-  lateinit var mockUserRepository: UserRepository
+    @MockitoBean
+    lateinit var mockUserRepository: UserRepository
 
-  @MockBean
-  lateinit var mockPasswordEncoder: PasswordEncoder
+    @MockitoBean
+    lateinit var mockPasswordEncoder: PasswordEncoder
 
-  @MockBean
-  lateinit var mockUserEventPublisher: UserEventPublisher
-  // -- end of region mock --
+    @MockitoBean
+    lateinit var mockUserEventPublisher: UserEventPublisher
 
-  // -- region of smoke testing --
-  @Test
-  fun `dependencies are not null`() {
-    assertThat(service).isNotNull
-    assertThat(mockRoleService).isNotNull
-    assertThat(mockUserRoleService).isNotNull
-    assertThat(mockUserRepository).isNotNull
-    assertThat(mockPasswordEncoder).isNotNull
-    assertThat(mockUserEventPublisher).isNotNull
-  }
-  // -- end of region smoke testing --
+    @MockitoBean
+    lateinit var mockEmailVerificationTokenService: EmailVerificationTokenService
+    // -- end of region mock --
 
-  @Test
-  fun `attempting to create but email is already exist`() {
-    val mockUser = User("email", "pass")
-    // -- mock --
-    whenever(mockUserRepository.findByEmail(any<String>())).thenReturn(Optional.of(mockUser))
+    // -- region of smoke testing --
+    @Test
+    fun `dependencies are not null`() {
+        assertThat(service).isNotNull
+        assertThat(mockRoleService).isNotNull
+        assertThat(mockUserRoleService).isNotNull
+        assertThat(mockUserRepository).isNotNull
+        assertThat(mockPasswordEncoder).isNotNull
+        assertThat(mockUserEventPublisher).isNotNull
+        assertThat(mockEmailVerificationTokenService).isNotNull
+    }
+    // -- end of region smoke testing --
 
-    // -- execute --
-    assertThrows<DataIntegrityViolationException> { service.create("email", "pass") }
+    @Test
+    fun `attempting to create but email is already exist`() {
+        val mockUser = User("email", "pass")
+        // -- mock --
+        whenever(mockUserRepository.findByEmail(any<String>())).thenReturn(Optional.of(mockUser))
 
-    // -- verify --
-    verify(mockUserRepository, never()).save(any<User>())
-  }
+        // -- execute --
+        assertThrows<DataIntegrityViolationException> { service.create("email", "pass") }
 
-  @Test
-  fun `attempting to create then success`() {
-    val mockUser = User("email", "pass")
-    val mockRole = Role("ROLE")
-    // -- mock --
-    whenever(mockUserRepository.findByEmail(any<String>())).thenReturn(Optional.empty())
-    whenever(mockUserRepository.save(any<User>())).thenReturn(mockUser)
-    whenever(mockPasswordEncoder.encode(any<String>())).thenReturn("pass")
-    whenever(mockRoleService.getOrCreate(any<String>(), anyOrNull())).thenReturn(mockRole)
+        // -- verify --
+        verify(mockUserRepository, never()).save(any<User>())
+    }
 
-    // -- execute --
-    val result = service.create("email", "pass")
-    assertThat(result).usingRecursiveComparison().isEqualTo(mockUser)
+    @Test
+    fun `attempting to create then success`() {
+        val mockUser = User("email", "pass").apply { this.id = 1L }
+        val mockRole = Role("ROLE")
+        val mockToken = EmailVerificationToken(
+            user = mockUser,
+            token = "verification-token",
+            expiresAt = OffsetDateTime.now().plusHours(24)
+        )
+        // -- mock --
+        whenever(mockUserRepository.findByEmail(any<String>())).thenReturn(Optional.empty())
+        whenever(mockUserRepository.save(any<User>())).thenAnswer { invocation ->
+            val user = invocation.arguments[0] as User
+            user.id = 1L
+            user
+        }
+        whenever(mockPasswordEncoder.encode(any<String>())).thenReturn("pass")
+        whenever(mockRoleService.getOrCreate(any<String>(), anyOrNull())).thenReturn(mockRole)
+        whenever(mockEmailVerificationTokenService.generateToken(any<User>())).thenReturn(mockToken)
 
-    // -- verify --
-    verify(mockUserRepository).save(any<User>())
-    verify(mockUserRoleService).assign(any<User>(), any<Role>())
-    verify(mockUserEventPublisher).publish(any<UserEventRequest>())
-  }
+        // -- execute --
+        val result = service.create("email", "pass")
+        assertThat(result).usingRecursiveComparison().isEqualTo(mockUser)
+
+        // -- verify --
+        verify(mockUserRepository).save(any<User>())
+        verify(mockUserRoleService).assign(any<User>(), any<Role>())
+        verify(mockUserEventPublisher).publish(any<UserEventRequest>())
+    }
 }

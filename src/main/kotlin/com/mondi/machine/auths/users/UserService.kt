@@ -25,6 +25,21 @@ class UserService(private val userRepository: UserRepository) {
     }
 
     /**
+     * a function to get the [User] by id with profile eagerly loaded.
+     *
+     * This method is useful when you need to access the user's profile
+     * in async/detached contexts (e.g., event listeners running in different transactions).
+     *
+     * @param id the unique identifier of user.
+     * @return the [User] instance with profile loaded.
+     */
+    fun getWithProfile(id: Long): User {
+        return userRepository.findByIdWithProfile(id).orElseThrow {
+            NoSuchElementException("no user was found with id '$id'")
+        }
+    }
+
+    /**
      * a function to get the [User] by email.
      *
      * @param email the email address of user.

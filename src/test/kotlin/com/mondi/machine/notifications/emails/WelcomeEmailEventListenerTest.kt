@@ -51,7 +51,7 @@ internal class WelcomeEmailEventListenerTest(
                 this.name = "John"
             }
         }
-        val mockRequest = UserEventRequest(mockUser)
+        val mockRequest = UserEventRequest.from(mockUser)
         val mockEvent = UserApplicationEvent(mockRequest)
 
         // -- act --
@@ -78,7 +78,7 @@ internal class WelcomeEmailEventListenerTest(
             this.id = 2L
             this.profile = null
         }
-        val mockRequest = UserEventRequest(mockUser)
+        val mockRequest = UserEventRequest.from(mockUser)
         val mockEvent = UserApplicationEvent(mockRequest)
 
         // -- act --
@@ -104,7 +104,7 @@ internal class WelcomeEmailEventListenerTest(
                 this.name = null
             }
         }
-        val mockRequest = UserEventRequest(mockUser)
+        val mockRequest = UserEventRequest.from(mockUser)
         val mockEvent = UserApplicationEvent(mockRequest)
 
         // -- act --
@@ -127,7 +127,7 @@ internal class WelcomeEmailEventListenerTest(
         val mockUser = User("error@example.com", "password").apply {
             this.id = 4L
         }
-        val mockRequest = UserEventRequest(mockUser)
+        val mockRequest = UserEventRequest.from(mockUser)
         val mockEvent = UserApplicationEvent(mockRequest)
 
         whenever(mockEmailService.sendTemplateEmail(any(), any(), any(), any()))
@@ -149,7 +149,7 @@ internal class WelcomeEmailEventListenerTest(
                 this.name = "Complete"
             }
         }
-        val mockRequest = UserEventRequest(mockUser)
+        val mockRequest = UserEventRequest.from(mockUser)
         val mockEvent = UserApplicationEvent(mockRequest)
 
         // -- act --
