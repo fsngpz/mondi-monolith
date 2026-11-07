@@ -181,6 +181,24 @@ internal class OrderPersistenceIntegrationTest(
         assertThat(byOrderId.content.map { it.order.id }).containsExactly(delivered.id)
     }
 
+    @Test
+    fun `file ownership queries match only the owner's records`() {
+        val order = saveOrder(OrderStatus.DELIVERED).apply {
+            paymentProofUrl = "payment-proofs/1/order-receipt.png"
+            items.single().certificateUrl = "certificates/1/item.pdf"
+        }
+        orderRepository.save(order)
+        entityManager.flush()
+        val ownerId = requireNotNull(profile.id)
+
+        // -- verify --
+        assertThat(orderRepository.existsByProfileIdAndPaymentProofUrl(ownerId, "payment-proofs/1/order-receipt.png")).isTrue()
+        assertThat(orderRepository.existsByProfileIdAndPaymentProofUrl(999_999L, "payment-proofs/1/order-receipt.png")).isFalse()
+        assertThat(orderItemRepository.existsByOrder_Profile_IdAndCertificateUrl(ownerId, "certificates/1/item.pdf")).isTrue()
+        assertThat(orderItemRepository.existsByOrder_Profile_IdAndCertificateUrl(999_999L, "certificates/1/item.pdf")).isFalse()
+        assertThat(profileRepository.existsByIdAndProfilePictureUrl(ownerId, "users/other.jpg")).isFalse()
+    }
+
     /**
      * a private function to save an order with one item of [product].
      */

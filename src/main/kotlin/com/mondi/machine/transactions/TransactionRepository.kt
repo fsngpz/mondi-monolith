@@ -50,4 +50,13 @@ interface TransactionRepository : JpaRepository<Transaction, Long> {
    * @return the list of [Transaction].
    */
   fun findAllByProfileId(profileId: Long, sort: Sort): List<Transaction>
+
+  /**
+   * a function to check whether a legacy certificate key belongs to the profile.
+   *
+   * @param profileId the user / profile unique identifier.
+   * @param certificateUrl the storage key.
+   * @return true if it does.
+   */
+  fun existsByProfileIdAndCertificateUrl(profileId: Long, certificateUrl: String): Boolean
 }

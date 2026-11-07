@@ -23,6 +23,15 @@ interface OrderRepository : JpaRepository<Order, Long> {
     fun findByIdAndProfileId(id: Long, profileId: Long): Order?
 
     /**
+     * a function to check whether a payment proof key belongs to an order of the profile.
+     *
+     * @param profileId the profile / user unique identifier.
+     * @param paymentProofUrl the storage key.
+     * @return true if it does.
+     */
+    fun existsByProfileIdAndPaymentProofUrl(profileId: Long, paymentProofUrl: String): Boolean
+
+    /**
      * a function to find all [Order] of a profile, optionally filtered by status.
      *
      * @param profileId the profile / user unique identifier.

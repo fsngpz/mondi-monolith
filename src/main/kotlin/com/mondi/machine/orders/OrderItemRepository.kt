@@ -14,6 +14,15 @@ import org.springframework.data.jpa.repository.Query
 interface OrderItemRepository : JpaRepository<OrderItem, Long> {
 
     /**
+     * a function to check whether a certificate key belongs to an order item of the profile.
+     *
+     * @param profileId the profile / user unique identifier.
+     * @param certificateUrl the storage key.
+     * @return true if it does.
+     */
+    fun existsByOrder_Profile_IdAndCertificateUrl(profileId: Long, certificateUrl: String): Boolean
+
+    /**
      * a function to find all order items of a profile that have a certificate,
      * newest order first, leaving out orders with [excludedStatus].
      * The status is a parameter because an enum literal in JPQL is cast to a PostgreSQL type
