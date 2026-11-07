@@ -36,6 +36,7 @@ import org.springframework.test.context.TestPropertySource
 @TestPropertySource(properties = ["spring.flyway.enabled=true"])
 internal class OrderPersistenceIntegrationTest(
     @Autowired private val orderRepository: OrderRepository,
+    @Autowired private val orderItemRepository: OrderItemRepository,
     @Autowired private val productRepository: ProductRepository,
     @Autowired private val userRepository: UserRepository,
     @Autowired private val profileRepository: ProfileRepository,
@@ -61,7 +62,7 @@ internal class OrderPersistenceIntegrationTest(
                 discountPrice = BigDecimal.ZERO,
                 category = ProductCategory.RING,
                 stock = 4,
-                sku = "RING_26_TEST1"
+                sku = "RING_SKU_TESTONLY"
             )
         )
     }
@@ -135,6 +136,29 @@ internal class OrderPersistenceIntegrationTest(
 
         // -- verify --
         assertThat(locked.map { it.id }).containsExactly(product.id)
+    }
+
+    @Test
+    fun `certificate queries return only items with a certificate`() {
+        val delivered = saveOrder(OrderStatus.DELIVERED).also {
+            it.items.single().certificateUrl = "certificates/1/delivered.pdf"
+        }
+        saveOrder(OrderStatus.CANCELLED).also { it.items.single().certificateUrl = "certificates/1/cancelled.pdf" }
+        saveOrder(OrderStatus.PROCESSING)
+        entityManager.flush()
+        val pageable = PageRequest.of(0, 10)
+
+        // -- execute --
+        val mine = orderItemRepository.findAllWithCertificateByProfileId(requireNotNull(profile.id), OrderStatus.CANCELLED)
+        val all = orderItemRepository.findAllWithCertificate(null, pageable)
+        val bySku = orderItemRepository.findAllWithCertificate("testonly", pageable)
+        val byOrderId = orderItemRepository.findAllWithCertificate(delivered.id.toString(), pageable)
+
+        // -- verify: the customer does not see the cancelled order, the backoffice does --
+        assertThat(mine.map { it.certificateUrl }).containsExactly("certificates/1/delivered.pdf")
+        assertThat(all.totalElements).isEqualTo(2)
+        assertThat(bySku.totalElements).isEqualTo(2)
+        assertThat(byOrderId.content.map { it.order.id }).containsExactly(delivered.id)
     }
 
     /**
