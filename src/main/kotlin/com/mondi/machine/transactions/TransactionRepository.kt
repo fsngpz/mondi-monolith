@@ -3,6 +3,7 @@ package com.mondi.machine.transactions
 import java.time.OffsetDateTime
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 
@@ -40,4 +41,13 @@ interface TransactionRepository : JpaRepository<Transaction, Long> {
     purchasedAtTo: OffsetDateTime,
     pageable: Pageable
   ): Page<Transaction>
+
+  /**
+   * a function to find all [Transaction] of a profile.
+   *
+   * @param profileId the user / profile unique identifier.
+   * @param sort the [Sort].
+   * @return the list of [Transaction].
+   */
+  fun findAllByProfileId(profileId: Long, sort: Sort): List<Transaction>
 }
