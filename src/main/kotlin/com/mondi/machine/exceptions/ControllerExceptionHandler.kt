@@ -217,4 +217,21 @@ class ControllerExceptionHandler {
     // -- return as response entity --
     return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse)
   }
+
+  /**
+   * Handle review already exists exception.
+   *
+   * @param e the [ReviewAlreadyExistsException].
+   * @return the [ErrorResponse] with [HttpStatus.CONFLICT].
+   */
+  @ExceptionHandler
+  fun handleReviewAlreadyExistsException(e: ReviewAlreadyExistsException): ResponseEntity<ErrorResponse> {
+    // -- setup the instance of error response --
+    val errorResponse = ErrorResponse(
+      type = e.javaClass.simpleName,
+      message = e.message ?: "You have already reviewed this product"
+    )
+    // -- return as response entity --
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse)
+  }
 }
