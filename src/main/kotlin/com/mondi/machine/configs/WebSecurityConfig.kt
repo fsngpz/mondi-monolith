@@ -5,6 +5,7 @@ import com.mondi.machine.auths.jwt.JwtAuthFilter
 import com.mondi.machine.auths.users.UserService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
@@ -74,10 +75,12 @@ class WebSecurityConfig(
                 // -- Public APIs --
                 it.requestMatchers(
                     "/v1/auth/**",
-                    "/",
-                    "/v1/products**"
-
+                    "/"
                 ).permitAll()
+
+                // -- Public: product catalog, read only. "/v1/products**" would not match
+                // "/v1/products/{id}", because "**" only spans whole path segments --
+                it.requestMatchers(HttpMethod.GET, "/v1/products", "/v1/products/**").permitAll()
 
                 // -- Protected: Backoffice --
                 it.requestMatchers("/v1/backoffice/**").hasRole(ROLE_ADMIN)
