@@ -6,6 +6,8 @@ import com.mondi.machine.auths.users.UserService
 import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationListener
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * The new profile event listener.
@@ -23,8 +25,13 @@ class NewProfileEventListener(
     /**
      * an override function to handle the [ApplicationListener] of [UserApplicationEvent].
      *
+     * Runs in a new transaction: the event is published from `afterCommit()` of the registration
+     * transaction, and writes made there join the already committed transaction and are never
+     * saved (see `TransactionSynchronization.afterCommit`).
+     *
      * @param event the [UserApplicationEvent] instance.
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     override fun onApplicationEvent(event: UserApplicationEvent) {
         logger.info("Receiving the event with value: $event")
         // convert the source to instance of UserEventRequest --
