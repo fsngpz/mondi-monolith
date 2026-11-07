@@ -6,6 +6,7 @@ import com.mondi.machine.orders.OrderRepository
 import com.mondi.machine.orders.OrderStatus
 import com.mondi.machine.orders.OrderTestFixtures
 import com.mondi.machine.orders.OrderTestFixtures.withItem
+import com.mondi.machine.orders.ShippingCourier
 import com.mondi.machine.products.Product
 import com.mondi.machine.products.ProductRepository
 import com.mondi.machine.storage.supabase.SupabaseService
@@ -78,9 +79,12 @@ internal class BackofficeOrderServiceTest(@Autowired private val service: Backof
     fun `update status with an allowed transition`(from: OrderStatus, to: OrderStatus) {
         val order = OrderTestFixtures.order(status = from)
         mockFindAndSave(order)
+        // -- shipping needs a courier --
+        val courier = if (to == OrderStatus.SHIPPED) ShippingCourier.JNE else null
+        val trackingNumber = if (to == OrderStatus.SHIPPED) "CGK1234567890" else null
 
         // -- execute --
-        val result = service.updateStatus(10L, to)
+        val result = service.updateStatus(10L, to, courier, trackingNumber)
 
         // -- verify --
         assertThat(result.status).isEqualTo(to)
@@ -133,6 +137,111 @@ internal class BackofficeOrderServiceTest(@Autowired private val service: Backof
         assertThrows<NoSuchElementException> { service.updateStatus(10L, OrderStatus.CANCELLED) }
     }
     // -- end of region status transitions --
+
+    // -- region of shipment --
+    @Test
+    fun `marking as shipped without a shipment is rejected`() {
+        val order = OrderTestFixtures.order(status = OrderStatus.PROCESSING)
+        mockFindAndSave(order)
+
+        // -- execute --
+        val exception = assertThrows<IllegalArgumentException> { service.updateStatus(10L, OrderStatus.SHIPPED) }
+
+        // -- verify --
+        assertThat(exception.message).contains("courier")
+        assertThat(order.status).isEqualTo(OrderStatus.PROCESSING)
+        verify(mockOrderRepository, never()).save(any<Order>())
+    }
+
+    @Test
+    fun `marking as shipped with the shipment in the request sets it and the shipped date`() {
+        val order = OrderTestFixtures.order(status = OrderStatus.PROCESSING)
+        mockFindAndSave(order)
+
+        // -- execute --
+        val result = service.updateStatus(10L, OrderStatus.SHIPPED, ShippingCourier.JNT, "  JD0123456789 ")
+
+        // -- verify --
+        assertThat(result.shipment?.courier).isEqualTo(ShippingCourier.JNT)
+        assertThat(result.shipment?.trackingNumber).isEqualTo("JD0123456789")
+        assertThat(result.shipment?.shippedAt).isNotNull()
+    }
+
+    @Test
+    fun `marking as shipped uses a shipment set earlier`() {
+        val order = OrderTestFixtures.order(status = OrderStatus.PROCESSING).apply {
+            shippingCourier = ShippingCourier.SICEPAT
+            trackingNumber = "004512345678"
+        }
+        mockFindAndSave(order)
+
+        // -- execute --
+        val result = service.updateStatus(10L, OrderStatus.SHIPPED)
+
+        // -- verify --
+        assertThat(result.status).isEqualTo(OrderStatus.SHIPPED)
+        assertThat(result.shipment?.trackingNumber).isEqualTo("004512345678")
+    }
+
+    @Test
+    fun `in-house delivery does not need a tracking number`() {
+        val order = OrderTestFixtures.order(status = OrderStatus.PROCESSING)
+        mockFindAndSave(order)
+
+        // -- execute --
+        val result = service.updateStatus(10L, OrderStatus.SHIPPED, ShippingCourier.IN_HOUSE, null)
+
+        // -- verify --
+        assertThat(result.shipment?.courier).isEqualTo(ShippingCourier.IN_HOUSE)
+        assertThat(result.shipment?.trackingNumber).isNull()
+    }
+
+    @Test
+    fun `a courier service needs a tracking number`() {
+        val order = OrderTestFixtures.order(status = OrderStatus.PAYMENT_CONFIRMED)
+        mockFindAndSave(order)
+
+        // -- execute & verify --
+        assertThrows<IllegalArgumentException> { service.updateShipment(10L, ShippingCourier.JNE, "  ") }
+        verify(mockOrderRepository, never()).save(any<Order>())
+    }
+
+    @Test
+    fun `a tracking number with spaces or symbols is rejected`() {
+        val order = OrderTestFixtures.order(status = OrderStatus.PAYMENT_CONFIRMED)
+        mockFindAndSave(order)
+
+        // -- execute & verify --
+        assertThrows<IllegalArgumentException> { service.updateShipment(10L, ShippingCourier.JNE, "CGK 123/45") }
+    }
+
+    @ParameterizedTest
+    @CsvSource("PAYMENT_CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED")
+    fun `shipment can be set once payment is confirmed`(status: OrderStatus) {
+        val order = OrderTestFixtures.order(status = status)
+        mockFindAndSave(order)
+
+        // -- execute --
+        val result = service.updateShipment(10L, ShippingCourier.ANTERAJA, "10001234567890")
+
+        // -- verify --
+        assertThat(result.shipment?.courier).isEqualTo(ShippingCourier.ANTERAJA)
+        assertThat(result.status).isEqualTo(status)
+    }
+
+    @ParameterizedTest
+    @CsvSource("PENDING_PAYMENT", "CANCELLED")
+    fun `shipment cannot be set before payment or on a cancelled order`(status: OrderStatus) {
+        val order = OrderTestFixtures.order(status = status)
+        mockFindAndSave(order)
+
+        // -- execute & verify --
+        assertThrows<IllegalArgumentException> {
+            service.updateShipment(10L, ShippingCourier.JNE, "CGK1234567890")
+        }
+        verify(mockOrderRepository, never()).save(any<Order>())
+    }
+    // -- end of region shipment --
 
     // -- region of certificate upload --
     @Test

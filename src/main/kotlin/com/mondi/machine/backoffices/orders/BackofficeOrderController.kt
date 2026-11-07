@@ -71,7 +71,23 @@ class BackofficeOrderController(private val service: BackofficeOrderService) : B
         @RequestBody request: BackofficeOrderStatusRequest
     ): OrderResponse {
         // -- update the status --
-        return service.updateStatus(orderId, request.status)
+        return service.updateStatus(orderId, request.status, request.courier, request.trackingNumber)
+    }
+
+    /**
+     * a PATCH request to set or correct the shipment of an order.
+     *
+     * @param orderId the order unique identifier.
+     * @param request the [BackofficeOrderShipmentRequest] instance.
+     * @return the updated [OrderResponse].
+     */
+    @PatchMapping("/{orderId}/shipment")
+    override fun updateShipment(
+        @PathVariable orderId: Long,
+        @RequestBody request: BackofficeOrderShipmentRequest
+    ): OrderResponse {
+        // -- update the shipment --
+        return service.updateShipment(orderId, request.courier, request.trackingNumber)
     }
 
     /**

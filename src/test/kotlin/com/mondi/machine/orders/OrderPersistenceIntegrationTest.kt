@@ -87,6 +87,26 @@ internal class OrderPersistenceIntegrationTest(
     }
 
     @Test
+    fun `shipment fields round-trip through the database`() {
+        val saved = saveOrder(OrderStatus.SHIPPED).apply {
+            shippingCourier = ShippingCourier.POS_INDONESIA
+            trackingNumber = "P2511080001"
+            shippedAt = java.time.OffsetDateTime.now()
+        }
+        orderRepository.save(saved)
+        entityManager.flush()
+        entityManager.clear()
+
+        // -- execute --
+        val found = orderRepository.findById(requireNotNull(saved.id)).orElseThrow()
+
+        // -- verify --
+        assertThat(found.shippingCourier).isEqualTo(ShippingCourier.POS_INDONESIA)
+        assertThat(found.trackingNumber).isEqualTo("P2511080001")
+        assertThat(found.shippedAt).isNotNull()
+    }
+
+    @Test
     fun `order of another profile is not found`() {
         val saved = saveOrder(OrderStatus.PENDING_PAYMENT)
 
