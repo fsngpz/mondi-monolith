@@ -1,6 +1,7 @@
 package com.mondi.machine.backoffices.orders
 
 import com.mondi.machine.exceptions.InvalidOrderStatusTransitionException
+import com.mondi.machine.loyalty.LoyaltyService
 import com.mondi.machine.orders.Order
 import com.mondi.machine.orders.OrderRepository
 import com.mondi.machine.orders.OrderResponse
@@ -12,6 +13,7 @@ import com.mondi.machine.storage.extensionOrDefault
 import com.mondi.machine.storage.requireDocument
 import com.mondi.machine.storage.supabase.SupabaseService
 import com.mondi.machine.storage.supabase.SupabaseService.Companion.BUCKET_CERTIFICATES
+import com.mondi.machine.vouchers.VoucherService
 import java.time.OffsetDateTime
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
@@ -34,6 +36,8 @@ class BackofficeOrderService(
     private val orderRepository: OrderRepository,
     private val productRepository: ProductRepository,
     private val supabaseService: SupabaseService,
+    private val loyaltyService: LoyaltyService,
+    private val voucherService: VoucherService,
     transactionManager: PlatformTransactionManager
 ) {
 
@@ -105,9 +109,14 @@ class BackofficeOrderService(
             }
             order.shippedAt = OffsetDateTime.now()
         }
-        // -- put the items back in stock when the order is cancelled --
+        // -- put the items back in stock and give back the voucher use when the order is cancelled --
         if (status == OrderStatus.CANCELLED) {
             restock(order)
+            order.voucherCode?.let { voucherService.release(it) }
+        }
+        // -- the customer earns loyalty points once the order is delivered --
+        if (status == OrderStatus.DELIVERED) {
+            order.profile?.let { loyaltyService.earnPoints(it, orderId, order.totalPrice) }
         }
         order.status = status
         val savedOrder = orderRepository.save(order)

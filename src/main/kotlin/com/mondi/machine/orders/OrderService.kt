@@ -10,6 +10,7 @@ import com.mondi.machine.storage.extensionOrDefault
 import com.mondi.machine.storage.requireDocument
 import com.mondi.machine.storage.supabase.SupabaseService
 import com.mondi.machine.storage.supabase.SupabaseService.Companion.BUCKET_PAYMENT_PROOFS
+import com.mondi.machine.vouchers.VoucherService
 import java.math.BigDecimal
 import java.time.OffsetDateTime
 import org.slf4j.LoggerFactory
@@ -37,6 +38,7 @@ class OrderService(
     private val addressService: AddressService,
     private val profileService: ProfileService,
     private val supabaseService: SupabaseService,
+    private val voucherService: VoucherService,
     transactionManager: PlatformTransactionManager
 ) {
 
@@ -125,8 +127,9 @@ class OrderService(
         val subtotal = lines.fold(BigDecimal.ZERO) { sum, (product, quantity) ->
             sum + product.sellingPrice() * quantity.toBigDecimal()
         }
-        val voucherCode = request.voucherCode?.trim()?.ifEmpty { null }
-        val discountAmount = calculateVoucherDiscount(voucherCode, subtotal)
+        // -- use the voucher; this counts one use and is undone if the order fails --
+        val applied = request.voucherCode?.trim()?.ifEmpty { null }?.let { voucherService.redeem(it, subtotal) }
+        val discountAmount = applied?.discountAmount ?: BigDecimal.ZERO
 
         // -- setup the instance of Order --
         val order = Order(
@@ -144,7 +147,7 @@ class OrderService(
             discountAmount = discountAmount,
             totalPrice = (subtotal - discountAmount).max(BigDecimal.ZERO)
         ).apply {
-            this.voucherCode = voucherCode
+            this.voucherCode = applied?.code
             this.notes = notes
         }
         // -- add the items and take them off the stock --
@@ -216,22 +219,6 @@ class OrderService(
         require(order.status == OrderStatus.PENDING_PAYMENT) {
             "payment proof can only be uploaded while the order is waiting for payment"
         }
-    }
-
-    /**
-     * a private function to calculate the discount of a voucher code.
-     * Vouchers are not available yet, so any code is rejected.
-     *
-     * @param voucherCode the voucher code, or null.
-     * @param subtotal the order subtotal.
-     * @return the discount amount.
-     */
-    @Suppress("UNUSED_PARAMETER")
-    private fun calculateVoucherDiscount(voucherCode: String?, subtotal: BigDecimal): BigDecimal {
-        require(voucherCode == null) {
-            "voucher codes are not available yet"
-        }
-        return BigDecimal.ZERO
     }
 
     companion object {
