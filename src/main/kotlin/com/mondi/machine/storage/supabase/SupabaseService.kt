@@ -42,6 +42,10 @@ class SupabaseService(
      * @return the [SupabaseClient] instance.
      */
     internal open fun getClient(): SupabaseClient {
+        // -- the key comes from the environment; fail with a clear message when it is missing --
+        check(supabaseKey.isNotBlank()) {
+            "Supabase is not configured: set the SUPABASE_API_KEY environment variable to a secret key (sb_secret_...)"
+        }
         return createSupabaseClient(
             supabaseUrl = supabaseUrl,
             supabaseKey = supabaseKey
