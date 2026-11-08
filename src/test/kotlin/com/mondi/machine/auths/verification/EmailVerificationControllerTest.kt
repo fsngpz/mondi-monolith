@@ -207,7 +207,7 @@ internal class EmailVerificationControllerTest(@Autowired private val mockMvc: M
     }
 
     @Test
-    fun `resendVerification POST endpoint returns 500 when user not found`() {
+    fun `resendVerification POST endpoint returns 404 when user not found`() {
         // -- arrange --
         val userId = 999L
         whenever(mockResendVerificationService.resendVerification(userId))
@@ -218,7 +218,7 @@ internal class EmailVerificationControllerTest(@Autowired private val mockMvc: M
             post("/v1/auth/resend-verification")
                 .requestAttr("ID", userId)
         )
-            .andExpect(status().isInternalServerError)
+            .andExpect(status().isNotFound)
             .andExpect(jsonPath("$.type").value("NoSuchElementException"))
             .andExpect(jsonPath("$.message").value("no user was found with id '999'"))
 
