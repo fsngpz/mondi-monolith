@@ -7,6 +7,7 @@ import java.math.BigDecimal
 import com.mondi.machine.orders.Order
 import com.mondi.machine.orders.OrderRepository
 import com.mondi.machine.orders.OrderStatus
+import com.mondi.machine.orders.OrderShippedEvent
 import com.mondi.machine.orders.OrderTestFixtures
 import com.mondi.machine.orders.OrderTestFixtures.withItem
 import com.mondi.machine.orders.ShippingCourier
@@ -31,6 +32,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.mock.web.MockMultipartFile
 import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.test.context.event.ApplicationEvents
+import org.springframework.test.context.event.RecordApplicationEvents
 import org.springframework.transaction.PlatformTransactionManager
 import org.springframework.transaction.support.SimpleTransactionStatus
 
@@ -41,7 +44,12 @@ import org.springframework.transaction.support.SimpleTransactionStatus
  * @since 2026-11-07
  */
 @SpringBootTest(classes = [BackofficeOrderService::class])
+@RecordApplicationEvents
 internal class BackofficeOrderServiceTest(@Autowired private val service: BackofficeOrderService) {
+    // -- recorded per test method, so it is a field, not a constructor parameter --
+    @Autowired
+    lateinit var events: ApplicationEvents
+
     // -- region of mock --
     @MockitoBean
     lateinit var mockOrderRepository: OrderRepository
@@ -211,6 +219,31 @@ internal class BackofficeOrderServiceTest(@Autowired private val service: Backof
         // -- verify --
         assertThat(result.status).isEqualTo(OrderStatus.SHIPPED)
         assertThat(result.shipment?.trackingNumber).isEqualTo("004512345678")
+    }
+
+    @Test
+    fun `marking as shipped publishes the shipped email event`() {
+        val order = OrderTestFixtures.order(status = OrderStatus.PROCESSING).withItem(OrderTestFixtures.product(), quantity = 2)
+        mockFindAndSave(order)
+
+        service.updateStatus(10L, OrderStatus.SHIPPED, ShippingCourier.JNE, "CGK1234567890")
+
+        val event = events.stream(OrderShippedEvent::class.java).toList().single()
+        assertThat(event.orderId).isEqualTo(10L)
+        assertThat(event.email).isEqualTo("customer@example.com")
+        assertThat(event.trackingNumber).isEqualTo("CGK1234567890")
+        assertThat(event.items.single().quantity).isEqualTo(2)
+    }
+
+    @Test
+    fun `other status changes and shipment edits send no shipped email`() {
+        val order = OrderTestFixtures.order(status = OrderStatus.PAYMENT_CONFIRMED)
+        mockFindAndSave(order)
+
+        service.updateShipment(10L, ShippingCourier.JNE, "CGK1234567890")
+        service.updateStatus(10L, OrderStatus.PROCESSING)
+
+        assertThat(events.stream(OrderShippedEvent::class.java).count()).isZero()
     }
 
     @Test

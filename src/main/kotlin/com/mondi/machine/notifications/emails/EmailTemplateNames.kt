@@ -11,5 +11,6 @@ class EmailTemplateNames {
         const val WELCOME = "welcome"
         const val PASSWORD_RESET = "password-reset"
         const val EMAIL_VERIFICATION = "email-verification"
+        const val ORDER_SHIPPED = "order-shipped"
     }
 }

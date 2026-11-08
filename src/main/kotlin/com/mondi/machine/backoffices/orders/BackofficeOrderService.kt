@@ -4,6 +4,7 @@ import com.mondi.machine.exceptions.InvalidOrderStatusTransitionException
 import com.mondi.machine.loyalty.LoyaltyService
 import com.mondi.machine.orders.Order
 import com.mondi.machine.orders.OrderRepository
+import com.mondi.machine.orders.OrderShippedEvent
 import com.mondi.machine.orders.OrderResponse
 import com.mondi.machine.orders.OrderStatus
 import com.mondi.machine.orders.ShippingCourier
@@ -16,6 +17,7 @@ import com.mondi.machine.storage.supabase.SupabaseService.Companion.BUCKET_CERTI
 import com.mondi.machine.vouchers.VoucherService
 import java.time.OffsetDateTime
 import org.slf4j.LoggerFactory
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
@@ -38,6 +40,7 @@ class BackofficeOrderService(
     private val supabaseService: SupabaseService,
     private val loyaltyService: LoyaltyService,
     private val voucherService: VoucherService,
+    private val eventPublisher: ApplicationEventPublisher,
     transactionManager: PlatformTransactionManager
 ) {
 
@@ -121,6 +124,10 @@ class BackofficeOrderService(
         order.status = status
         val savedOrder = orderRepository.save(order)
         log.info("Changed order $orderId status from $current to $status")
+        // -- email the customer; the listener runs after this transaction commits --
+        if (status == OrderStatus.SHIPPED) {
+            OrderShippedEvent.from(savedOrder)?.let { eventPublisher.publishEvent(it) }
+        }
         return savedOrder.toResponse()
     }
 
