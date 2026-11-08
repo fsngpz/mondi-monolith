@@ -60,6 +60,15 @@ internal class SupabaseServiceTest {
 
     // -- region of smoke testing --
     @Test
+    fun `missing api key fails with a clear message instead of calling Supabase`() {
+        val unconfigured = SupabaseService("https://example.supabase.co", "  ")
+
+        val exception = org.junit.jupiter.api.assertThrows<IllegalStateException> { unconfigured.getClient() }
+
+        assertThat(exception.message).contains("SUPABASE_API_KEY")
+    }
+
+    @Test
     fun `dependencies are not null`() {
         assertThat(supabaseService).isNotNull
     }

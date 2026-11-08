@@ -12,6 +12,8 @@ val apacheCommonsIoVersion = "2.21.0"
 val googleApiClientVersion = "2.7.2"
 val owaspSanitizerVersion = "20260102.1"
 val velocityEngineVersion = "2.4.1"
+// -- kotlinx-serialization version supabase-kt 3.3 and Ktor 3.3 are built against --
+val kotlinxSerializationVersion = "1.9.0"
 
 plugins {
     id("org.springframework.boot") version "3.5.9"
@@ -31,6 +33,12 @@ java {
 repositories {
     mavenCentral()
 }
+
+// -- Spring Boot's dependency management pins kotlinx-serialization (1.6.3) and coroutines (1.8.1)
+// below what supabase-kt 3.3 and Ktor 3.3 need. With 1.6.3 every Supabase upload failed with
+// AbstractMethodError (GeneratedSerializer.typeParametersSerializers). Override both. --
+extra["kotlin-serialization.version"] = kotlinxSerializationVersion
+extra["kotlin-coroutines.version"] = coroutinesVersion
 
 
 
